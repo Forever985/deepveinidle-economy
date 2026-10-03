@@ -94,6 +94,38 @@
         default: 0, min: 0, max: 1 },
     ],
 
+    /* 快捷操作：主干会在面板里渲染成按钮，并挂到油猴菜单。
+     * 「升到第几级」这件事用一个数字框来表达太别扭 ——
+     * 得先知道目标等级是多少，还得先翻面板。给个直接问的入口。 */
+    quickActions: [
+      {
+        label: '设置目标等级',
+        menuIcon: '🎯',
+        run(ctx) {
+          // 用数据层的技能表，而不是写死技能名 —— 游戏加技能时自动跟上
+          const skills = [...data.BY_SKILL.keys()];
+          const me = ctx.state.me;
+          const lv = (k) => calc.levelForXp((me && me.skills && me.skills[k]) || 0);
+          const lows = me ? skills.map(lv) : [];
+          const range = lows.length ? `${Math.min(...lows)} ~ ${Math.max(...lows)}` : '未知';
+
+          const now = Number(ctx.settings.get('target')) || 0;
+          const input = prompt(
+            '升到指定等级\n' +
+            `（当前各技能等级：${range}）\n\n` +
+            '填 0 = 只看下一级\n' +
+            '填具体等级 = 一直算到那一级为止',
+            now > 0 ? String(now) : '0'
+          );
+          if (input === null) return;                 // 用户取消
+          const v = Math.max(0, Math.min(120, Math.floor(Number(input)) || 0));
+          ctx.settings.set('target', v);
+          this.recompute(ctx, true);
+          ctx.core.ui.toast(v > 0 ? `目标等级已设为 ${v}` : '目标等级已设为「下一级」');
+        },
+      },
+    ],
+
     /* ══════════ 为什么是「按需」而不是「即时」 ══════════
      * 计算（actionsToLevel）比重新注入贵得多：
      * 前者要按等级逐级累加经验，后者只是 Map 查表 + 插一个节点。
@@ -293,6 +325,10 @@
       }
 
       lines.push('不含赶路时间');
+      const tgt = Number(ctx.settings.get('target')) || 0;
+      // 两种情况都写明修改入口 —— 设了目标之后更应该能记起怎么改回来
+      lines.push((tgt > 0 ? `目标：升到第 ${tgt} 级` : '目标：下一级') +
+                 '（菜单「🎯 设置目标等级」可改）');
       lines.push(this.isAuto(ctx)
         ? '自动模式：状态变化后会自动重算'
         : '点一下这条标注即可重算');

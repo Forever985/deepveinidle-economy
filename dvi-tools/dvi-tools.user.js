@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.5
+// @version      2026.10.03.6
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.5 · 2026-10-03 09:45 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.6 · 2026-10-03 09:52 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.5';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.6';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2971,6 +2971,26 @@
           if (input) r2.appendChild(input);
           host.appendChild(r2);
         }
+
+        /* 插件的「快捷操作」。
+         * 有些设置光靠一个输入框很难用（比如「升到第几级」——
+         * 用数字框意味着要先知道目标等级，还得翻面板才找得到）。
+         * 插件可以声明自己的快捷入口，主干负责在面板里渲染按钮、并挂到油猴菜单，
+         * 这样主干不必知道任何插件的具体逻辑。 */
+        for (const qa of (rec.def.quickActions || [])) {
+          const r3 = document.createElement('div');
+          r3.className = 'dvi-row dvi-quick';
+          const b3 = document.createElement('button');
+          b3.type = 'button';
+          b3.className = 'dvi-btn';
+          b3.textContent = qa.label;
+          b3.onclick = () => {
+            try { qa.run(rec.ctx); renderSettings && renderSettings(); }
+            catch (e) { console.error('[DVI] 快捷操作失败', e); }
+          };
+          r3.appendChild(b3);
+          host.appendChild(r3);
+        }
       }
     }
 
@@ -3341,6 +3361,38 @@
         default: 0, min: 0, max: 1 },
     ],
 
+    /* 快捷操作：主干会在面板里渲染成按钮，并挂到油猴菜单。
+     * 「升到第几级」这件事用一个数字框来表达太别扭 ——
+     * 得先知道目标等级是多少，还得先翻面板。给个直接问的入口。 */
+    quickActions: [
+      {
+        label: '设置目标等级',
+        menuIcon: '🎯',
+        run(ctx) {
+          // 用数据层的技能表，而不是写死技能名 —— 游戏加技能时自动跟上
+          const skills = [...data.BY_SKILL.keys()];
+          const me = ctx.state.me;
+          const lv = (k) => calc.levelForXp((me && me.skills && me.skills[k]) || 0);
+          const lows = me ? skills.map(lv) : [];
+          const range = lows.length ? `${Math.min(...lows)} ~ ${Math.max(...lows)}` : '未知';
+
+          const now = Number(ctx.settings.get('target')) || 0;
+          const input = prompt(
+            '升到指定等级\n' +
+            `（当前各技能等级：${range}）\n\n` +
+            '填 0 = 只看下一级\n' +
+            '填具体等级 = 一直算到那一级为止',
+            now > 0 ? String(now) : '0'
+          );
+          if (input === null) return;                 // 用户取消
+          const v = Math.max(0, Math.min(120, Math.floor(Number(input)) || 0));
+          ctx.settings.set('target', v);
+          this.recompute(ctx, true);
+          ctx.core.ui.toast(v > 0 ? `目标等级已设为 ${v}` : '目标等级已设为「下一级」');
+        },
+      },
+    ],
+
     /* ══════════ 为什么是「按需」而不是「即时」 ══════════
      * 计算（actionsToLevel）比重新注入贵得多：
      * 前者要按等级逐级累加经验，后者只是 Map 查表 + 插一个节点。
@@ -3540,6 +3592,10 @@
       }
 
       lines.push('不含赶路时间');
+      const tgt = Number(ctx.settings.get('target')) || 0;
+      // 两种情况都写明修改入口 —— 设了目标之后更应该能记起怎么改回来
+      lines.push((tgt > 0 ? `目标：升到第 ${tgt} 级` : '目标：下一级') +
+                 '（菜单「🎯 设置目标等级」可改）');
       lines.push(this.isAuto(ctx)
         ? '自动模式：状态变化后会自动重算'
         : '点一下这条标注即可重算');
@@ -3570,6 +3626,21 @@
       `物品${ITEM.size}/配方${ACTION.size}/站点${SITE.size}`);
     DIAG.info('启动', `插件 ${registry.list().length} 个 · 内联锚点 ${ui.inline.size} 个 · ` +
       `沙箱 ${(typeof unsafeWindow !== 'undefined' && unsafeWindow) ? '正常' : '无 unsafeWindow'}`);
+
+    /* 插件声明的快捷操作也挂到油猴菜单 ——
+     * 打开面板要点菜单再点按钮，而这里一步就到位。
+     * 插件在 document-start 注册，ui.ready 之前必然已完成，所以此时能拿到全量。 */
+    try {
+      for (const rec of registry.list()) {
+        for (const qa of (rec.def.quickActions || [])) {
+          if (!qa.label || typeof qa.run !== 'function') continue;
+          GM_registerMenuCommand(`${qa.menuIcon || '⚙'} ${qa.label}（${rec.name}）`, () => {
+            try { qa.run(rec.ctx); }
+            catch (e) { console.error('[DVI] 快捷操作失败', e); ui.toast('操作失败：' + e.message); }
+          });
+        }
+      }
+    } catch (e) { /* 菜单注册失败不该影响主干 */ }
 
     bus.emit(EVT.READY, api);
 

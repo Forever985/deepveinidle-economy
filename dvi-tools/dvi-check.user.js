@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI 最小自检（诊断用，装完可删）
 // @namespace    dvi.diag
-// @version      2026.10.03.5
+// @version      2026.10.03.6
 // @description  只有一个菜单项：判断主干是否在运行、插件是否初始化成功、内联是否命中。装完可随时删除。
 // @author       -
 // @match        https://deepveinidle.com/*

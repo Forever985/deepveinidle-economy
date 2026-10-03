@@ -1460,6 +1460,76 @@ section('㉜ 不闪烁：观察器回调里同步注入');
   })());
 }
 
+/* ══════════ 目标等级 ══════════ */
+section('㉝ 目标等级：可以升到指定级，而不只是下一级');
+{
+  const rec = DVI.plugin.get('job-level-estimate');
+  const def = rec.def;
+  const ctx = rec.ctx;
+
+  // 造一个「挖矿 30 级」的状态
+  DVI.state.reduce({ tick: 100, m: [{
+    t: 'welcome', protocol: 3, seed: 1, online: 5, build: 'x',
+    you: { id: 1, name: 'Tgt', skills: { mining: DVI.calc.xpForLevel(30) },
+          equipment: { pickaxe: 81 }, perks: {}, masteries: {}, lastTick: 100 },
+    windows: [],
+  }] });
+
+  const xp = DVI.state.s.me.skills.mining;
+  ok('当前等级算出来是 30', DVI.calc.levelForXp(xp) === 30,
+     `实得 ${DVI.calc.levelForXp(xp)}`);
+
+  const setT = (v) => { ctx.settings.set('target', v); def.cache.clear(); };
+
+  setT(0);
+  ok('目标 0 → 下一级（31）', def.resolveTarget(ctx, 'mining', xp) === 31,
+     `实得 ${def.resolveTarget(ctx, 'mining', xp)}`);
+
+  setT(50);
+  ok('目标 50 → 就是 50', def.resolveTarget(ctx, 'mining', xp) === 50,
+     `实得 ${def.resolveTarget(ctx, 'mining', xp)}`);
+
+  setT(31);
+  ok('目标等于下一级时也正确', def.resolveTarget(ctx, 'mining', xp) === 31);
+
+  // 真正影响渲染结果：目标不同，得出「还需几次」应当不同
+  const jobHost = { dataset: { job: '1' } };
+  const countFor = (v) => {
+    setT(v);
+    const html = def.renderRow(ctx, jobHost) || '';
+    const m = /共 ([\d,]+) 次/.exec(html);
+    return m ? Number(m[1].replace(/,/g, '')) : null;
+  };
+  const nNext = countFor(0);
+  const nFar = countFor(60);
+  ok('渲染结果会随目标等级变化', nNext != null && nFar != null && nFar > nNext,
+     `下一级 ${nNext} 次 vs 目标 60 级 ${nFar} 次`);
+
+  // 提示里要写明当前目标，并指出改它的入口
+  setT(60);
+  const html60 = def.renderRow(ctx, jobHost) || '';
+  ok('提示里写出当前目标', html60.includes('升到第 60 级'), html60.slice(0, 120));
+  ok('提示里指出修改入口', html60.includes('设置目标等级'));
+
+  // 快捷操作已声明，并挂了菜单/面板
+  ok('声明了快捷操作', Array.isArray(def.quickActions) && def.quickActions.length > 0);
+  const qa = (def.quickActions || [])[0];
+  ok('快捷操作有标签与执行体',
+     qa && typeof qa.label === 'string' && typeof qa.run === 'function', JSON.stringify(qa && qa.label));
+  ok('快捷操作挂了菜单图标', !!(qa && qa.menuIcon));
+
+  // 工具函数应在 [0,120] 内夹取（用桩替换 prompt 验证）
+  const origPrompt = sandbox.prompt;
+  sandbox.prompt = () => '999';
+  try { qa.run(ctx); } catch (e) { /* toast 在桩里可能不可用 */ }
+  sandbox.prompt = origPrompt;
+  ok('超范围输入被夹到 120', Number(ctx.settings.get('target')) === 120,
+     `实得 ${ctx.settings.get('target')}`);
+
+  setT(0);
+  def.cache.clear();
+}
+
 /* ══════════ 导出（只做下载） ══════════ */
 (async () => {
   section('⑳ 导出成文件（只保留下载）');
