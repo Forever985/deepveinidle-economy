@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { t } from '../i18n'
-import { diagnoseHandle } from '../lib/handleStore'
-import type { HandleDiag } from '../lib/handleStore'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { GameData } from '../types'
 import type { PriceBook } from '../calc/price'
 import {
-  priceState, supportsFileApi, connectPriceFile, readPriceFile, handleFiles,
-  applyPasted, clearAll, loadCache, autoReconnect, isFileConnected,
-  grantAndRead, disconnect, receipt,
+  priceState, handleFiles,
+  applyPasted, clearAll, loadCache, receipt,
 } from '../stores/market'
 
 const props = defineProps<{ data: GameData; book: PriceBook }>()
@@ -16,13 +13,13 @@ const props = defineProps<{ data: GameData; book: PriceBook }>()
 const msg = ref('')
 const pasteText = ref('')
 const showPaste = ref(false)
-const diag = ref<HandleDiag | null>(null)
-const diagBusy = ref(false)
 const dragOver = ref(false)
 
 onMounted(() => {
+  // 只读本地缓存。**不要**在这里自动恢复文件句柄 ——
+  // 那条路已证明在部分浏览器里句柄存不住，每次打开都会弹「句柄已失效」，
+  // 而它早就不是主通路了（主通路是 dvi-tools 的「送到利润网站」）。
   if (!Object.keys(priceState.market).length) loadCache()
-  void autoReconnect()
   window.addEventListener('dragover', onDragOver)
   window.addEventListener('drop', onDrop)
 })
@@ -45,44 +42,6 @@ function onDrop(e: DragEvent) {
   if (r.ok) setTimeout(() => { msg.value = `已载入 ${Object.keys(priceState.market).length} 个物品` }, 200)
 }
 
-async function doConnect() {
-  const r = await connectPriceFile()
-  msg.value = r.msg
-}
-async function doRead() {
-  const r = await readPriceFile()
-  msg.value = r.msg
-}
-/** 诊断结果的可读文案（放 script 里算，模板保持干净） */
-const PERM_LABEL: Record<string, string> = {
-  granted: '已授权', denied: '被拒绝', prompt: '需点一下确认',
-}
-const permLabel = computed(() => {
-  const p = diag.value?.permission
-  return p ? (PERM_LABEL[p] || p) : '—'
-})
-const readLabel = computed(() => {
-  const d = diag.value
-  if (!d) return '—'
-  if (!d.stored) return '—'
-  if (d.canRead) return `是（${d.count} 个物品）`
-  return '否'
-})
-
-async function runDiag() {
-  diagBusy.value = true
-  diag.value = await diagnoseHandle()
-  diagBusy.value = false
-}
-
-async function doGrant() {
-  const r = await grantAndRead()
-  msg.value = r.msg
-}
-async function doDisconnect() {
-  await disconnect()
-  msg.value = '已断开（下次打开需要重新选一次文件）'
-}
 function doClear() {
   clearAll()
   msg.value = '已清空本机价格数据（游戏快照文件不受影响）'
@@ -211,53 +170,11 @@ const spreads = computed(() => {
       </template>
     </div>
 
-    <!-- 需要一次点击授权：浏览器硬性要求用户手势，无法自动完成 -->
-    <div v-if="priceState.needsGesture" class="note warn bar-fix">
-      <div>
-        浏览器需要你<b>点一下</b>才允许继续读取 <code>{{ priceState.fileName }}</code>。
-        这是浏览器规定的安全机制，无法自动完成 —— 但<b>只需要这一次</b>，
-        之后每次打开都会自动读取。
-      </div>
-      <div style="margin-top:6px;display:flex;gap:6px">
-        <button class="primary" @click="doGrant">点一下继续（只此一次）</button>
-        <button @click="doDisconnect">断开</button>
-      </div>
-    </div>
-
-    <!-- 已记住文件：明确告诉用户「以后不用再弄了」 -->
-    <div v-else-if="priceState.fileRemembered && priceState.fileConnected" class="note ok-note">
-      ✓ 已记住 <code>{{ priceState.fileName }}</code>，
-      <b>以后每次打开自动读取，不用再做任何操作</b>。关掉浏览器、重启电脑都不影响。
-    </div>
-
-    <!-- 三个入口 -->
     <div class="card">
-      <h3>接入方式</h3>
+      <h3>其他接入方式</h3>
       <div class="entries">
         <div class="entry">
-          <div class="t">① 连接本机文件<span class="badge" v-if="supportsFileApi">推荐</span></div>
-          <p>选一次 <code>dvi-prices.json</code>，之后每次打开本站自动重读。</p>
-          <div class="acts">
-            <button class="primary" @click="doConnect">连接价格文件</button>
-            <button v-if="isFileConnected()" @click="doRead">立即重读</button>
-            <button v-if="priceState.fileConnected" @click="doDisconnect">断开</button>
-            <span v-if="priceState.fileConnected" class="muted">
-              已连接：{{ priceState.fileName }}（{{ priceState.fileRemembered ? '已记住，永久有效' : '本次会话' }}）
-            </span>
-          </div>
-          <p v-if="!supportsFileApi" class="muted">
-            这个浏览器不支持 File System Access API，请用下面的拖放或粘贴。
-          </p>
-        </div>
-
-        <div class="entry">
-          <div class="t">② 拖放文件</div>
-          <p>把 dvi-tools 下载的 json <b>直接拖到页面任意位置</b>。</p>
-          <div class="acts"><span class="muted">无需任何授权</span></div>
-        </div>
-
-        <div class="entry">
-          <div class="t">③ 粘贴 JSON</div>
+          <div class="t">② 粘贴 JSON</div>
           <p>把快照内容贴进文本框。</p>
           <div class="acts">
             <button v-if="!showPaste" @click="showPaste = true">打开输入框</button>
@@ -277,31 +194,7 @@ const spreads = computed(() => {
       <div v-if="priceState.error" class="msg err">{{ priceState.error }}</div>
 
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-        <button @click="runDiag" :disabled="diagBusy">{{ diagBusy ? '诊断中…' : '🔍 连接诊断' }}</button>
         <button @click="doClear">清空本机价格数据</button>
-      </div>
-
-      <!-- 诊断：把「为什么没连上」摆到台面上 -->
-      <div v-if="diag" class="diag">
-        <div class="diag-t">连接诊断</div>
-        <div class="kv"><span>浏览器支持文件选择器</span>
-          <span :class="diag.apiSupported ? 'ok' : 'bad'">{{ diag.apiSupported ? '是' : '否' }}</span></div>
-        <div class="kv"><span>已记住文件句柄</span>
-          <span :class="diag.stored ? 'ok' : 'no'">{{ diag.stored ? '是' : '否' }}</span></div>
-        <div class="kv"><span>句柄方法完好</span>
-          <span :class="diag.methodsOk ? 'ok' : (diag.stored ? 'bad' : 'no')">
-            {{ diag.stored ? (diag.methodsOk ? '是' : '否') : '—' }}</span></div>
-        <div class="kv"><span>读取权限</span>
-          <span :class="diag.permission === 'granted' ? 'ok' : (diag.permission ? 'bad' : 'no')">
-            {{ permLabel }}</span></div>
-        <div class="kv"><span>能读到文件</span>
-          <span :class="diag.canRead ? 'ok' : (diag.stored ? 'bad' : 'no')">{{ readLabel }}</span></div>
-        <div class="kv"><span>本机缓存（localStorage）</span>
-          <span :class="stats.n ? 'ok' : 'no'">{{ stats.n }} 个物品{{ priceState.at ? ' · ' + new Date(priceState.at).toLocaleString('zh-CN') : '' }}</span></div>
-        <div v-if="diag.error" class="kv"><span>错误</span><span class="bad">{{ diag.error }}</span></div>
-        <p v-if="!diag.stored" class="hint" style="margin:6px 0 0">
-          说明还没绑定过 —— 点上面的「连接本机文件」选一次 dvi-prices.json 即可。
-        </p>
       </div>
     </div>
 
