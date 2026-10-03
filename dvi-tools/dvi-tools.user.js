@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.13
+// @version      2026.10.03.14
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.13 · 2026-10-03 17:46 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.14 · 2026-10-03 17:51 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.13';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.14';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2213,7 +2213,15 @@
           try { raw = origGet.call(this); } catch (e) { return origGet.call(this); }
           try {
             const sock = this.currentTarget;
-            if (sock instanceof WebSocket && sock.url && sock.url.includes('deepveinidle.com')) {
+            /* ⚠ 千万不要用 `sock instanceof WebSocket` 判断。
+             * 油猴的沙箱有自己的 WebSocket 构造器，页面创建的那个
+             * 对它 instanceof 恒为 false —— 于是**一条消息都抓不到**，
+             * 表现为「无 socket / 尚未收到服务器帧」。
+             * 沙箱模式下 console 还会报 Illegal invocation（接收者不对）。
+             * 改成鸭子类型：只看有没有带 deepveinidle.com 的 url。
+             */
+            const url = sock && sock.url;
+            if (typeof url === 'string' && url.indexOf('deepveinidle.com') >= 0) {
               stats.socket = sock;
               stats.bytes += (typeof raw === 'string' ? raw.length : 0);
               // 浏览器已完成分包重组，这里拿到的总是完整消息
@@ -4267,20 +4275,22 @@
     ui.toast(`已抓取 ${api.price.lastCount} 个物品（1 秒内落盘）`);
   });
 
+  /* 菜单**不能**直接开文件选择器：浏览器不认 GM_registerMenuCommand 的用户手势
+   * （报 "Must be handling a user gesture to show a file picker"），
+   * 从这里调必然失败。所以这个入口只负责把面板打开并露出价格桥分区，
+   * 真正选文件的按钮在面板里 —— 那是页面内的真实点击。 */
   GM_registerMenuCommand('🔗 连接价格文件（给利润网站用）', () => {
     if (!api.price) { ui.toast('价格桥未就绪'); return; }
-    api.price.connect().then((r) => {
-      if (r.ok) {
-        ui.toast(`已连接 ${r.name} —— 之后每次抓价都会自动写入，网站读同一个文件即可`);
-      } else if (r.why === 'unsupported') {
-        ui.toast('这个浏览器不支持自动写入，已改为下载方式（把文件拖到利润网站即可）');
-        api.price.download();
-      } else if (r.why === 'cancelled') {
-        ui.toast('已取消');
-      } else {
-        ui.toast('连接失败：' + r.why + '（可改用「💾 下载价格文件」，再把文件拖到利润网站）');
-      }
-    });
+    ui.toggle(true);
+    renderPriceBridgePanel();
+    const st = api.price.status();
+    if (st.connected) {
+      ui.toast(st.fileRemembered
+        ? `已连接 ${st.fileName}（已记住，永久有效）—— 无需再操作`
+        : `已连接 ${st.fileName}，但尚未记住：点面板里的「恢复授权」以免下次要重选`);
+    } else {
+      ui.toast('请点面板里的「选择价格文件（只需这一次）」');
+    }
   });
 
   GM_registerMenuCommand('🔄 恢复价格文件连接', () => {
@@ -4293,7 +4303,8 @@
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {
     if (!api.price) { ui.toast('价格桥未就绪'); return; }
     const n = api.price.download();
-    ui.toast(`已下载 ${api.price.fileName}（${n} 个物品），拖到利润网站页面即可`);
+    ui.toast(`已下载 ${api.price.fileName}（${n} 个物品）—— 打开利润网站，把它直接拖到页面上`) +
+      '（浏览器不支持自动写入时的备用路径）';
   });
 
   GM_registerMenuCommand('📈 价格桥状态', () => {
