@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { t } from '../i18n'
 import { diagnoseHandle } from '../lib/handleStore'
+import { cloudUp, pullFromCloud } from '../stores/market'
 import type { HandleDiag } from '../lib/handleStore'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { GameData } from '../types'
@@ -21,7 +22,9 @@ const diagBusy = ref(false)
 const dragOver = ref(false)
 
 onMounted(async () => {
-  // 首选本机服务：不需要任何授权，也不碰文件系统
+  // 首选云端（dvi-tools 推的），零操作
+  if (await pullFromCloud()) return
+  // 其次本机服务
   const got = await pullFromLocalServer()
   if (!got) {
     if (!Object.keys(priceState.market).length) loadCache()
@@ -77,6 +80,12 @@ async function runDiag() {
   diagBusy.value = true
   diag.value = await diagnoseHandle()
   diagBusy.value = false
+}
+
+async function retryCloud() {
+  msg.value = '正在读取云端价格…'
+  const ok = await pullFromCloud()
+  msg.value = ok ? `已读到 ${cloudUp.count} 个物品` : '云端还没有数据（游戏侧需先配置令牌并推送一次）'
 }
 
 async function retryLocal() {
@@ -152,7 +161,23 @@ const spreads = computed(() => {
       </p>
     </div>
 
-    <!-- 本机服务：首选通路 -->
+    <!-- 云端：真正的零操作通路 -->
+    <div v-if="cloudUp.checked && cloudUp.up" class="note ok-note">
+      ✓ 已读到<b>云端价格</b>（{{ cloudUp.count }} 个物品 · {{ new Date(cloudUp.at || '').toLocaleString('zh-CN') }}）——
+      dvi-tools 每次打开市场页面、以及每小时都会自动更新，<b>这里每次打开自动读取</b>。
+      <b>不需要选文件、不需要拖拽、不需要部署。</b>
+    </div>
+    <div v-else-if="cloudUp.checked && !cloudUp.up" class="note warn">
+      <b>云端还没有价格数据</b>，当前{{ stats.n ? '用的是上次缓存' : '全部使用兜底价' }}。
+      <div style="margin-top:4px;font-size:12px">
+        只需配置一次：游戏里打开油猴菜单 → <b>「☁️ 设置云端传输令牌（GitHub）」</b>，
+        粘贴一个带 <code>contents:write</code> 权限的 Token。
+        之后<b>什么都不用做</b> —— 游戏推、网站读。
+      </div>
+      <div style="margin-top:6px"><button @click="retryCloud">重试读取</button></div>
+    </div>
+
+    <!-- 本机服务：备用 -->
     <div v-if="localServerUp.checked && localServerUp.up" class="note ok-note">
       ✓ 已连上<b>本机价格服务</b>（{{ localServerUp.count }} 个物品）——
       dvi-tools 每次打开市场页面都会自动推过来，这里每次打开自动读取。

@@ -76,6 +76,53 @@ export const supportsFileApi = typeof window !== 'undefined' && typeof fsa().sho
  */
 export const LOCAL_SERVER = 'http://127.0.0.1:8791'
 
+/**
+ * 云端价格地址 —— **首选通路**。
+ *
+ * dvi-tools 充当 DVI 的「价格 API」（银河奶牛本来就有公开 API，
+ * milkonomy 才那么简单；DVI 没有，我们让用户脚本补上这一层）：
+ * 它把行情写进仓库里的 data/prices.json，网站从这里读。
+ *
+ * ## 为什么这不是「部署」
+ *   网站**不需要重新构建、不需要推送**。游戏推数据、网站拉数据，各走各的。
+ *   raw.githubusercontent.com 带 CORS 头，HTTPS 页面直接 fetch 即可。
+ *
+ * ## 隐私
+ *   只上传**价格**，不含任何玩家身份信息。
+ */
+export const CLOUD_PRICES =
+  'https://raw.githubusercontent.com/Forever985/deepveinidle-economy/main/data/prices.json'
+
+/** 云端是否可用 */
+export const cloudUp = reactive<{ up: boolean; checked: boolean; at: string | null; count: number }>({
+  up: false, checked: false, at: null, count: 0,
+})
+
+/** 从云端拉价格。返回 false 表示拿不到（调用方退回缓存/兜底价）。 */
+export async function pullFromCloud(timeoutMs = 6000): Promise<boolean> {
+  const ac = new AbortController()
+  const timer = setTimeout(() => ac.abort(), timeoutMs)
+  try {
+    // 加时间戳绕开 CDN / 浏览器缓存，保证每次打开都拿到最新的
+    const url = CLOUD_PRICES + '?t=' + Date.now()
+    const r = await fetch(url, { signal: ac.signal, cache: 'no-store' })
+    if (!r.ok) throw new Error('HTTP ' + r.status)
+    const txt = await r.text()
+    if (!applySnapshot(txt, 'drop')) return false
+    cloudUp.up = true
+    cloudUp.checked = true
+    cloudUp.count = Object.keys(priceState.market).length
+    cloudUp.at = priceState.at
+    return true
+  } catch {
+    cloudUp.up = false
+    cloudUp.checked = true
+    return false
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 /** 本机服务是否可用（页面加载时探一次） */
 export const localServerUp = reactive<{ up: boolean; checked: boolean; count: number }>({
   up: false, checked: false, count: 0,

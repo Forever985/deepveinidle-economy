@@ -8,12 +8,15 @@ import { ChainCalc } from './calc/chain.ts'
 import { Rank, SORTS, type Row, type SortKey } from './calc/rank.ts'
 import { settings, calcOptions, resetSettings } from './stores/settings.ts'
 import { loadPrices, priceState } from './stores/prices.ts'
-import { priceState as marketState, loadCache as loadMarketCache, pullFromLocalServer } from './stores/market.ts'
+import { priceState as marketState, loadCache as loadMarketCache, pullFromLocalServer, pullFromCloud } from './stores/market.ts'
 
 function loadMarket(): Record<string, any> {
   loadMarketCache()
-  // 首选本机价格服务（零授权、零文件）；拿不到再用本地缓存
-  void pullFromLocalServer()
+  // 顺序：云端（dvi-tools 推的）→ 本机服务 → 本地缓存
+  void (async () => {
+    if (await pullFromCloud()) return
+    await pullFromLocalServer()
+  })()
   return marketState.market as Record<string, any>
 }
 import { player } from './stores/player.ts'

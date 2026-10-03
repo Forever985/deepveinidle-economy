@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.15
+// @version      2026.10.03.16
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.15 · 2026-10-03 17:58 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.16 · 2026-10-03 18:21 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.15';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.16';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -3190,6 +3190,81 @@
   const WRITE_DEBOUNCE_MS = 4000;
   /** 每小时至少重新记一次时间戳（用于「多久没更新了」的提示） */
   const STALE_MS = 70 * 60 * 1000;
+  /** 本机价格服务（scripts/price-server.js）。有了它，网站无需碰任何文件。 */
+  const SERVER = 'http://127.0.0.1:8791';
+
+  /* ── GitHub 传输（首选：真正的零操作）────────────────────────
+   *
+   * DVI 没有公开价格 API，而银河奶牛有 —— 这就是 milkonomy 简单的根本原因。
+   * 我们让 dvi-tools **充当那个 API 层**：把行情写进一个 GitHub 仓库文件，
+   * 网站从 raw.githubusercontent.com 读。
+   *
+   * 这**不是部署**：网站不用重新构建、不用推送，gitignore 也不管它。
+   * 游戏推数据、网站拉数据，各自独立。
+   *
+   * 为什么不用共享文件：实测本机浏览器把文件句柄从 IndexedDB 取回来后
+   * 会**丢失原型方法**（getFile / queryPermission 都没了），
+   * 于是「一次绑定永久有效」不成立 —— 每个会话都得重连。
+   * GitHub 这条路没有这个问题。
+   */
+  const GH = {
+    owner: 'Forever985',
+    repo: 'deepveinidle-economy',
+    path: 'data/prices.json',
+    branch: 'main',
+  };
+  function ghApi(pathname) {
+    return `https://api.github.com/repos/${GH.owner}/${GH.repo}/${pathname}`;
+  }
+  function ghRaw() {
+    return `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${GH.path}`;
+  }
+
+  /** 令牌存在脚本存储（仅本机），永不上传到别处 */
+  function ghToken() { try { return GM_getValue('dvi-gh-token', '') || ''; } catch (e) { return ''; } }
+  function setGhToken(t) { try { t ? GM_setValue('dvi-gh-token', t) : GM_setValue('dvi-gh-token', ''); } catch (e) {} }
+
+  let ghUp = null;      // null=未知 true=通 false=不通
+
+  async function pushToGitHub(snap) {
+    if (ghUp === false) return 0;
+    const tok = ghToken();
+    if (!tok) {
+      if (ghUp !== false) { ghUp = false; log('未配置 GitHub 令牌，跳过云端推送'); }
+      return 0;
+    }
+    try {
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(snap))));
+      // 1) 查现有文件（拿 sha）
+      let sha = null;
+      const head = await fetch(ghApi(`contents/${GH.path}?ref=${GH.branch}`), {
+        headers: { Authorization: `Bearer ${tok}`, Accept: 'application/vnd.github+json' },
+      });
+      if (head.ok) { try { sha = (await head.json()).sha || null; } catch (e) {} }
+
+      // 2) 提交（PUT 同一个 path 就是更新）
+      const put = await fetch(ghApi(`contents/${GH.path}`), {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${tok}`,
+          Accept: 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `prices: ${new Date().toISOString()}`,
+          content,
+          branch: GH.branch,
+          ...(sha ? { sha } : {}),
+        }),
+      });
+      if (!put.ok) throw new Error('HTTP ' + put.status + ' ' + (await put.text()).slice(0, 120));
+      if (ghUp !== true) { ghUp = true; log('已连上 GitHub 传输（网站可自动读取）'); }
+      return Object.keys(snap.market).length;
+    } catch (e) {
+      if (ghUp !== false) { ghUp = false; log('GitHub 推送失败：' + (e && e.message)); }
+      return 0;
+    }
+  }
 
   let fileHandle = null;      // FileSystemFileHandle
   let timer = null;           // 落盘 debounce
@@ -3317,6 +3392,11 @@
 
     try { GM_setValue(SNAP_KEY, JSON.stringify(snap)); } catch (e) { /* 配额满等 */ }
 
+    // 首选：推到 GitHub（网站自动读，零操作、零文件）
+    void pushToGitHub(snap);
+    // 备用：本机服务若在跑也推一份
+    void pushToServer(snap);
+
     if (!fileHandle) {
       notify(snap, '已存入脚本存储（未连接文件）');
       return;
@@ -3342,6 +3422,42 @@
       });
   }
 
+  /**
+   * 把快照推给本机服务。
+   *
+   * 这是**首选通路**：网站从 127.0.0.1 直接读，
+   * 完全不经过文件、拖拽、GitHub，也就绕开了那一整类沙箱/句柄问题。
+   *
+   * 用 text/plain 而不是 application/json —— 简单请求不触发 CORS 预检，
+   * 少一次往返，兼容性也更好。
+   */
+  let serverUp = null;      // null=未知 / true=通 / false=不通
+
+  async function pushToServer(snap) {
+    if (serverUp === false) return false;
+    try {
+      const r = await fetch(SERVER + '/price', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(snap),
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json().catch(() => ({}));
+      if (serverUp !== true) { serverUp = true; log('本机价格服务已连通'); }
+      return j.count != null ? j.count : Object.keys(snap.market).length;
+    } catch (e) {
+      if (serverUp !== false) {
+        serverUp = false;
+        log('连不上本机价格服务（' + SERVER + '）—— '
+          + '价格仍会存到脚本存储；想启用请运行 D:////dvitools////启动价格服务.bat');
+      }
+      return 0;
+    }
+  }
+
+  /** 供状态面板显示用 */
+  function serverReachable() { return serverUp === true; }
+
   function schedule(reason) {
     clearTimeout(timer);
     timer = setTimeout(() => flush(reason), WRITE_DEBOUNCE_MS);
@@ -3356,6 +3472,14 @@
     get lastWrittenAt() { return lastWrittenAt; },
     get lastCount() { return lastCount; },
     get connected() { return !!fileHandle; },
+    get serverUp() { return serverReachable(); },
+    gh: {
+      target: `${GH.owner}/${GH.repo}/${GH.path}`,
+      get token() { return ghToken(); },
+      setToken: setGhToken,
+      get up() { return ghUp; },
+      repo: GH,
+    },
     fileName: FILE_NAME,
 
     onUpdate(fn) { listeners.push(fn); return () => { listeners = listeners.filter(f => f !== fn); }; },
@@ -4152,11 +4276,14 @@
       row.appendChild(re);
     }
 
+    const gh = api.price.gh;
     const note = document.createElement('div');
     note.className = 'dvi-row';
     const span = document.createElement('span');
     span.style.cssText = 'flex:1;font-size:11.5px;color:#8a95a0';
-    span.textContent = '网站侧：利润网站「价格」页 → 连接本机文件 → 选同一个文件。';
+    span.textContent = gh.token
+      ? `云端传输：已配置 → ${gh.target}（${gh.up ? '已连通' : '待首次推送'}）`
+      : `云端传输：未配置令牌（用油猴菜单「☁️ 设置云端传输令牌」开启，网站即可自动读取）`;
     note.appendChild(span);
     row.appendChild(note);
 
@@ -4319,6 +4446,32 @@
     api.price.reauthorise().then((r) => {
       ui.toast(r.ok ? `已恢复 ${r.name}，之后自动写入` : '恢复失败：' + r.why);
     });
+  });
+
+  /* 云端传输：让 dvi-tools 充当银河奶牛那样的「价格 API」——
+   * 游戏把行情写进仓库文件，网站从 raw.githubusercontent.com 读。
+   * 不需要网站重新部署，是真正的零操作。 */
+  GM_registerMenuCommand('☁️ 设置云端传输令牌（GitHub）', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    const cur = api.price.gh.token ? '（已配置）' : '（未配置）';
+    const v = prompt(
+      `云端传输把价格写到 GitHub 仓库，网站自动读取。\n\n` +
+      `目标：${api.price.gh.target}\n当前：${cur}\n\n` +
+      `粘贴一个 Personal Access Token（需要 contents:write 权限）。\n` +
+      `留空则清除。\n\n` +
+      `令牌只存在本机脚本存储里，不会外传。`, '');
+    if (v === null) { ui.toast('已取消'); return; }
+    api.price.gh.setToken(v.trim());
+    ui.toast(v.trim() ? '令牌已保存，下次抓价时自动推送' : '已清除令牌');
+  });
+
+  GM_registerMenuCommand('☁️ 立即推送到云端', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    if (!api.price.gh.token) { ui.toast('还没设置令牌（用菜单「☁️ 设置云端传输令牌」）'); return; }
+    api.price.flushNow('手动推送');
+    setTimeout(() => {
+      ui.toast(api.price.gh.up ? '已推送，网站现在能读到了' : '推送失败，详情见控制台 [DVI:价格桥]');
+    }, 2500);
   });
 
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {

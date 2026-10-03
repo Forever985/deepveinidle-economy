@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.15
+// @version      2026.10.03.16
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.15';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.16';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -1985,11 +1985,14 @@
       row.appendChild(re);
     }
 
+    const gh = api.price.gh;
     const note = document.createElement('div');
     note.className = 'dvi-row';
     const span = document.createElement('span');
     span.style.cssText = 'flex:1;font-size:11.5px;color:#8a95a0';
-    span.textContent = '网站侧：利润网站「价格」页 → 连接本机文件 → 选同一个文件。';
+    span.textContent = gh.token
+      ? `云端传输：已配置 → ${gh.target}（${gh.up ? '已连通' : '待首次推送'}）`
+      : `云端传输：未配置令牌（用油猴菜单「☁️ 设置云端传输令牌」开启，网站即可自动读取）`;
     note.appendChild(span);
     row.appendChild(note);
 
@@ -2152,6 +2155,32 @@
     api.price.reauthorise().then((r) => {
       ui.toast(r.ok ? `已恢复 ${r.name}，之后自动写入` : '恢复失败：' + r.why);
     });
+  });
+
+  /* 云端传输：让 dvi-tools 充当银河奶牛那样的「价格 API」——
+   * 游戏把行情写进仓库文件，网站从 raw.githubusercontent.com 读。
+   * 不需要网站重新部署，是真正的零操作。 */
+  GM_registerMenuCommand('☁️ 设置云端传输令牌（GitHub）', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    const cur = api.price.gh.token ? '（已配置）' : '（未配置）';
+    const v = prompt(
+      `云端传输把价格写到 GitHub 仓库，网站自动读取。\n\n` +
+      `目标：${api.price.gh.target}\n当前：${cur}\n\n` +
+      `粘贴一个 Personal Access Token（需要 contents:write 权限）。\n` +
+      `留空则清除。\n\n` +
+      `令牌只存在本机脚本存储里，不会外传。`, '');
+    if (v === null) { ui.toast('已取消'); return; }
+    api.price.gh.setToken(v.trim());
+    ui.toast(v.trim() ? '令牌已保存，下次抓价时自动推送' : '已清除令牌');
+  });
+
+  GM_registerMenuCommand('☁️ 立即推送到云端', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    if (!api.price.gh.token) { ui.toast('还没设置令牌（用菜单「☁️ 设置云端传输令牌」）'); return; }
+    api.price.flushNow('手动推送');
+    setTimeout(() => {
+      ui.toast(api.price.gh.up ? '已推送，网站现在能读到了' : '推送失败，详情见控制台 [DVI:价格桥]');
+    }, 2500);
   });
 
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {
