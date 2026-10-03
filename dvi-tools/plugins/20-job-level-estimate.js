@@ -122,11 +122,13 @@
         render: (host) => this.renderRow(ctx, host),
       });
 
-      // 一个就地可点的刷新入口，省得为一次重算去翻油猴菜单
+      // 就地刷新入口。放在列表**下方**而不是上方：
+      // 上方是游戏自己的标题区，插进去会打乱排版，也容易被误认成游戏的功能。
+      // 放在列表之后，不抢视线，也不占位置。
       ctx.ui.inline({
         id: 'job-level-refresh',
         selector: ['[data-routes]'],
-        where: 'beforebegin',
+        where: 'afterend',
         render: () => this.renderRefreshButton(ctx),
       });
 
@@ -179,23 +181,32 @@
       return true;
     },
 
-    /** 就地刷新按钮：长得像游戏自己的小链接，不抢眼 */
+    /**
+     * 就地刷新入口。
+     * 做得尽量小、尽量不显眼：它是个「需要时才用」的东西，
+     * 常驻一个显眼按钮只会干扰视线。
+     * 文案自带「数据多旧」，所以一眼就知道它有什么用。
+     */
     renderRefreshButton(ctx) {
       const me = ctx.state.me;
       if (!me) return null;                       // 还没登录就不显示
-      let age = '';
+
+      let age = '刚刚';
+      let stale = false;
       if (this.lastCalc) {
         const s = Math.round((Date.now() - this.lastCalc) / 1000);
-        age = s < 60 ? `${s} 秒前` : `${Math.round(s / 60)} 分钟前`;
+        if (s >= 60) { age = `${Math.round(s / 60)} 分钟前`; stale = s >= 120; }
+        else age = `${s} 秒前`;
       }
-      return `<button class="dvi-inline-note dvi-refresh" type="button"
-        data-tone="link"
-        ${ctx.ui.tip('升级预估', [
-          '点一下就用当前状态重算',
-          this.isAuto(ctx) ? '当前：自动模式（状态变化后最多 30 秒重算一次）'
-                           : '当前：按需模式（只在点击或刷新页面时重算）',
-          age ? `上次重算：${age}` : '尚未重算',
-        ])}>重算预估${age ? ` · ${age}` : ''}</button>`;
+
+      return `<button class="dvi-refresh" type="button"
+        data-stale="${stale ? '1' : '0'}"
+        ${ctx.ui.tip('重算升级预估', [
+          '用当前等级、装备、增益重新算一遍',
+          `数据时间：${age}${stale ? '（已过期）' : ''}`,
+          this.isAuto(ctx) ? '当前是自动模式，状态变化后最多 30 秒自动重算一次'
+                           : '当前是按需模式，只会在这里点击或刷新页面时重算',
+        ])}>↻ 重算<span class="dvi-refresh-age">${age}</span></button>`;
     },
 
     enable(ctx) {
@@ -277,29 +288,35 @@
         ? `需 ${est.actions.toLocaleString()} 次 · ${calc.humanDuration(est.seconds)}`
         : `需 ${est.actions.toLocaleString()} 次`;
 
-      // tooltip：分段明细 + 「当前配置」如实展示
+      // tooltip 必须有节制：游戏的原生提示框没有滚动条，
+      // 行数一多就撑破屏幕（曾经堆到 22 行，直接「爆」了）。
+      // 所以这里硬性裁剪，只保留最该看的，分段明细最多 4 行且超出就汇总。
       const lines = [
         `${data.skillName(skill)} ${est.fromLevel} → ${est.toLevel} 级`,
-        `经验 ${est.xpNeeded.toLocaleString()}（每次 ${est.xpPerAction}）`,
-        `共 ${est.actions.toLocaleString()} 次`,
+        `共 ${est.actions.toLocaleString()} 次 · 每次 ${est.xpPerAction} 经验`,
         `纯作业耗时 ${calc.humanDuration(est.seconds)}`,
       ];
 
-      // 把这次计算实际用到的实时参数列出来，让人看得见不是写死的
-      const cfg = ctx.state.configSummary(action);
+      // 当前配置：只列「非默认」的项，最多 4 条 —— 全是默认值时不占篇幅
+      const cfg = ctx.state.configSummary(action)
+        .filter(c => c.label === '工具' ? !c.value.includes('未装备') : true)
+        .slice(0, 4);
       if (cfg.length) {
         lines.push('— 当前配置 —');
-        for (const c of cfg) lines.push(`${c.label}: ${c.value}`);
+        for (const c of cfg) lines.push(`${c.label}：${c.value}`);
       }
 
-      if (est.perLevel.length > 1) {
+      // 分段明细：只在跨越不多时给，最多 4 段，超出就只说平均
+      if (est.perLevel.length > 1 && est.perLevel.length <= 4) {
         lines.push('— 分段 —');
-        for (const seg of est.perLevel.slice(0, 10)) {
-          lines.push(`${seg.level}→${seg.level + 1}: ${seg.actions} 次`);
+        for (const seg of est.perLevel) {
+          lines.push(`${seg.level}→${seg.level + 1}：${seg.actions} 次`);
         }
-        if (est.perLevel.length > 10) lines.push(`…共 ${est.perLevel.length} 段`);
+      } else if (est.perLevel.length > 4) {
+        lines.push(`跨 ${est.perLevel.length} 级，平均每级 ${Math.round(est.actions / est.perLevel.length)} 次`);
       }
-      lines.push('不含赶路时间；强化装备的额外加成暂未计入');
+
+      lines.push('不含赶路时间');
 
       return `<span class="dvi-inline-note" data-tone="${est.actions > 1000 ? 'warn' : ''}"
         ${ctx.ui.tip('升级预估 · ' + action.name, lines)}>${label}</span>`;

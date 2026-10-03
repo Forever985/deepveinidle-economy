@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.1
+// @version      2026.10.03.2
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.1';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.2';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -970,11 +970,17 @@
       .dvi-inline-note[data-tone="warn"]{color:#d8a657}
       .dvi-inline-note[data-tone="done"]{color:#6fbf8b}
       .dvi-inline-row{display:block;margin-top:2px;color:#8b96a3;font-size:11px}
-      /* 就地刷新按钮：做得像游戏自己的小链接，不抢眼、不占位 */
-      .dvi-refresh{background:transparent;border:0;padding:0 4px;margin:0 0 4px 2px;
-        color:#7f8b98;font:inherit;font-size:11px;cursor:pointer;text-decoration:underline;
-        text-underline-offset:2px;opacity:.8}
-      .dvi-refresh:hover{color:#c8d2dc;opacity:1}
+      /* 就地重算入口：放在列表下方，做得尽量小。
+       * 它是「需要时才用」的东西，常驻显眼按钮只会干扰视线。 */
+      .dvi-refresh{display:flex;align-items:center;gap:6px;width:fit-content;
+        margin:6px 0 0 2px;padding:2px 8px;border:0;border-radius:4px;
+        background:rgba(255,255,255,.05);color:#7f8b98;
+        font:inherit;font-size:11px;cursor:pointer;opacity:.75;
+        transition:opacity .15s,color .15s,background .15s}
+      .dvi-refresh:hover{opacity:1;color:#c8d2dc;background:rgba(255,255,255,.10)}
+      .dvi-refresh[data-stale="1"]{color:#d8a657;opacity:.95}
+      .dvi-refresh-age{color:#5f6b78;font-size:10.5px}
+      .dvi-refresh[data-stale="1"] .dvi-refresh-age{color:#a5843f}
     `;
 
     let cssInjected = false;
@@ -1291,7 +1297,12 @@
     /* 游戏原生 tooltip 约定：data-tip-name + data-tip-lines（用 | 分隔）
      * 照这个格式生成，注入内容的提示就能和游戏自带的一模一样。 */
     function tip(name, lines) {
+      /* 注意：游戏用 `|` 当行分隔符，且**没有办法转义它** ——
+       * 内容里一旦出现 `|`，那一行就会被拆成两行，提示框随即错乱。
+       * 所以这里直接把 `|` 换成视觉相近的 `｜`（全角），宁可字形略有差异，
+       * 也不要让整个提示框崩掉。 */
       const esc = (s) => String(s)
+        .replace(/\|/g, '｜')
         .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
         .replace(/</g, '&lt;').replace(/>/g, '&gt;');
       const body = (Array.isArray(lines) ? lines : [lines])

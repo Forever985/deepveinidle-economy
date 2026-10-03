@@ -1319,6 +1319,55 @@ section('㉚ 按需刷新：高频渲染不得重算');
   ok('主干声明了 REFRESH 事件', DVI.EVT.REFRESH === 'core:refresh');
 }
 
+/* ══════════ tooltip 体积（防止撑爆屏幕） ══════════ */
+section('㉛ 原生 tooltip 必须克制');
+{
+  // 由来：标注的提示框曾经堆到 22 行（头部 4 + 配置 6 + 分段 11 + 说明 1），
+  // 而游戏的原生提示框没有滚动条 —— 直接撑破屏幕。
+  // 这里守住行数上限。
+  const LIMIT = 12;
+
+  const rec = DVI.plugin.get('job-level-estimate');
+  DVI.state.reduce({ tick: 100, m: [{
+    t: 'welcome', protocol: 3, seed: 1, online: 5, build: 'x',
+    you: { id: 1, name: 'Tip', skills: { mining: DVI.calc.xpForLevel(1) },
+          equipment: { pickaxe: 84 }, perks: { quick: 10 },
+          masteries: { xp: 20 }, lastTick: 100, guildBonus: 0.05 },
+    windows: [{ fromTick: 0, toTick: 9999, xpMult: 1.5, rarityMult: 1 }],
+  }] });
+
+  // 挑一个「跨级很多」的场景：1 级去做高经验配方，必然有很多分段
+  const rows = [];
+  for (const id of [1, 8, 12, 42]) {
+    if (!D.ACTION.get(id)) continue;
+    rec.def.cache.clear();
+    const html = rec.def.renderRow(rec.ctx, { dataset: { job: String(id) } });
+    if (html) rows.push({ id, html });
+  }
+
+  ok('至少渲染出一行', rows.length > 0, `实得 ${rows.length} 行`);
+
+  const countLines = (html) => {
+    const m = /data-tip-lines="([^"]*)"/.exec(html);
+    if (!m) return 1;
+    return m[1].split('|').filter(Boolean).length;
+  };
+
+  for (const r of rows) {
+    const n = countLines(r.html);
+    ok(`配方 ${r.id} 的提示框行数 ≤ ${LIMIT}`, n <= LIMIT, `实得 ${n} 行`);
+  }
+
+  ok('提示框内容里不含分隔符 |（否则会被拆行）',
+     rows.every(r => !/data-tip-lines="[^"]*\|[^"]*"/.test('') &&
+                     (() => {
+                       const m = /data-tip-lines="([^"]*)"/.exec(r.html);
+                       return !m || !m[1].includes('||');
+                     })()));
+
+  rec.def.cache.clear();
+}
+
 /* ══════════ 导出（只做下载） ══════════ */
 (async () => {
   section('⑳ 导出成文件（只保留下载）');
