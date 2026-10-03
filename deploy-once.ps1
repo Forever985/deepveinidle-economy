@@ -1,4 +1,4 @@
-﻿﻿# ============================================================
+﻿﻿﻿# ============================================================
 #  DVI 利润网 · 一键部署（由「超级一键部署.bat」双击调用，也可直接跑）
 #
 #  为什么需要专门的网络处理：
@@ -225,7 +225,23 @@ try {
         $ErrorActionPreference = $prevEap
 
         if ($pushExit -eq 0) { Ok "$branch 推送完成"; break }
-        if (($pushOut -join "`n") -match 'Everything up-to-date') { Ok "$branch 已是最新"; break }
+        $pushText = ($pushOut -join "`n")
+        if ($pushText -match 'Everything up-to-date') { Ok "$branch 已是最新"; break }
+
+        # 权限 / 认证类错误**重试没有意义**，立刻停下并说清原因。
+        # 之前不明就重试 3 次，3 次都是同样的错，白等 6 秒还看不懂问题在哪。
+        if ($pushText -match 'without .* scope|remote rejected|Permission denied|403|401|could not read Username|Authentication failed') {
+            Write-Host "  [!] 推送被拒绝（权限/认证问题，重试无用）：" -ForegroundColor Yellow
+            $pushOut | ForEach-Object { Write-Host "      $_" -ForegroundColor DarkGray }
+            throw @"
+推送被 GitHub 拒绝 —— 原因如上。
+最常见的是 Personal Access Token 缺某个 scope：
+  · 要推 .github/workflows/ 里的文件 → token 需要 workflow scope
+  · 仓库是私有的 → token 需要 repo scope
+本机凭据管理：控制面板 → 凭据管理器 → git:https://github.com → 删掉旧条目，
+下次推送时会重新弹出登录窗口，重新授权即可（勾上需要的 scope）。
+"@
+        }
 
         Warn "$branch 推送失败："
         $pushOut | ForEach-Object { Write-Host "      $_" -ForegroundColor DarkGray }

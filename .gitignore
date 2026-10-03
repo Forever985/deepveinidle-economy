@@ -35,3 +35,11 @@ __pycache__/
 # 改为：构建时现生成（deploy-once.ps1 会自动跑 prepare-data.py）。
 web/public/data/dvi-gamedata.json
 dvi_probe/gamedata/dvi-gamedata.json
+
+# GitHub Actions 工作流 —— 当前 PAT 缺 workflow 权限，推不上去。
+#
+# 说清楚：这个 CI 是我当初自己加的，**你从没要求过**。
+# 部署脚本本身在推送前就会跑测试和构建，所以 CI 对你是冗余的。
+# 留文件在本地（万一以后换了带 workflow 权限的 token 就能用），
+# 但不入库 —— 免得每次部署都被它卡住。
+.github/workflows/
