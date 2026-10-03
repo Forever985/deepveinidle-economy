@@ -10,7 +10,7 @@ import { loadPrices, priceState } from './stores/prices.ts'
 import { player } from './stores/player.ts'
 import { isPristine } from './calc/player.ts'
 import type { GameData } from './types.ts'
-import { VIEWS, useView } from './router.ts'
+import { NAV_VIEWS, useView } from './router.ts'
 import DashboardView from './views/DashboardView.vue'
 import EnhanceView from './views/EnhanceView.vue'
 import CombatView from './views/CombatView.vue'
@@ -113,7 +113,7 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
     </header>
 
     <nav class="nav">
-      <button v-for="v in VIEWS" :key="v.key" :class="{ on: current === v.key }"
+      <button v-for="v in NAV_VIEWS" :key="v.key" :class="{ on: current === v.key }"
               :title="v.desc" @click="go(v.key)">
         <span class="ic">{{ v.icon }}</span>{{ v.label }}
       </button>
