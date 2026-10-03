@@ -263,6 +263,37 @@ if (!DVI) { console.log(results.join('\n')); process.exit(1); }
 ok('版本号存在', typeof DVI.VERSION === 'string');
 ok('API 版本存在', DVI.API_VERSION === 1);
 
+/* ══════════ 价格桥 ══════════ */
+/* 这一节是被一次真实故障逼出来的：
+ * 面板函数里写了 DVI.price，但**主干作用域里没有 DVI 这个标识符**
+ * （本体用的是 api），于是函数第一行就 ReferenceError，
+ * 面板分区永远不出现 —— 而当时 360 项测试全绿，
+ * 因为没有一条断言碰过它。
+ *
+ * 教训：凡是接进主干的能力，都必须有一条断言确认它真的挂上了。
+ */
+section('② 价格桥');
+{
+  const P = DVI.price;
+  ok('DVI.price 已挂上', !!P);
+  if (P) {
+    ok('有 flushNow', typeof P.flushNow === 'function');
+    ok('有 connect', typeof P.connect === 'function');
+    ok('有 status', typeof P.status === 'function');
+    ok('有 loadStored', typeof P.loadStored === 'function');
+    ok('有 reauthorise（授权被清后恢复）', typeof P.reauthorise === 'function');
+    ok('有 disconnect', typeof P.disconnect === 'function');
+    const st = P.status();
+    ok('status.fileName 是字符串', typeof st.fileName === 'string', String(st.fileName));
+    ok('status.supported 是布尔', typeof st.supported === 'boolean', String(st.supported));
+    ok('status.stale 是布尔', typeof st.stale === 'boolean', String(st.stale));
+    let threw = false;
+    try { P.flushNow('测试'); } catch (e) { threw = true; }
+    ok('未连文件时 flushNow 也不抛（只写脚本存储）', !threw);
+  }
+  ok('DVI.attachPriceBridge 存在', typeof DVI.attachPriceBridge === 'function');
+}
+
 /* ══════════ 数据层 ══════════ */
 section('② 数据层');
 const D = DVI.data;

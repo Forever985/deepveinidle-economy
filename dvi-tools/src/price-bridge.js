@@ -296,4 +296,6 @@
 
   DVI.price = PRICE;
   DVI.attachPriceBridge = attach;
-})(window.DVI);
+})(typeof api !== 'undefined'
+    ? api                                        // 正常情况：就在主干 IIFE 作用域里
+    : ((typeof unsafeWindow !== 'undefined' && unsafeWindow && unsafeWindow.DVI) || window.DVI));

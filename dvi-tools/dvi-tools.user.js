@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.12
+// @version      2026.10.03.13
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.12 · 2026-10-03 17:40 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.13 · 2026-10-03 17:46 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.12';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.13';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -3447,7 +3447,9 @@
 
   DVI.price = PRICE;
   DVI.attachPriceBridge = attach;
-})(window.DVI);
+})(typeof api !== 'undefined'
+    ? api                                        // 正常情况：就在主干 IIFE 作用域里
+    : ((typeof unsafeWindow !== 'undefined' && unsafeWindow && unsafeWindow.DVI) || window.DVI));
 
   /* ═══════════════════════════════════════════════════════════════
    * 插件注入点
@@ -4066,9 +4068,9 @@
    * 以后每次打开自动写入，永不再问。
    */
   function renderPriceBridgePanel() {
-    if (!DVI.price) return;
+    if (!api.price) return;
     const box = ui.ownSection('价格桥 — 给利润网站提供行情', 'trunk:price-bridge');
-    const st = DVI.price.status();
+    const st = api.price.status();
 
     const info = document.createElement('div');
     info.className = 'dvi-row';
@@ -4090,7 +4092,7 @@
     pick.onclick = (ev) => {
       // 真实点击 → 浏览器认这个手势。**不要**把 picker 调用挪进 Promise/定时器。
       ev.preventDefault();
-      DVI.price.connect().then((r) => {
+      api.price.connect().then((r) => {
         if (r.ok) ui.toast(`已连接 ${r.name} —— 之后自动写入，网站读同一个文件即可`);
         else if (r.why === 'unsupported') ui.toast('此浏览器不支持，请用菜单里的「💾 下载价格文件」');
         else if (r.why === 'cancelled') ui.toast('已取消');
@@ -4104,7 +4106,7 @@
     grab.type = 'button';
     grab.className = 'dvi-btn';
     grab.textContent = '立即抓一次';
-    grab.onclick = () => { DVI.price.flushNow('手动'); setTimeout(renderPriceBridgePanel, 200); };
+    grab.onclick = () => { api.price.flushNow('手动'); setTimeout(renderPriceBridgePanel, 200); };
     row.appendChild(grab);
 
     if (st.connected) {
@@ -4113,7 +4115,7 @@
       re.className = 'dvi-btn';
       re.textContent = '恢复授权';
       re.onclick = () => {
-        DVI.price.reauthorise().then((r) => {
+        api.price.reauthorise().then((r) => {
           ui.toast(r.ok ? '已恢复' : '恢复失败：' + r.why);
           renderPriceBridgePanel();
         });
@@ -4133,7 +4135,7 @@
   }
 
   /* 价格桥常驻：市场消息一来就防抖落盘（途径①）；另有每小时兜底（途径②） */
-  if (typeof DVI.attachPriceBridge === 'function') DVI.attachPriceBridge();
+  if (typeof api.attachPriceBridge === 'function') api.attachPriceBridge();
 
   GM_registerMenuCommand('打开 DVI Tools 面板', () => { ui.toggle(true); renderPriceBridgePanel(); });
   GM_registerMenuCommand('关闭面板', () => ui.toggle(false));
@@ -4260,19 +4262,19 @@
    * 各选一次同一个文件即可，闭环全在本机。
    */
   GM_registerMenuCommand('💰 立即抓一次价格', () => {
-    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
-    DVI.price.flushNow('手动');
-    ui.toast(`已抓取 ${DVI.price.lastCount} 个物品（1 秒内落盘）`);
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    api.price.flushNow('手动');
+    ui.toast(`已抓取 ${api.price.lastCount} 个物品（1 秒内落盘）`);
   });
 
   GM_registerMenuCommand('🔗 连接价格文件（给利润网站用）', () => {
-    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
-    DVI.price.connect().then((r) => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    api.price.connect().then((r) => {
       if (r.ok) {
         ui.toast(`已连接 ${r.name} —— 之后每次抓价都会自动写入，网站读同一个文件即可`);
       } else if (r.why === 'unsupported') {
         ui.toast('这个浏览器不支持自动写入，已改为下载方式（把文件拖到利润网站即可）');
-        DVI.price.download();
+        api.price.download();
       } else if (r.why === 'cancelled') {
         ui.toast('已取消');
       } else {
@@ -4282,21 +4284,21 @@
   });
 
   GM_registerMenuCommand('🔄 恢复价格文件连接', () => {
-    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
-    DVI.price.reauthorise().then((r) => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    api.price.reauthorise().then((r) => {
       ui.toast(r.ok ? `已恢复 ${r.name}，之后自动写入` : '恢复失败：' + r.why);
     });
   });
 
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {
-    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
-    const n = DVI.price.download();
-    ui.toast(`已下载 ${DVI.price.fileName}（${n} 个物品），拖到利润网站页面即可`);
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    const n = api.price.download();
+    ui.toast(`已下载 ${api.price.fileName}（${n} 个物品），拖到利润网站页面即可`);
   });
 
   GM_registerMenuCommand('📈 价格桥状态', () => {
-    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
-    const st = DVI.price.status();
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    const st = api.price.status();
     const when = st.snapshotAt ? new Date(st.snapshotAt).toLocaleString('zh-CN') : '从未';
     const lines = [
       `自动写入：${st.connected ? '已连接 ' + st.fileName : '未连接（菜单里点「连接价格文件」）'}`,
