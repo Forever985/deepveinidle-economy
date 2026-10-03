@@ -1,5 +1,8 @@
 import { reactive } from 'vue'
 import type { MarketSnapshot } from '../types'
+import {
+  saveHandle, loadHandle, forgetHandle, checkPermission, requestPermission,
+} from '../lib/handleStore.ts'
 
 /**
  * 价格数据 —— 全部走本机，不经过 GitHub。
@@ -21,7 +24,6 @@ import type { MarketSnapshot } from '../types'
  */
 
 const LS_KEY = 'dvi-profit-net:market:v2'
-const HANDLE_KEY = 'dvi-profit-net:price-file-handle'
 
 /** localStorage 约 5 MB，行情 JSON 约 60~120 KB，留足余量 */
 const SIZE_LIMIT = 4 * 1024 * 1024
@@ -35,11 +37,16 @@ export const priceState = reactive<{
   /** 已连接的文件（File System Access API） */
   fileName: string | null
   fileConnected: boolean
+  /** 是否已记住文件句柄（关掉浏览器再打开仍然有效） */
+  fileRemembered: boolean
+  /** 需要你点一下才能继续读（浏览器要求授权必须有用户手势） */
+  needsGesture: boolean
   lastRead: string | null
   error: string
 }>({
   market: {}, at: null, origin: 'none',
-  fileName: null, fileConnected: false, lastRead: null, error: '',
+  fileName: null, fileConnected: false, fileRemembered: false,
+  needsGesture: false, lastRead: null, error: '',
 })
 
 /**
@@ -149,8 +156,10 @@ export async function connectPriceFile(): Promise<{ ok: boolean; msg: string }> 
       multiple: false,
       types: [{ description: 'DVI 价格快照', accept: { 'application/json': ['.json'] } }],
     })
-    // 句柄可以存起来，下次打开网站直接复用（可能需要重新授权）
-    try { localStorage.setItem(HANDLE_KEY, '1') } catch { /* 忽略 */ }
+    // ★ 关键：句柄存进 IndexedDB，**关掉浏览器再打开依然有效**。
+    //   否则每次都要重选文件，等于没做持久化。
+    await saveHandle(fileHandle)
+    priceState.fileRemembered = true
     const name = fileHandle.name
     const r = await readPriceFile()
     return r.ok ? { ok: true, msg: `已连接 ${name}` } : { ok: false, msg: r.msg }
@@ -190,16 +199,55 @@ export async function readPriceFile(): Promise<{ ok: boolean; msg: string }> {
 }
 
 /**
- * 页面打开时尝试自动重读已连接的文件。
+ * 页面打开时自动恢复。
  *
- * 注意：File System Access 的句柄**不能可靠地跨会话持久化**
- * （存 IndexedDB 需用户手势，且浏览器可能清掉），所以这里只做「本次会话内自动重读」。
- * 真正免重复选择依赖浏览器自己的权限记忆；失效时用户再点一次连接即可，
- * 期间用 localStorage 里的缓存顶着 —— 不会白屏。
+ * 三种结果：
+ *   ① 句柄还在且权限 granted → **直接读，零交互**（绝大多数情况）
+ *   ② 句柄还在但权限 prompt  → 设 needsGesture，界面上出一个「点一下继续」的小条
+ *   ③ 句柄没了/文件被删     → 静默退回 localStorage 缓存，界面标明数据是缓存
  */
-export function autoReconnect(): void {
-  if (!fileHandle) return
-  void readPriceFile()
+export async function autoReconnect(): Promise<void> {
+  if (fileHandle) { void readPriceFile(); return }
+
+  const h = await loadHandle()
+  if (!h) return                       // 首次使用，或用户主动断开过
+
+  const perm = await checkPermission(h)
+  if (perm === 'granted') {
+    fileHandle = h
+    priceState.fileRemembered = true
+    await readPriceFile()
+    return
+  }
+  if (perm === 'prompt') {
+    // 只记下句柄，真正申请要等用户点击（浏览器硬性要求用户手势）
+    fileHandle = h
+    priceState.fileName = h.name
+    priceState.fileRemembered = true
+    priceState.needsGesture = true
+  }
+}
+
+/** 用户点击「继续」后调用（申请权限必须有手势） */
+export async function grantAndRead(): Promise<{ ok: boolean; msg: string }> {
+  if (!fileHandle) return { ok: false, msg: '没有可用的文件句柄' }
+  const perm = await requestPermission(fileHandle)
+  if (perm !== 'granted') {
+    return { ok: false, msg: perm === 'denied' ? '授权被拒绝' : '未获得授权' }
+  }
+  priceState.needsGesture = false
+  await saveHandle(fileHandle)          // 确认有效，重新写回以防被清
+  return readPriceFile()
+}
+
+/** 主动断开（换文件 / 不想要了） */
+export async function disconnect(): Promise<void> {
+  fileHandle = null
+  priceState.fileName = null
+  priceState.fileConnected = false
+  priceState.fileRemembered = false
+  priceState.needsGesture = false
+  await forgetHandle()
 }
 
 /* ─────────────── ② 拖放 ③ 粘贴 ─────────────── */

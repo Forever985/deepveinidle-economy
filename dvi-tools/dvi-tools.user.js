@@ -33,7 +33,7 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.10 · 2026-10-03 16:25 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.10 · 2026-10-03 16:43 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
@@ -162,7 +162,7 @@
    *    更新游戏版本后重新跑 build.py 即可。
    * ═══════════════════════════════════════════════════════════════ */
   const DATA = ({
-  meta: {source:"deepveinidle.com client bundle",version:"0.0.1164-latest",commit:"reextract 2026-10-03",extractedAt:"2026-10-03"},
+  meta: {source:"deepveinidle.com client bundle",version:"0.0.1164-latest",commit:"reextract 2026-10-03",extractedAt:"2026-10-03",i18n:"官方中文，提取自客户端 bundle"},
   balance: {maxLevel:99,baseXp:100,xpGrowth:1.12,beyondGrowth:1.145,speedPerLevelAboveRequirement:0.005,enhance:{
   baseChanceFloor:0.2,
   chanceDropPerTier:0.06,
@@ -3174,6 +3174,9 @@
   'use strict';
 
   const SNAP_KEY = 'dvi-price-snapshot';      // GM 存储的键（跨刷新保留）
+  const DB_NAME = 'dvi-price-bridge';         // 句柄持久化用
+  const STORE = 'handles';
+  const HKEY = 'price-file';
   const FILE_NAME = 'dvi-prices.json';
   /** 抓价后延迟这么久再落盘：市场消息很密集，等一小会儿再取，避免写太频繁 */
   const WRITE_DEBOUNCE_MS = 4000;
@@ -3187,6 +3190,59 @@
   let listeners = [];
 
   function log(...a) { console.info('[DVI:价格桥]', ...a); }
+
+  /* ── 句柄持久化 ──────────────────────────────────────────────
+   * FileSystemFileHandle 是可结构化克隆的，能存进 IndexedDB 并在
+   * 下次打开时取回。**不存的话，句柄只活在当前会话**，
+   * 关掉浏览器就得重新选一次文件 —— 那等于「每次都要搞一下」。
+   */
+  function openDb() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open(DB_NAME, 1);
+      r.onupgradeneeded = () => {
+        const db = r.result;
+        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+      };
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function idb(mode, fn) {
+    const db = await openDb();
+    return new Promise((res, rej) => {
+      const t = db.transaction(STORE, mode);
+      const q = fn(t.objectStore(STORE));
+      q.onsuccess = () => res(q.result);
+      q.onerror = () => rej(q.error);
+      t.oncomplete = () => db.close();
+    });
+  }
+  async function saveHandle(h) {
+    try { await idb('readwrite', (s) => s.put(h, HKEY)); } catch (e) { log('句柄未能持久化', e); }
+  }
+  async function loadHandle() {
+    try { return (await idb('readonly', (s) => s.get(HKEY))) || null; } catch { return null; }
+  }
+  async function forgetHandle() {
+    try { await idb('readwrite', (s) => s.delete(HKEY)); } catch { /* 忽略 */ }
+  }
+  function permApi(h) {
+    return h;
+  }
+  async function checkPerm(h) {
+    try {
+      const p = permApi(h);
+      if (!p.queryPermission) return 'granted';
+      return await p.queryPermission({ mode: 'readwrite' });
+    } catch { return 'denied'; }
+  }
+  async function requestPerm(h) {
+    try {
+      const p = permApi(h);
+      if (!p.requestPermission) return 'granted';
+      return await p.requestPermission({ mode: 'readwrite' });
+    } catch { return 'denied'; }
+  }
 
   /** 当前市场快照（只取有报价的） */
   function collect() {
@@ -3280,6 +3336,9 @@
           suggestedName: FILE_NAME,
           types: [{ description: 'DVI 价格快照', accept: { 'application/json': ['.json'] } }],
         });
+        // ★ 存进 IndexedDB：关掉浏览器、重启电脑后依然有效，
+        //   否则每次开游戏都要重选一遍文件。
+        await saveHandle(fileHandle);
         flush('连接文件');
         return { ok: true, name: fileHandle.name };
       } catch (e) {
@@ -3287,6 +3346,26 @@
         if (e && e.name === 'AbortError') return { ok: false, why: 'cancelled' };
         return { ok: false, why: e && e.message };
       }
+    },
+
+    /** 授权被清掉后，从已保存的句柄恢复（需用户手势） */
+    async reauthorise() {
+      if (!fileHandle) {
+        const h = await loadHandle();
+        if (!h) return { ok: false, why: '没有保存过文件，请用「连接价格文件」选一次' };
+        fileHandle = h;
+      }
+      const perm = await requestPerm(fileHandle);
+      if (perm !== 'granted') return { ok: false, why: '未获得授权' };
+      await saveHandle(fileHandle);
+      flush('恢复连接');
+      return { ok: true, name: fileHandle.name };
+    },
+
+    /** 主动断开并忘记文件 */
+    async disconnect() {
+      fileHandle = null;
+      await forgetHandle();
     },
 
     /** 降级路径：下载一份 */
@@ -3316,8 +3395,28 @@
     },
   };
 
+  /**
+   * 启动时恢复上次授权的文件。
+   * 权限已是 granted 就直接写；是 prompt 则记下来，等用户点菜单时再申请
+   * （浏览器硬性要求：申请权限必须有用户手势）。
+   */
+  async function restore() {
+    const h = await loadHandle();
+    if (!h) return;
+    fileHandle = h;
+    const perm = await checkPerm(h);
+    if (perm === 'granted') {
+      log('已恢复上次连接的文件：' + h.name);
+    } else if (perm === 'prompt') {
+      log('文件句柄已保存，但需要你点一下菜单里的「恢复价格文件连接」来授权');
+    } else {
+      fileHandle = null;
+    }
+  }
+
   /** 挂上总线：市场消息一来就（防抖后）记一次 */
   function attach() {
+    void restore();
     DVI.bus.on(DVI.EVT.MARKET, () => schedule('市场更新'));
     // 每小时强制落一次，哪怕没有新消息 —— 用来刷新「快照时间」
     setInterval(() => {
@@ -4083,6 +4182,13 @@
     });
   });
 
+  GM_registerMenuCommand('🔄 恢复价格文件连接', () => {
+    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
+    DVI.price.reauthorise().then((r) => {
+      ui.toast(r.ok ? `已恢复 ${r.name}，之后自动写入` : '恢复失败：' + r.why);
+    });
+  });
+
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {
     if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
     const n = DVI.price.download();
@@ -4095,6 +4201,7 @@
     const when = st.snapshotAt ? new Date(st.snapshotAt).toLocaleString('zh-CN') : '从未';
     const lines = [
       `自动写入：${st.connected ? '已连接 ' + st.fileName : '未连接（菜单里点「连接价格文件」）'}`,
+      `连接是否记住：${st.connected ? '是 —— 关浏览器、重启电脑都有效' : '否'}`,
       `浏览器支持：${st.supported ? '是' : '否（只能下载）'}`,
       `上次快照：${when}`,
       `快照物品数：${st.snapshotCount}`,

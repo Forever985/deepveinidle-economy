@@ -5,6 +5,7 @@ import type { PriceBook } from '../calc/price'
 import {
   priceState, supportsFileApi, connectPriceFile, readPriceFile, handleFiles,
   applyPasted, clearAll, loadCache, autoReconnect, isFileConnected,
+  grantAndRead, disconnect,
 } from '../stores/market'
 
 const props = defineProps<{ data: GameData; book: PriceBook }>()
@@ -46,6 +47,14 @@ async function doConnect() {
 async function doRead() {
   const r = await readPriceFile()
   msg.value = r.msg
+}
+async function doGrant() {
+  const r = await grantAndRead()
+  msg.value = r.msg
+}
+async function doDisconnect() {
+  await disconnect()
+  msg.value = '已断开（下次打开需要重新选一次文件）'
 }
 function doClear() {
   clearAll()
@@ -132,6 +141,25 @@ const spreads = computed(() => {
       </template>
     </div>
 
+    <!-- 需要一次点击授权：浏览器硬性要求用户手势，无法自动完成 -->
+    <div v-if="priceState.needsGesture" class="note warn bar-fix">
+      <div>
+        浏览器需要你<b>点一下</b>才允许继续读取 <code>{{ priceState.fileName }}</code>。
+        这是浏览器规定的安全机制，无法自动完成 —— 但<b>只需要这一次</b>，
+        之后每次打开都会自动读取。
+      </div>
+      <div style="margin-top:6px;display:flex;gap:6px">
+        <button class="primary" @click="doGrant">点一下继续（只此一次）</button>
+        <button @click="doDisconnect">断开</button>
+      </div>
+    </div>
+
+    <!-- 已记住文件：明确告诉用户「以后不用再弄了」 -->
+    <div v-else-if="priceState.fileRemembered && priceState.fileConnected" class="note ok-note">
+      ✓ 已记住 <code>{{ priceState.fileName }}</code>，
+      <b>以后每次打开自动读取，不用再做任何操作</b>。关掉浏览器、重启电脑都不影响。
+    </div>
+
     <!-- 三个入口 -->
     <div class="card">
       <h3>接入方式</h3>
@@ -142,7 +170,10 @@ const spreads = computed(() => {
           <div class="acts">
             <button class="primary" @click="doConnect">连接价格文件</button>
             <button v-if="isFileConnected()" @click="doRead">立即重读</button>
-            <span v-if="priceState.fileName" class="muted">已连接：{{ priceState.fileName }}</span>
+            <button v-if="priceState.fileConnected" @click="doDisconnect">断开</button>
+            <span v-if="priceState.fileConnected" class="muted">
+              已连接：{{ priceState.fileName }}（{{ priceState.fileRemembered ? '已记住，永久有效' : '本次会话' }}）
+            </span>
           </div>
           <p v-if="!supportsFileApi" class="muted">
             这个浏览器不支持 File System Access API，请用下面的拖放或粘贴。
@@ -220,5 +251,7 @@ code{font-family:var(--mono);background:#eceff3;padding:1px 4px;border-radius:3p
 .msg{margin-top:8px;font-size:12.5px;color:var(--up)}
 .msg.err{color:var(--warn)}
 .tw{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:7px}
+.ok-note{border-left-color:var(--up);background:#f0f8f2}
+.bar-fix{display:flex;flex-direction:column;gap:6px}
 .view.dragging{outline:3px dashed var(--accent);outline-offset:-6px;background:var(--accent-soft)}
 </style>

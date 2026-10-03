@@ -2058,6 +2058,13 @@
     });
   });
 
+  GM_registerMenuCommand('🔄 恢复价格文件连接', () => {
+    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
+    DVI.price.reauthorise().then((r) => {
+      ui.toast(r.ok ? `已恢复 ${r.name}，之后自动写入` : '恢复失败：' + r.why);
+    });
+  });
+
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {
     if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
     const n = DVI.price.download();
@@ -2070,6 +2077,7 @@
     const when = st.snapshotAt ? new Date(st.snapshotAt).toLocaleString('zh-CN') : '从未';
     const lines = [
       `自动写入：${st.connected ? '已连接 ' + st.fileName : '未连接（菜单里点「连接价格文件」）'}`,
+      `连接是否记住：${st.connected ? '是 —— 关浏览器、重启电脑都有效' : '否'}`,
       `浏览器支持：${st.supported ? '是' : '否（只能下载）'}`,
       `上次快照：${when}`,
       `快照物品数：${st.snapshotCount}`,
