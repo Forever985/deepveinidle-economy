@@ -1,0 +1,31 @@
+一键部署：按 milkonomy 的「超级一键部署」模式适配
+
+用户给了仓库地址 https://github.com/Forever985/deepveinidle-economy ，
+并要求部署脚本参考 milkonomy 的「超级一键部署」。
+
+那套脚本真正的关键不是「一条命令部署」，而是**网络**：
+本机用 Watt Toolkit(Steam++) 的 hosts 劫持 + 443 MITM 加速 GitHub，
+但 Git for Windows 的 libcurl **不读 hosts 文件**（直连真实 IP 会超时），
+把 git 指向 127.0.0.1:443 当代理也不行（Watt 对 CONNECT 返回 302，不做隧道）。
+所以脚本必须自己起一个 HTTP CONNECT 反代把流量转给 Watt。
+
+本次新增
+- scripts/local-github-proxy.mjs   本地 HTTPS CONNECT 反代 + 启动自检
+- scripts/publish-gh-pages.mjs    把 web/dist 发到 gh-pages（不依赖 npx）
+- deploy-once.ps1                 六步：环境→通道→测试→构建→推main→推gh-pages
+- 超级一键部署.bat                 双击入口（先冲 DNS 再调 ps1）
+- scripts/ensure-bom.py           给 .ps1 加 UTF-8 BOM
+
+改动
+- 分支 master → main（与 GitHub 默认一致）
+- 删掉 deploy-web.yml：Actions 部署会与本地脚本抢 gh-pages，
+  改为 ci.yml 只做「测试 + 类型检查 + 构建」，不部署
+
+踩坑：.ps1 存成无 BOM 的 UTF-8 时，Windows 桌面版读取 .ps1 会按系统 GBK 解码，
+中文乱码导致 9 处莫名其妙的语法错误。加 UTF-8 BOM 后校验通过。
+已加 scripts/ensure-bom.py 固化这个规则。
+
+安全原则沿用 milkonomy 那套：通道不通就停下，绝不空推；
+构建/测试失败则完全没推送；绝不把「连不上」误报成「部署成功」。
+
+未推送远程 —— 等用户确认后再推。

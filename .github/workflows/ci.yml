@@ -1,0 +1,38 @@
+name: CI
+
+# 只做检查，**不部署**。
+# 部署走本地的「超级一键部署.bat」——
+# 因为本机 git 需要经 Watt Toolkit 的加速通道，而 Actions 跑在 GitHub 服务器上，
+# 两边同时写 gh-pages 会互相覆盖。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 计算层测试
+        run: npm test
+
+      - name: 类型检查
+        run: npx vue-tsc --noEmit
+
+      - name: 构建
+        run: npm run build
