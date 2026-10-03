@@ -8,7 +8,7 @@ import type { PriceBook } from '../calc/price'
 import {
   priceState, supportsFileApi, connectPriceFile, readPriceFile, handleFiles,
   applyPasted, clearAll, loadCache, autoReconnect, isFileConnected,
-  grantAndRead, disconnect,
+  grantAndRead, disconnect, receipt,
 } from '../stores/market'
 
 const props = defineProps<{ data: GameData; book: PriceBook }>()
@@ -162,10 +162,27 @@ const spreads = computed(() => {
         核对方法：游戏里打开油猴菜单 →「🔏 查看送出凭证」，
         把那里的<b>指纹</b>和上面这一行对比。<b>一致</b>就证明本站正在用的就是你送出的那份数据。
       </p>
+
       <p v-else class="tip2">
         当前所有价格都是游戏内置的基础价值，<b>不是市场真实价格</b>，利润排序仅供参考。
         想用真实行情：游戏里点「📤 送到利润网站」。
       </p>
+
+      <!-- 收货回执：逐环节显示，直接看出卡在哪一环 -->
+      <div class="rcpt">
+        <div class="rcpt-t">收货回执（本次打开网站时）</div>
+        <div class="rcpt-row"><span>网址里带数据了吗</span>
+          <b :class="receipt.hadHash ? 'ok' : 'no'">{{ receipt.hadHash ? `是（网址片段 ${receipt.hashLen} 字符）` : '否 —— 是直接打开网站的，没有带数据' }}</b></div>
+        <div class="rcpt-row"><span>解开了吗</span>
+          <b :class="receipt.parsed ? 'ok' : 'no'">{{ receipt.parsed ? `是（耗时 ${receipt.ms} ms）` : (receipt.hadHash ? '否' : '—') }}</b></div>
+        <div class="rcpt-row"><span>入库了吗</span>
+          <b :class="receipt.applied ? 'ok' : 'no'">{{ receipt.applied ? `是（${receipt.count} 个物品）` : '否' }}</b></div>
+        <div v-if="receipt.error" class="rcpt-row"><span>错误</span><b class="bad">{{ receipt.error }}</b></div>
+        <p class="tip2" style="margin-top:6px">
+          若是「网址里带数据了吗 = 否」，说明<b>游戏那边的「送到利润网站」没成功打开新标签</b> ——
+          可能是浏览器拦了弹窗，或网址太长被截断。
+        </p>
+      </div>
     </div>
 
     <!-- 状态 -->
@@ -337,6 +354,12 @@ code{font-family:var(--mono);background:#eceff3;padding:1px 4px;border-radius:3p
 .tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;
      border-radius:50%;background:var(--line2);color:var(--fg3);font-size:10px;cursor:help}
 .tip2{font-size:12px;color:var(--fg2);margin:9px 0 0;line-height:1.6}
+.rcpt{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line2)}
+.rcpt-t{font-size:12px;font-weight:600;margin-bottom:5px;color:var(--fg2)}
+.rcpt-row{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;padding:1px 0}
+.rcpt-row>span:first-child{color:var(--fg3);white-space:nowrap}
+.rcpt-row b{text-align:right;font-weight:600}
+.rcpt-row b.ok{color:var(--up)} .rcpt-row b.bad{color:var(--warn)} .rcpt-row b.no{color:var(--fg3)}
 .diag{margin-top:10px;border:1px solid var(--line);border-radius:7px;padding:9px 11px;background:#fbfcfd}
 .diag-t{font-size:12.5px;font-weight:600;margin-bottom:5px}
 .diag .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:1px 0}

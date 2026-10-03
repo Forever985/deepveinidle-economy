@@ -108,11 +108,32 @@ function unb64(s: string): Uint8Array {
   return u8
 }
 
-/** 解出网址里带来的快照；没有就返回 null */
+/** 收货回执 —— 逐环节记录，用来定位「到底卡在哪一环」 */
+export const receipt = reactive<{
+  checked: boolean
+  hadHash: boolean
+  hashLen: number
+  parsed: boolean
+  applied: boolean
+  count: number
+  fingerprint: string
+  ms: number
+  error: string
+}>({ checked: false, hadHash: false, hashLen: 0, parsed: false, applied: false, count: 0, fingerprint: '', ms: 0, error: '' })
+
+/** 解出网址里带来的快照；没有就返回 0 */
 export async function takeFromUrl(): Promise<number> {
+  const t0 = Date.now()
   const h = location.hash
+  receipt.checked = true
+  receipt.hadHash = !!h && h.length > 2
+  receipt.hashLen = h.length
+  receipt.parsed = false
+  receipt.applied = false
+  receipt.error = ''
+
   const m = /[#&]p=([zr])([A-Za-z0-9+/=_-]+)/.exec(h)
-  if (!m) return 0
+  if (!m) { receipt.ms = Date.now() - t0; return 0 }
   try {
     const bytes = unb64(m[2].replace(/-/g, '+').replace(/_/g, '/'))
     let text: string
@@ -125,14 +146,21 @@ export async function takeFromUrl(): Promise<number> {
       text = new TextDecoder().decode(bytes)
     }
     const snap = JSON.parse(text) as unknown
-    if (!applySnapshot(snap, 'paste')) return 0
+    receipt.parsed = true
+    if (!applySnapshot(snap, 'paste')) { receipt.error = priceState.error || '格式不对'; receipt.ms = Date.now() - t0; return 0 }
+    receipt.applied = true
+    receipt.count = Object.keys(priceState.market).length
+    receipt.fingerprint = priceState.fingerprint
     // 抹掉 #，免得刷新时重复导入、也免得网址一直带着几百 KB
     history.replaceState(null, '', location.pathname + location.search)
-    return Object.keys(priceState.market).length
+    receipt.ms = Date.now() - t0
+    return receipt.count
   } catch (e) {
-    priceState.error = '网址里的数据解不开：' + ((e as Error)?.message ?? e)
+    receipt.error = ((e as Error)?.message ?? String(e))
+    priceState.error = '网址里的数据解不开：' + receipt.error
     // 数据坏了也要清掉网址，否则用户会被同一个坏数据卡住
     try { history.replaceState(null, '', location.pathname + location.search) } catch { /* 忽略 */ }
+    receipt.ms = Date.now() - t0
     return 0
   }
 }
