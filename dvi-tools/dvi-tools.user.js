@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.3
+// @version      2026.10.03.4
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.3 · 2026-10-03 09:34 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.4 · 2026-10-03 09:39 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.3';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.4';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2302,14 +2302,9 @@
       .dvi-inline-note[data-tone="warn"]{color:#d8a657}
       .dvi-inline-note[data-tone="done"]{color:#6fbf8b}
       .dvi-inline-row{display:block;margin-top:2px;color:#8b96a3;font-size:11px}
-      /* 就地重算入口：放在列表下方，保持极简。
-       * 不提示数据新旧、不做状态变色 —— 需要时点一下就好。 */
-      .dvi-refresh{display:flex;align-items:center;gap:5px;width:fit-content;
-        margin:6px 0 0 2px;padding:2px 9px;border:0;border-radius:4px;
-        background:rgba(255,255,255,.05);color:#7f8b98;
-        font:inherit;font-size:11px;cursor:pointer;opacity:.8;
-        transition:opacity .15s,color .15s,background .15s}
-      .dvi-refresh:hover{opacity:1;color:#c8d2dc;background:rgba(255,255,255,.10)}
+      /* 标注可点（用于重算）：给一点可点的暗示，但不改变原有观感 */
+      .dvi-inline-note{cursor:pointer}
+      .dvi-inline-note:hover{background:rgba(255,255,255,.14)}
     `;
 
     let cssInjected = false;
@@ -2586,12 +2581,37 @@
 
       // 只在「注入总数」变化时记一条，避免每帧刷屏
       if (total !== lastLoggedTotal) {
+        const first = total > 0 && lastLoggedTotal <= 0;   // 首次成功注入
         lastLoggedTotal = total;
         const detail = [...anchors.values()]
           .map(a => `${a.id}:宿主${a.hostsFound}/注入${a.count}${a.lastError ? ' ⚠' + a.lastError : ''}`)
           .join(' · ');
         if (total > 0) DIAG.info('内联', `已注入 ${total} 处 · ${detail}`);
         else DIAG.warn('内联', `未注入任何内容 · ${detail || '（无锚点）'}`);
+
+        // 首次注入时把「落点周围的 DOM 结构」也记下来。
+        // 出过的问题：注入的元素把游戏面板排版撑坏，但日志里只有数量，
+        // 看不出它到底被放进了什么样的容器。这里把父链和容器子元素数记清楚。
+        if (first) {
+          try {
+            const host = document.querySelector([...anchors.values()][0].selector);
+            if (host) {
+              const chain = [];
+              let el = host, depth = 0;
+              while (el && el.tagName && depth < 4) {
+                chain.push(el.tagName.toLowerCase() +
+                  (el.className ? '.' + String(el.className).trim().split(/\s+/).slice(0, 2).join('.') : ''));
+                el = el.parentElement; depth++;
+              }
+              DIAG.info('结构', `注入落点：<${chain.join(' < ')}> · ` +
+                `父容器子元素 ${host.parentElement ? host.parentElement.children.length : '?'} 个 · ` +
+                `列表子元素 ${(() => {
+                  const list = document.querySelector('[data-routes]');
+                  return list ? list.children.length : '无';
+                })()} 个`);
+            }
+          } catch (e) { /* 诊断失败不影响功能 */ }
+        }
       }
     }
 
@@ -3293,33 +3313,16 @@
         render: (host) => this.renderRow(ctx, host),
       });
 
-      // 就地刷新入口。放在列表**下方**而不是上方：
-      // 上方是游戏自己的标题区，插进去会打乱排版，也容易被误认成游戏的功能。
-      // 放在列表之后，不抢视线，也不占位置。
-      ctx.ui.inline({
-        id: 'job-level-refresh',
-        selector: ['[data-routes]'],
-        where: 'afterend',
-        render: () => this.renderRefreshButton(ctx),
-      });
+      /* 刷新入口**不新增任何 DOM 节点**。
+       * 曾经在列表上下各插过一个独立按钮，两次都把游戏面板的排版撑坏 ——
+       * 那个容器多半是 flex/grid，多一个兄弟节点就改变整个布局。
+       * 改成：直接让**标注自己**可点。标注本来就长在作业行内部，
+       * 不引入新节点，也就不会影响任何布局。
+       * （游戏会吞掉落在 data-tip-name 上的点击，所以这里必须自己接管。） */
+      this.attachClick(ctx);
 
       // 用户主动要求重算
       ctx.bus.on(ctx.EVT.REFRESH, () => this.recompute(ctx, true));
-
-      /* 内联刷新按钮的点击 —— 用**事件委托**而不是逐个绑监听：
-       * 按钮会被游戏重绘反复替换，绑在节点上的监听会随之丢失。
-       * 捕获阶段 + stopPropagation：抢在游戏自己的点击处理之前，
-       * 并阻止它把我们的小按钮当成作业行。 */
-      this.onDocClick = (e) => {
-        const t = e.target;
-        if (t && t.closest && t.closest('.dvi-refresh')) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.recompute(ctx, true);
-          ctx.log('用户点击「重算预估」');
-        }
-      };
-      document.addEventListener('click', this.onDocClick, true);
 
       // 自动模式：只在状态真的变了、且距上次重算超过 MIN_GAP 时才重算
       ctx.bus.on(ctx.EVT.SNAPSHOT, () => {
@@ -3352,33 +3355,37 @@
       return true;
     },
 
-    /**
-     * 就地重算入口。
-     * 保持极简：不提示数据新旧、不做状态变色 ——
-     * 用户本来就知道「要用的时候点一下」。
-     */
-    renderRefreshButton(ctx) {
-      const me = ctx.state.me;
-      if (!me) return null;                       // 还没登录就不显示
+    /** 安装「点标注 → 重算」的委托监听。幂等：重复调用不会装两遍。 */
+    attachClick(ctx) {
+      if (this.onDocClick) return;
+      this.onDocClick = (e) => {
+        const t = e.target;
+        const note = t && t.closest && t.closest('.dvi-inline-note');
+        if (note) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.recompute(ctx, true);
+          ctx.log('点击标注 → 重算');
+        }
+      };
+      document.addEventListener('click', this.onDocClick, true);
+    },
 
-      return `<button class="dvi-refresh" type="button"
-        ${ctx.ui.tip('重算升级预估', [
-          '按当前等级、装备与增益重新算一遍',
-          this.isAuto(ctx) ? '当前为自动模式，状态变化后会自动重算'
-                           : '当前为按需模式，点这里或刷新页面即可',
-        ])}>↻ 重算</button>`;
+    detachClick() {
+      if (this.onDocClick) {
+        document.removeEventListener('click', this.onDocClick, true);
+        this.onDocClick = null;
+      }
     },
 
     enable(ctx) {
+      this.attachClick(ctx);      // disable 时摘掉了，启用必须装回来
       ctx.ui.inline.refresh();
       ctx.log('已启用');
     },
 
     disable(ctx) {
-      if (this.onDocClick) {
-        document.removeEventListener('click', this.onDocClick, true);
-        this.onDocClick = null;
-      }
+      this.detachClick();
       if (this.cache) this.cache.clear();
       ctx.ui.uninline();
     },
@@ -3477,6 +3484,9 @@
       }
 
       lines.push('不含赶路时间');
+      lines.push(this.isAuto(ctx)
+        ? '自动模式：状态变化后会自动重算'
+        : '点一下这条标注即可重算');
 
       return `<span class="dvi-inline-note" data-tone="${est.actions > 1000 ? 'warn' : ''}"
         ${ctx.ui.tip('升级预估 · ' + action.name, lines)}>${label}</span>`;

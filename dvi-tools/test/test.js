@@ -1317,6 +1317,20 @@ section('㉚ 按需刷新：高频渲染不得重算');
 
   // 主干必须提供主动重算的入口
   ok('主干声明了 REFRESH 事件', DVI.EVT.REFRESH === 'core:refresh');
+
+  /* 只允许往「作业行内部」注入，不许往面板布局里塞新节点。
+   * 曾经在 [data-routes] 前后插过独立刷新按钮，两次都把游戏面板撑坏 ——
+   * 那个容器是 flex/grid，多一个兄弟节点就改变整个排版。 */
+  const anchors = DVI.ui.inline.report();
+  const layoutAnchors = anchors.filter(a =>
+    /\[data-routes\]\s*$/.test((a['候选选择器'] || '').split('|').pop().trim()) ||
+    (a['候选选择器'] || '').includes('[data-routes]'));
+  ok('没有往面板布局容器上挂锚点（只挂在行内部）',
+     layoutAnchors.length === 0,
+     layoutAnchors.map(a => a['锚点'] + ' → ' + a['候选选择器']).join(' ; '));
+
+  ok('重算是靠「点标注」触发的，不需要额外节点',
+     typeof DVI.plugin.get('job-level-estimate').def.onDocClick === 'function');
 }
 
 /* ══════════ tooltip 体积（防止撑爆屏幕） ══════════ */

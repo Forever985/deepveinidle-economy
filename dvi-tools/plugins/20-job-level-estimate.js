@@ -122,33 +122,16 @@
         render: (host) => this.renderRow(ctx, host),
       });
 
-      // 就地刷新入口。放在列表**下方**而不是上方：
-      // 上方是游戏自己的标题区，插进去会打乱排版，也容易被误认成游戏的功能。
-      // 放在列表之后，不抢视线，也不占位置。
-      ctx.ui.inline({
-        id: 'job-level-refresh',
-        selector: ['[data-routes]'],
-        where: 'afterend',
-        render: () => this.renderRefreshButton(ctx),
-      });
+      /* 刷新入口**不新增任何 DOM 节点**。
+       * 曾经在列表上下各插过一个独立按钮，两次都把游戏面板的排版撑坏 ——
+       * 那个容器多半是 flex/grid，多一个兄弟节点就改变整个布局。
+       * 改成：直接让**标注自己**可点。标注本来就长在作业行内部，
+       * 不引入新节点，也就不会影响任何布局。
+       * （游戏会吞掉落在 data-tip-name 上的点击，所以这里必须自己接管。） */
+      this.attachClick(ctx);
 
       // 用户主动要求重算
       ctx.bus.on(ctx.EVT.REFRESH, () => this.recompute(ctx, true));
-
-      /* 内联刷新按钮的点击 —— 用**事件委托**而不是逐个绑监听：
-       * 按钮会被游戏重绘反复替换，绑在节点上的监听会随之丢失。
-       * 捕获阶段 + stopPropagation：抢在游戏自己的点击处理之前，
-       * 并阻止它把我们的小按钮当成作业行。 */
-      this.onDocClick = (e) => {
-        const t = e.target;
-        if (t && t.closest && t.closest('.dvi-refresh')) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.recompute(ctx, true);
-          ctx.log('用户点击「重算预估」');
-        }
-      };
-      document.addEventListener('click', this.onDocClick, true);
 
       // 自动模式：只在状态真的变了、且距上次重算超过 MIN_GAP 时才重算
       ctx.bus.on(ctx.EVT.SNAPSHOT, () => {
@@ -181,33 +164,37 @@
       return true;
     },
 
-    /**
-     * 就地重算入口。
-     * 保持极简：不提示数据新旧、不做状态变色 ——
-     * 用户本来就知道「要用的时候点一下」。
-     */
-    renderRefreshButton(ctx) {
-      const me = ctx.state.me;
-      if (!me) return null;                       // 还没登录就不显示
+    /** 安装「点标注 → 重算」的委托监听。幂等：重复调用不会装两遍。 */
+    attachClick(ctx) {
+      if (this.onDocClick) return;
+      this.onDocClick = (e) => {
+        const t = e.target;
+        const note = t && t.closest && t.closest('.dvi-inline-note');
+        if (note) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.recompute(ctx, true);
+          ctx.log('点击标注 → 重算');
+        }
+      };
+      document.addEventListener('click', this.onDocClick, true);
+    },
 
-      return `<button class="dvi-refresh" type="button"
-        ${ctx.ui.tip('重算升级预估', [
-          '按当前等级、装备与增益重新算一遍',
-          this.isAuto(ctx) ? '当前为自动模式，状态变化后会自动重算'
-                           : '当前为按需模式，点这里或刷新页面即可',
-        ])}>↻ 重算</button>`;
+    detachClick() {
+      if (this.onDocClick) {
+        document.removeEventListener('click', this.onDocClick, true);
+        this.onDocClick = null;
+      }
     },
 
     enable(ctx) {
+      this.attachClick(ctx);      // disable 时摘掉了，启用必须装回来
       ctx.ui.inline.refresh();
       ctx.log('已启用');
     },
 
     disable(ctx) {
-      if (this.onDocClick) {
-        document.removeEventListener('click', this.onDocClick, true);
-        this.onDocClick = null;
-      }
+      this.detachClick();
       if (this.cache) this.cache.clear();
       ctx.ui.uninline();
     },
@@ -306,6 +293,9 @@
       }
 
       lines.push('不含赶路时间');
+      lines.push(this.isAuto(ctx)
+        ? '自动模式：状态变化后会自动重算'
+        : '点一下这条标注即可重算');
 
       return `<span class="dvi-inline-note" data-tone="${est.actions > 1000 ? 'warn' : ''}"
         ${ctx.ui.tip('升级预估 · ' + action.name, lines)}>${label}</span>`;

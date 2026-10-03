@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.3
+// @version      2026.10.03.4
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.3';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.4';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -970,14 +970,9 @@
       .dvi-inline-note[data-tone="warn"]{color:#d8a657}
       .dvi-inline-note[data-tone="done"]{color:#6fbf8b}
       .dvi-inline-row{display:block;margin-top:2px;color:#8b96a3;font-size:11px}
-      /* 就地重算入口：放在列表下方，保持极简。
-       * 不提示数据新旧、不做状态变色 —— 需要时点一下就好。 */
-      .dvi-refresh{display:flex;align-items:center;gap:5px;width:fit-content;
-        margin:6px 0 0 2px;padding:2px 9px;border:0;border-radius:4px;
-        background:rgba(255,255,255,.05);color:#7f8b98;
-        font:inherit;font-size:11px;cursor:pointer;opacity:.8;
-        transition:opacity .15s,color .15s,background .15s}
-      .dvi-refresh:hover{opacity:1;color:#c8d2dc;background:rgba(255,255,255,.10)}
+      /* 标注可点（用于重算）：给一点可点的暗示，但不改变原有观感 */
+      .dvi-inline-note{cursor:pointer}
+      .dvi-inline-note:hover{background:rgba(255,255,255,.14)}
     `;
 
     let cssInjected = false;
@@ -1254,12 +1249,37 @@
 
       // 只在「注入总数」变化时记一条，避免每帧刷屏
       if (total !== lastLoggedTotal) {
+        const first = total > 0 && lastLoggedTotal <= 0;   // 首次成功注入
         lastLoggedTotal = total;
         const detail = [...anchors.values()]
           .map(a => `${a.id}:宿主${a.hostsFound}/注入${a.count}${a.lastError ? ' ⚠' + a.lastError : ''}`)
           .join(' · ');
         if (total > 0) DIAG.info('内联', `已注入 ${total} 处 · ${detail}`);
         else DIAG.warn('内联', `未注入任何内容 · ${detail || '（无锚点）'}`);
+
+        // 首次注入时把「落点周围的 DOM 结构」也记下来。
+        // 出过的问题：注入的元素把游戏面板排版撑坏，但日志里只有数量，
+        // 看不出它到底被放进了什么样的容器。这里把父链和容器子元素数记清楚。
+        if (first) {
+          try {
+            const host = document.querySelector([...anchors.values()][0].selector);
+            if (host) {
+              const chain = [];
+              let el = host, depth = 0;
+              while (el && el.tagName && depth < 4) {
+                chain.push(el.tagName.toLowerCase() +
+                  (el.className ? '.' + String(el.className).trim().split(/\s+/).slice(0, 2).join('.') : ''));
+                el = el.parentElement; depth++;
+              }
+              DIAG.info('结构', `注入落点：<${chain.join(' < ')}> · ` +
+                `父容器子元素 ${host.parentElement ? host.parentElement.children.length : '?'} 个 · ` +
+                `列表子元素 ${(() => {
+                  const list = document.querySelector('[data-routes]');
+                  return list ? list.children.length : '无';
+                })()} 个`);
+            }
+          } catch (e) { /* 诊断失败不影响功能 */ }
+        }
       }
     }
 
