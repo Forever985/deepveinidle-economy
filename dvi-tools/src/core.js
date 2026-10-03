@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.11
+// @version      2026.10.03.12
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.11';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.12';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -1909,10 +1909,89 @@
     }, 4000);
   });
 
+  /* ── 价格桥 · 面板分区 ────────────────────────────────────────
+   *
+   * 为什么入口必须放在**页面里的面板**上，而不是只放油猴菜单：
+   *   浏览器规定 showSaveFilePicker / showOpenFilePicker **必须有真实用户手势**
+   *   （真实的点击），而 GM_registerMenuCommand 的回调**不算**用户手势 ——
+   *   实测报 "Must be handling a user gesture to show a file picker"。
+   *   从油猴菜单调，永远打不开这个对话框。
+   *
+   * 所以：菜单负责「打开面板」，面板里的按钮负责「选文件」。
+   * 而这只是一次性动作 —— 句柄存进 IndexedDB 之后，
+   * 以后每次打开自动写入，永不再问。
+   */
+  function renderPriceBridgePanel() {
+    if (!DVI.price) return;
+    const box = ui.ownSection('价格桥 — 给利润网站提供行情', 'trunk:price-bridge');
+    const st = DVI.price.status();
+
+    const info = document.createElement('div');
+    info.className = 'dvi-row';
+    info.innerHTML = '<span style="flex:1;font-size:12.5px;color:#5f6b76"></span>';
+    const when = st.snapshotAt ? new Date(st.snapshotAt).toLocaleString('zh-CN') : '从未';
+    info.firstChild.textContent =
+      `状态：${st.connected ? '已连接 ' + st.fileName + (st.remembered ? '（已记住，永久有效）' : '（仅本次会话）')
+                           : '未连接'}　上次快照：${when}（${st.snapshotCount} 个物品）`
+      + (st.supported ? '' : '　⚠ 此浏览器不支持自动写入，请用「💾 下载价格文件」');
+    box.appendChild(info);
+
+    const row = document.createElement('div');
+    row.className = 'dvi-row';
+
+    const pick = document.createElement('button');
+    pick.type = 'button';
+    pick.className = 'dvi-btn';
+    pick.textContent = st.connected ? '换一个价格文件' : '选择价格文件（只需这一次）';
+    pick.onclick = (ev) => {
+      // 真实点击 → 浏览器认这个手势。**不要**把 picker 调用挪进 Promise/定时器。
+      ev.preventDefault();
+      DVI.price.connect().then((r) => {
+        if (r.ok) ui.toast(`已连接 ${r.name} —— 之后自动写入，网站读同一个文件即可`);
+        else if (r.why === 'unsupported') ui.toast('此浏览器不支持，请用菜单里的「💾 下载价格文件」');
+        else if (r.why === 'cancelled') ui.toast('已取消');
+        else ui.toast('连接失败：' + r.why);
+        renderPriceBridgePanel();
+      });
+    };
+    row.appendChild(pick);
+
+    const grab = document.createElement('button');
+    grab.type = 'button';
+    grab.className = 'dvi-btn';
+    grab.textContent = '立即抓一次';
+    grab.onclick = () => { DVI.price.flushNow('手动'); setTimeout(renderPriceBridgePanel, 200); };
+    row.appendChild(grab);
+
+    if (st.connected) {
+      const re = document.createElement('button');
+      re.type = 'button';
+      re.className = 'dvi-btn';
+      re.textContent = '恢复授权';
+      re.onclick = () => {
+        DVI.price.reauthorise().then((r) => {
+          ui.toast(r.ok ? '已恢复' : '恢复失败：' + r.why);
+          renderPriceBridgePanel();
+        });
+      };
+      row.appendChild(re);
+    }
+
+    const note = document.createElement('div');
+    note.className = 'dvi-row';
+    const span = document.createElement('span');
+    span.style.cssText = 'flex:1;font-size:11.5px;color:#8a95a0';
+    span.textContent = '网站侧：利润网站「价格」页 → 连接本机文件 → 选同一个文件。';
+    note.appendChild(span);
+    row.appendChild(note);
+
+    box.appendChild(row);
+  }
+
   /* 价格桥常驻：市场消息一来就防抖落盘（途径①）；另有每小时兜底（途径②） */
   if (typeof DVI.attachPriceBridge === 'function') DVI.attachPriceBridge();
 
-  GM_registerMenuCommand('打开 DVI Tools 面板', () => ui.toggle(true));
+  GM_registerMenuCommand('打开 DVI Tools 面板', () => { ui.toggle(true); renderPriceBridgePanel(); });
   GM_registerMenuCommand('关闭面板', () => ui.toggle(false));
 
   /* 主动重算。默认是「按需刷新」：游戏状态变了不会自动重算，
