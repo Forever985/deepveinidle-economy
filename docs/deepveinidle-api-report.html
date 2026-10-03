@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Vein Idle — API 实测报告</title>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#ffffff; --ink:#1c1f23; --muted:#5f6b76; --line:#e3e5e8;
+    --accent:#2f6fed; --ok:#1a9e6a; --warn:#c8791a; --bad:#c0392b; --code:#f4f5f7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.7 -apple-system,"Segoe UI","Microsoft YaHei",Roboto,sans-serif;}
+  .wrap{max-width:960px;margin:0 auto;padding:44px 26px 80px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:30px}
+  h1{margin:0 0 8px;font-size:27px;font-weight:650;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:14px}
+  .badges{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .badge{font-size:12.5px;padding:3px 10px;border-radius:20px;background:#eef1f5;color:#3a4753;border:1px solid var(--line)}
+  .badge.ok{background:#e8f7f0;color:var(--ok);border-color:#c6e9da}
+  .badge.bad{background:#fdecea;color:var(--bad);border-color:#f5cdc8}
+  h2{font-size:19px;margin:40px 0 14px;padding-left:11px;border-left:4px solid var(--accent);font-weight:620}
+  h3{font-size:15.5px;margin:24px 0 8px;font-weight:620}
+  p{margin:9px 0}
+  code{background:var(--code);padding:2px 6px;border-radius:4px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+  pre{background:#1c1f23;color:#e6e8ea;padding:15px 17px;border-radius:8px;overflow-x:auto;
+      font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.6}
+  pre .k{color:#8ab4f8}.pre .s{color:#7ee2b8}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--card);
+        border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th{background:#f0f2f5;text-align:left;padding:9px 12px;font-weight:620;border-bottom:1px solid var(--line)}
+  td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  .stat b{display:block;font-size:20px;font-weight:650;letter-spacing:-.3px}
+  .stat span{font-size:12.5px;color:var(--muted)}
+  .ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+  .note{border-left:3px solid var(--warn);background:#fffaf0;padding:11px 15px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+  .note.sec{border-left-color:var(--bad);background:#fdf3f2}
+  ul{margin:8px 0;padding-left:22px}li{margin:5px 0}
+  footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Deep Vein Idle — API 实测报告</h1>
+  <div class="sub">目标 <span class="mono">https://deepveinidle.com/</span> · 测试时间 2026-10-01 · 浏览器放置类 MMO</div>
+  <div class="badges">
+    <span class="badge ok">HTTP 可达</span>
+    <span class="badge ok">WebSocket 可用</span>
+    <span class="badge ok">访客免注册</span>
+    <span class="badge bad">/ws 强制鉴权</span>
+    <span class="badge">协议 v3</span>
+  </div>
+</header>
+
+<p>这是一个单页游戏（Vite 打包），前端<strong>不含任何游戏逻辑</strong>——所有世界状态都由服务端的 WebSocket 实时推送。HTTP 层只负责账号、商店和支付。</p>
+
+<div class="grid">
+  <div class="stat"><b>1.6<small style="font-size:13px">/s</small></b><span>世界帧推送频率</span></div>
+  <div class="stat"><b>39,322,266</b><span>测试时服务器 tick</span></div>
+  <div class="stat"><b>1,266</b><span>在线玩家数</span></div>
+  <div class="stat"><b>90+</b><span>客户端指令码</span></div>
+  <div class="stat"><b>323 KB</b><span>resync 全量快照</span></div>
+</div>
+
+<h2>1. 技术栈与协议栈</h2>
+<table>
+  <tr><th>层</th><th>实测结果</th></tr>
+  <tr><td>反向代理</td><td>Caddy（带 HTTP/3，<span class="mono">Alt-Svc: h3</span>）</td></tr>
+  <tr><td>应用服务器</td><td><span class="mono">uWebSockets/20</span>（响应头显式暴露）</td></tr>
+  <tr><td>静态资源</td><td><span class="mono">/assets/index-B9U1m8kB.js</span>（2.0 MB，含 three.js）</td></tr>
+  <tr><td>实时通道</td><td>原生 WebSocket <span class="mono">wss://deepveinidle.com/ws</span></td></tr>
+  <tr><td>会话</td><td>Cookie <span class="mono">sid</span>（HttpOnly / Secure / SameSite=Strict / 30 天）</td></tr>
+  <tr><td>支付</td><td>Stripe 托管收银台（另有 Xsolla 开关，当前关闭）</td></tr>
+  <tr><td>当前版本</td><td><span class="mono">0.0.1164</span> · commit <span class="mono">1db7eb7</span> · branch <span class="mono">design-pass</span></td></tr>
+</table>
+
+<h2>2. HTTP 接口</h2>
+<p>全部位于 <span class="mono">/api/*</span>，POST 请求体为 JSON；返回统一为 <span class="mono">{ok, ...}</span>，失败时是 <span class="mono">{ok:false, error:"..."}</span>。</p>
+
+<h3>公共接口（无需登录）</h3>
+<table>
+  <tr><th>方法 路径</th><th>实测返回</th></tr>
+  <tr><td class="mono">GET /version.json</td><td>版本、commit、分支、构建时间</td></tr>
+  <tr><td class="mono">GET /api/shop</td><td>5 档宝石包（$4.99–$100）、4 档创始人礼包、支付商 = stripe</td></tr>
+  <tr><td class="mono">GET /api/me</td><td>有会话 <span class="mono">{"ok":true}</span>；无会话 <span class="mono">{"ok":false}</span></td></tr>
+  <tr><td class="mono">POST /api/guest</td><td><span class="mono">{"ok":true,"name":"Wanderer-9004"}</span> + 下发 sid cookie</td></tr>
+  <tr><td class="mono">GET /art/index.json</td><td>231 个贴图文件名数组（世界美术清单）</td></tr>
+</table>
+
+<h3>需要登录的接口</h3>
+<table>
+  <tr><th>方法 路径</th><th>说明 / 实测</th></tr>
+  <tr><td class="mono">POST /api/account</td><td>返回 <span class="mono">{name,email,guest,referrals}</span>，实测拿到 <span class="mono">Wanderer-9004 / guest:true</span></td></tr>
+  <tr><td class="mono">POST /api/login</td><td>用户名+密码登录；缺字段报 <span class="mono">"Send a username and a password."</span></td></tr>
+  <tr><td class="mono">POST /api/register</td><td>注册</td></tr>
+  <tr><td class="mono">POST /api/logout</td><td>登出</td></tr>
+  <tr><td class="mono">POST /api/account/claim</td><td>把访客号升级为正式账号</td></tr>
+  <tr><td class="mono">POST /api/account/{email,password,export,delete}</td><td>改邮箱 / 改密码 / 导出数据 / 注销账号</td></tr>
+  <tr><td class="mono">POST /api/forgot · /api/reset</td><td>找回密码链路</td></tr>
+  <tr><td class="mono">POST /api/vote</td><td>投票奖励回调（无参调用返回 404 File Not Found，说明它走的是带 token 的路径）</td></tr>
+  <tr><td class="mono">POST /api/gems/checkout</td><td><span class="ok">返回真实 Stripe 结账链接</span>（本次未完成支付）</td></tr>
+  <tr><td class="mono">POST /api/admin</td><td>用访客号请求返回 <span class="ok">{"error":"No."}</span> — 权限校验生效</td></tr>
+</table>
+
+<div class="note sec"><strong>安全观察：</strong>管理接口 <span class="mono">/api/admin</span>、账号导出/注销等敏感操作都挂在同一个 sid 会话上。鉴权拒绝信息是极简的 <span class="mono">"No."</span>，不泄露内部结构——这点做得不错。登录接口本次只做了单次错误凭据测试，未做爆破/限流压测。</div>
+
+<h2>3. WebSocket 游戏协议（核心）</h2>
+
+<h3>3.1 握手与鉴权</h3>
+<pre>GET /ws HTTP/1.1
+Host: deepveinidle.com
+Upgrade: websocket
+Cookie: sid=bHb...cUA          ← 必须携带有效会话
+
+→ HTTP/1.1 101 Switching Protocols
+→ 无 Cookie 时：HTTP/1.1 401 Unauthorized（连接被直接拒绝）</pre>
+
+<h3>3.2 帧格式</h3>
+<p>文本帧，纯 JSON，<strong>无压缩、无二进制</strong>。但服务端会把大帧做 WebSocket 分片（continuation 帧），客户端必须拼帧——这是实现时最容易踩的坑。</p>
+<pre><span class="k">// 服务端 → 客户端：世界增量帧</span>
+{"tick": 39322008, "m": [ ...消息数组... ], "a": 3}
+
+<span class="k">// 客户端 → 服务端：单条指令</span>
+{"t": "moveTo", "x": 188, "y": 78}</pre>
+<table>
+  <tr><th>字段</th><th>含义</th></tr>
+  <tr><td class="mono">tick</td><td>服务器逻辑帧号，单调递增，1 帧 ≈ 0.6 s</td></tr>
+  <tr><td class="mono">m</td><td>本帧消息数组，可空</td></tr>
+  <tr><td class="mono">a</td><td>可选。确认序号——客户端发第 N 条指令后，服务端在帧里回 <span class="mono">a:N</span> 表示已处理（实测连续 <span class="mono">a:1 … a:5</span> 一一对应）</td></tr>
+</table>
+
+<h3>3.3 关键指令实测</h3>
+<table>
+  <tr><th>发送</th><th>返回</th></tr>
+  <tr><td class="mono">{"t":"resync"}</td><td><span class="ok">两帧</span>：<span class="mono">welcome</span>（323 KB 全量世界）+ <span class="mono">snapshot</span>（本人完整存档）</td></tr>
+  <tr><td class="mono">{"t":"ping","n":1}</td><td><span class="mono">{"t":"pong","n":1}</span>，用于 RTT 测量</td></tr>
+  <tr><td class="mono">{"t":"leaderboard"}</td><td>22 个榜单 × 各 20 名（总榜/总经验/战斗/财富/收集 + 16 项技能榜）</td></tr>
+  <tr><td class="mono">{"t":"marketStock"}</td><td>409 个在售物品 ID 列表</td></tr>
+  <tr><td class="mono">{"t":"friends"}</td><td><span class="mono">{"t":"friends","rows":[]}</span></td></tr>
+  <tr><td class="mono">{"t":"totallyBogusOp"}</td><td><span class="ok">静默忽略</span>——不报错、不断连</td></tr>
+</table>
+
+<h3>3.4 welcome 帧结构（世界模型）</h3>
+<table>
+  <tr><th>字段</th><th>实测值 / 含义</th></tr>
+  <tr><td class="mono">protocol</td><td>3</td></tr>
+  <tr><td class="mono">seed</td><td>20260831 — 世界地图由种子确定性生成</td></tr>
+  <tr><td class="mono">online</td><td>1266</td></tr>
+  <tr><td class="mono">chat</td><td>810 条历史聊天（含中文频道 <span class="mono">channel:"zh"</span>）</td></tr>
+  <tr><td class="mono">windows</td><td>83 — 当前开放的活动/事件窗口</td></tr>
+  <tr><td class="mono">orders / contracts / goals</td><td>市场订单、合约、每日目标</td></tr>
+  <tr><td class="mono">bossNext / masteryFreeUntil</td><td>下个世界 Boss 帧号、精通免费期截止 tick</td></tr>
+  <tr><td class="mono">you</td><td>本人存档，<strong>79 个字段</strong>：skills(21)、bank/pack、coins、gems、equipment、house(7)、plots、quests、perks、titles、skins 等</td></tr>
+</table>
+
+<h3>3.5 实时增量消息类型</h3>
+<p>实测 12 秒内收到的核心消息类型：</p>
+<table>
+  <tr><th>类型</th><th>含义</th></tr>
+  <tr><td class="mono">enter / leave</td><td>玩家进出视野（带 id、name、x、y、gear、mount、work）</td></tr>
+  <tr><td class="mono">move</td><td>移动：目标坐标 + 完整路径点数组 + speed</td></tr>
+  <tr><td class="mono">work</td><td>当前作业：<span class="mono">{siteId, tool:"pickaxe"|"rod"|"hammer"…, item}</span></td></tr>
+  <tr><td class="mono">batch</td><td>产出结算：<span class="mono">{kind:"produced", jobId, itemId, xp, tier, wire}</span></td></tr>
+  <tr><td class="mono">chat</td><td>聊天：name / text / tick / channel / c 字段</td></tr>
+  <tr><td class="mono">leaderboard / marketStock / guildBoard / patronsBoard</td><td>按需拉取的大块数据</td></tr>
+</table>
+
+<div class="note"><strong>架构判断：</strong>服务器只广播<strong>视野内</strong>的玩家动作（消息里反复出现 id 618 / 4960 / 200,83 附近聚集），并做了 actor 级增量——同一玩家的 work 状态反复推送 <span class="mono">null</span> 表示"未变化"。这是典型的 AOI（Area of Interest）裁剪 + 增量同步，长连接成本被压得很低。</div>
+
+<h2>4. 客户端实现要点</h2>
+<div class="card">
+<ul>
+  <li><strong>必须先拿 cookie</strong>：<span class="mono">POST /api/guest</span> 或 <span class="mono">/api/login</span>，否则 <span class="mono">/ws</span> 直接 401。</li>
+  <li><strong>必须拼 WebSocket 分片</strong>：大帧（welcome / snapshot / leaderboard）会被拆成 continuation 帧，按 opcode 0x0 续接、看 FIN 位收尾。</li>
+  <li><strong>心跳</strong>：客户端定时发 <span class="mono">{"t":"ping","n":N}</span>，服务端回 <span class="mono">pong</span>。</li>
+  <li><strong>非法指令无副作用</strong>：未知 op 被静默忽略，不会踢连接——便于灰度加新指令。</li>
+  <li><strong>指令码 90+</strong>，覆盖面很广：战斗、市场、公会、房屋、家具、交易、宠物、镶嵌、精通、排队、投票、举报等。</li>
+</ul>
+</div>
+
+<h2>5. 结论</h2>
+<div class="card">
+<p><strong>API 状态：完全可用，且设计相当克制。</strong></p>
+<ul>
+  <li>HTTP 层职责单一、语义清晰，<span class="mono">/api/*</span> 统一 JSON 约定。</li>
+  <li>实时层是它真正的骨架：约 <strong>1.6 帧/秒</strong>的世界 tick + 视野内增量广播，实测 1266 人在线时单帧仅几百字节到十几 KB。</li>
+  <li>鉴权边界清楚：无会话即 401，越权即拒绝，未发现明显信息泄露。</li>
+  <li>值得注意的暴露面：<span class="mono">/version.json</span> 会直接吐出分支名与 commit（当前 <span class="mono">dirty:true</span>），等于对外公开构建进度——对一款在运营的游戏无伤大雅，但属于有意的"透明开发"策略。</li>
+</ul>
+</div>
+
+<footer>
+本报告基于 2026-10-01 对公开接口的被动探测，仅做只读测试：未完成任何支付、未进行压测或爆破、未改动共享世界状态（仅创建 1 个官方支持的访客角色）。<br>
+测试脚本：<span class="mono">dvi_probe/dvi_client.py</span>（零依赖，可直接运行）
+</footer>
+
+</div>
+</body>
+</html>

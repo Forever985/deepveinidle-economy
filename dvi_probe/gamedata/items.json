@@ -1,0 +1,1756 @@
+[
+ {
+  "id": 1,
+  "name": "Copper",
+  "stackable": false,
+  "value": 3
+ },
+ {
+  "id": 2,
+  "name": "Tin",
+  "stackable": false,
+  "value": 4
+ },
+ {
+  "id": 3,
+  "name": "Iron",
+  "stackable": false,
+  "value": 12
+ },
+ {
+  "id": 4,
+  "name": "Silver",
+  "stackable": false,
+  "value": 40
+ },
+ {
+  "id": 5,
+  "name": "Coal",
+  "stackable": false,
+  "value": 55
+ },
+ {
+  "id": 6,
+  "name": "Gold",
+  "stackable": false,
+  "value": 140
+ },
+ {
+  "id": 7,
+  "name": "Cobalt",
+  "stackable": false,
+  "value": 380
+ },
+ {
+  "id": 8,
+  "name": "Meteoric",
+  "stackable": false,
+  "value": 900
+ },
+ {
+  "id": 10,
+  "name": "Logs",
+  "stackable": false,
+  "value": 3
+ },
+ {
+  "id": 11,
+  "name": "Oak logs",
+  "stackable": false,
+  "value": 15
+ },
+ {
+  "id": 12,
+  "name": "Willow logs",
+  "stackable": false,
+  "value": 45
+ },
+ {
+  "id": 13,
+  "name": "Maple logs",
+  "stackable": false,
+  "value": 100
+ },
+ {
+  "id": 14,
+  "name": "Yew logs",
+  "stackable": false,
+  "value": 240
+ },
+ {
+  "id": 15,
+  "name": "Magic logs",
+  "stackable": false,
+  "value": 600
+ },
+ {
+  "id": 20,
+  "name": "Shrimp",
+  "stackable": false,
+  "value": 4
+ },
+ {
+  "id": 21,
+  "name": "Sardine",
+  "stackable": false,
+  "value": 9
+ },
+ {
+  "id": 22,
+  "name": "Trout",
+  "stackable": false,
+  "value": 26
+ },
+ {
+  "id": 23,
+  "name": "Salmon",
+  "stackable": false,
+  "value": 48
+ },
+ {
+  "id": 24,
+  "name": "Tuna",
+  "stackable": false,
+  "value": 92
+ },
+ {
+  "id": 25,
+  "name": "Lobster",
+  "stackable": false,
+  "value": 175
+ },
+ {
+  "id": 26,
+  "name": "Swordfish",
+  "stackable": false,
+  "value": 330
+ },
+ {
+  "id": 27,
+  "name": "Shark",
+  "stackable": false,
+  "value": 780
+ },
+ {
+  "id": 40,
+  "name": "Bronze bar",
+  "stackable": false,
+  "value": 12
+ },
+ {
+  "id": 41,
+  "name": "Iron bar",
+  "stackable": false,
+  "value": 22
+ },
+ {
+  "id": 42,
+  "name": "Steel bar",
+  "stackable": false,
+  "value": 156
+ },
+ {
+  "id": 43,
+  "name": "Cobalt bar",
+  "stackable": false,
+  "value": 660
+ },
+ {
+  "id": 44,
+  "name": "Meteoric bar",
+  "stackable": false,
+  "value": 1527
+ },
+ {
+  "id": 60,
+  "name": "Cooked shrimp",
+  "stackable": false,
+  "value": 9,
+  "heals": 3
+ },
+ {
+  "id": 61,
+  "name": "Cooked sardine",
+  "stackable": false,
+  "value": 15,
+  "heals": 4
+ },
+ {
+  "id": 62,
+  "name": "Cooked trout",
+  "stackable": false,
+  "value": 44,
+  "heals": 7
+ },
+ {
+  "id": 63,
+  "name": "Cooked salmon",
+  "stackable": false,
+  "value": 82,
+  "heals": 9
+ },
+ {
+  "id": 64,
+  "name": "Cooked tuna",
+  "stackable": false,
+  "value": 150,
+  "heals": 12
+ },
+ {
+  "id": 65,
+  "name": "Cooked lobster",
+  "stackable": false,
+  "value": 290,
+  "heals": 16
+ },
+ {
+  "id": 66,
+  "name": "Cooked swordfish",
+  "stackable": false,
+  "value": 550,
+  "heals": 20
+ },
+ {
+  "id": 67,
+  "name": "Cooked shark",
+  "stackable": false,
+  "value": 1280,
+  "heals": 26
+ },
+ {
+  "id": 70,
+  "name": "Burnt food",
+  "stackable": true,
+  "value": 0
+ },
+ {
+  "id": 80,
+  "name": "Bronze pickaxe",
+  "stackable": false,
+  "value": 29
+ },
+ {
+  "id": 81,
+  "name": "Iron pickaxe",
+  "stackable": false,
+  "value": 54
+ },
+ {
+  "id": 82,
+  "name": "Steel pickaxe",
+  "stackable": false,
+  "value": 346
+ },
+ {
+  "id": 83,
+  "name": "Cobalt pickaxe",
+  "stackable": false,
+  "value": 1435
+ },
+ {
+  "id": 84,
+  "name": "Meteoric pickaxe",
+  "stackable": false,
+  "value": 3461
+ },
+ {
+  "id": 85,
+  "name": "Bronze rod",
+  "stackable": false,
+  "value": 20
+ },
+ {
+  "id": 86,
+  "name": "Iron rod",
+  "stackable": false,
+  "value": 47
+ },
+ {
+  "id": 87,
+  "name": "Steel rod",
+  "stackable": false,
+  "value": 235
+ },
+ {
+  "id": 88,
+  "name": "Cobalt rod",
+  "stackable": false,
+  "value": 1015
+ },
+ {
+  "id": 89,
+  "name": "Meteoric rod",
+  "stackable": false,
+  "value": 2534
+ },
+ {
+  "id": 90,
+  "name": "Bronze axe",
+  "stackable": false,
+  "value": 29
+ },
+ {
+  "id": 91,
+  "name": "Iron axe",
+  "stackable": false,
+  "value": 54
+ },
+ {
+  "id": 92,
+  "name": "Steel axe",
+  "stackable": false,
+  "value": 346
+ },
+ {
+  "id": 93,
+  "name": "Cobalt axe",
+  "stackable": false,
+  "value": 1435
+ },
+ {
+  "id": 94,
+  "name": "Meteoric axe",
+  "stackable": false,
+  "value": 3461
+ },
+ {
+  "id": 110,
+  "name": "Bronze blade",
+  "stackable": false,
+  "value": 17
+ },
+ {
+  "id": 111,
+  "name": "Iron blade",
+  "stackable": false,
+  "value": 32
+ },
+ {
+  "id": 112,
+  "name": "Steel blade",
+  "stackable": false,
+  "value": 190
+ },
+ {
+  "id": 113,
+  "name": "Cobalt blade",
+  "stackable": false,
+  "value": 775
+ },
+ {
+  "id": 114,
+  "name": "Meteoric blade",
+  "stackable": false,
+  "value": 1934
+ },
+ {
+  "id": 115,
+  "name": "Bronze shield",
+  "stackable": false,
+  "value": 41
+ },
+ {
+  "id": 116,
+  "name": "Iron shield",
+  "stackable": false,
+  "value": 76
+ },
+ {
+  "id": 117,
+  "name": "Steel shield",
+  "stackable": false,
+  "value": 502
+ },
+ {
+  "id": 118,
+  "name": "Cobalt shield",
+  "stackable": false,
+  "value": 2095
+ },
+ {
+  "id": 119,
+  "name": "Meteoric shield",
+  "stackable": false,
+  "value": 4988
+ },
+ {
+  "id": 120,
+  "name": "Bronze helm",
+  "stackable": false,
+  "value": 29
+ },
+ {
+  "id": 121,
+  "name": "Iron helm",
+  "stackable": false,
+  "value": 54
+ },
+ {
+  "id": 122,
+  "name": "Steel helm",
+  "stackable": false,
+  "value": 346
+ },
+ {
+  "id": 123,
+  "name": "Cobalt helm",
+  "stackable": false,
+  "value": 1435
+ },
+ {
+  "id": 124,
+  "name": "Meteoric helm",
+  "stackable": false,
+  "value": 3461
+ },
+ {
+  "id": 125,
+  "name": "Bronze plate",
+  "stackable": false,
+  "value": 65
+ },
+ {
+  "id": 126,
+  "name": "Iron plate",
+  "stackable": false,
+  "value": 120
+ },
+ {
+  "id": 127,
+  "name": "Steel plate",
+  "stackable": false,
+  "value": 814
+ },
+ {
+  "id": 128,
+  "name": "Cobalt plate",
+  "stackable": false,
+  "value": 3415
+ },
+ {
+  "id": 129,
+  "name": "Meteoric plate",
+  "stackable": false,
+  "value": 8042
+ },
+ {
+  "id": 130,
+  "name": "Bronze greaves",
+  "stackable": false,
+  "value": 53
+ },
+ {
+  "id": 131,
+  "name": "Iron greaves",
+  "stackable": false,
+  "value": 98
+ },
+ {
+  "id": 132,
+  "name": "Steel greaves",
+  "stackable": false,
+  "value": 658
+ },
+ {
+  "id": 133,
+  "name": "Cobalt greaves",
+  "stackable": false,
+  "value": 2755
+ },
+ {
+  "id": 134,
+  "name": "Meteoric greaves",
+  "stackable": false,
+  "value": 6515
+ },
+ {
+  "id": 140,
+  "name": "Shortbow",
+  "stackable": false,
+  "value": 8
+ },
+ {
+  "id": 141,
+  "name": "Oak shortbow",
+  "stackable": false,
+  "value": 25
+ },
+ {
+  "id": 142,
+  "name": "Willow shortbow",
+  "stackable": false,
+  "value": 79
+ },
+ {
+  "id": 143,
+  "name": "Maple shortbow",
+  "stackable": false,
+  "value": 158
+ },
+ {
+  "id": 144,
+  "name": "Yew shortbow",
+  "stackable": false,
+  "value": 355
+ },
+ {
+  "id": 145,
+  "name": "Magic shortbow",
+  "stackable": false,
+  "value": 820
+ },
+ {
+  "id": 146,
+  "name": "Longbow",
+  "stackable": false,
+  "value": 11
+ },
+ {
+  "id": 147,
+  "name": "Oak longbow",
+  "stackable": false,
+  "value": 40
+ },
+ {
+  "id": 148,
+  "name": "Willow longbow",
+  "stackable": false,
+  "value": 124
+ },
+ {
+  "id": 149,
+  "name": "Maple longbow",
+  "stackable": false,
+  "value": 258
+ },
+ {
+  "id": 150,
+  "name": "Yew longbow",
+  "stackable": false,
+  "value": 595
+ },
+ {
+  "id": 151,
+  "name": "Magic longbow",
+  "stackable": false,
+  "value": 1420
+ },
+ {
+  "id": 152,
+  "name": "Staff",
+  "stackable": false,
+  "value": 11
+ },
+ {
+  "id": 153,
+  "name": "Oak staff",
+  "stackable": false,
+  "value": 40
+ },
+ {
+  "id": 154,
+  "name": "Willow staff",
+  "stackable": false,
+  "value": 124
+ },
+ {
+  "id": 155,
+  "name": "Maple staff",
+  "stackable": false,
+  "value": 258
+ },
+ {
+  "id": 156,
+  "name": "Yew staff",
+  "stackable": false,
+  "value": 595
+ },
+ {
+  "id": 157,
+  "name": "Magic staff",
+  "stackable": false,
+  "value": 1420
+ },
+ {
+  "id": 100,
+  "name": "Rough gem",
+  "stackable": true,
+  "value": 2500
+ },
+ {
+  "id": 200,
+  "name": "Coins",
+  "stackable": true,
+  "value": 1
+ },
+ {
+  "id": 201,
+  "name": "Gnawed charm",
+  "stackable": true,
+  "value": 1500
+ },
+ {
+  "id": 202,
+  "name": "Bog pearl",
+  "stackable": true,
+  "value": 4000
+ },
+ {
+  "id": 203,
+  "name": "Dry sigil",
+  "stackable": true,
+  "value": 12000
+ },
+ {
+  "id": 204,
+  "name": "Cairn token",
+  "stackable": true,
+  "value": 40000
+ },
+ {
+  "id": 205,
+  "name": "Rime fang",
+  "stackable": true,
+  "value": 120000
+ },
+ {
+  "id": 206,
+  "name": "Ember heart",
+  "stackable": true,
+  "value": 350000
+ },
+ {
+  "id": 207,
+  "name": "Abyssal eye",
+  "stackable": true,
+  "value": 900000
+ },
+ {
+  "id": 208,
+  "name": "Voidshard",
+  "stackable": true,
+  "value": 1500
+ },
+ {
+  "id": 160,
+  "name": "Potato seed",
+  "stackable": true,
+  "value": 2
+ },
+ {
+  "id": 161,
+  "name": "Glowcap spore",
+  "stackable": true,
+  "value": 6
+ },
+ {
+  "id": 162,
+  "name": "Turnip seed",
+  "stackable": true,
+  "value": 14
+ },
+ {
+  "id": 163,
+  "name": "Bitterroot seed",
+  "stackable": true,
+  "value": 30
+ },
+ {
+  "id": 164,
+  "name": "Voidmelon seed",
+  "stackable": true,
+  "value": 60
+ },
+ {
+  "id": 165,
+  "name": "Pepper seed",
+  "stackable": true,
+  "value": 110
+ },
+ {
+  "id": 170,
+  "name": "Potato",
+  "stackable": false,
+  "value": 7,
+  "heals": 3
+ },
+ {
+  "id": 171,
+  "name": "Glowcap",
+  "stackable": false,
+  "value": 22,
+  "heals": 5
+ },
+ {
+  "id": 172,
+  "name": "Cave turnip",
+  "stackable": false,
+  "value": 55,
+  "heals": 7
+ },
+ {
+  "id": 173,
+  "name": "Bitterroot",
+  "stackable": false,
+  "value": 120,
+  "heals": 10
+ },
+ {
+  "id": 174,
+  "name": "Voidmelon",
+  "stackable": false,
+  "value": 260,
+  "heals": 14
+ },
+ {
+  "id": 175,
+  "name": "Ember pepper",
+  "stackable": false,
+  "value": 520,
+  "heals": 20
+ },
+ {
+  "id": 180,
+  "name": "Cut gem",
+  "stackable": true,
+  "value": 2505
+ },
+ {
+  "id": 181,
+  "name": "Silver ring",
+  "stackable": false,
+  "value": 2563
+ },
+ {
+  "id": 182,
+  "name": "Gold ring",
+  "stackable": false,
+  "value": 2703
+ },
+ {
+  "id": 183,
+  "name": "Meteoric ring",
+  "stackable": false,
+  "value": 6757
+ },
+ {
+  "id": 184,
+  "name": "Silver amulet",
+  "stackable": false,
+  "value": 2579
+ },
+ {
+  "id": 185,
+  "name": "Gold amulet",
+  "stackable": false,
+  "value": 2741
+ },
+ {
+  "id": 186,
+  "name": "Meteoric amulet",
+  "stackable": false,
+  "value": 6944
+ },
+ {
+  "id": 190,
+  "name": "Sage seed",
+  "stackable": true,
+  "value": 6
+ },
+ {
+  "id": 191,
+  "name": "Nightshade seed",
+  "stackable": true,
+  "value": 40
+ },
+ {
+  "id": 192,
+  "name": "Dragonleaf seed",
+  "stackable": true,
+  "value": 220
+ },
+ {
+  "id": 193,
+  "name": "Sage",
+  "stackable": true,
+  "value": 18
+ },
+ {
+  "id": 194,
+  "name": "Nightshade",
+  "stackable": true,
+  "value": 110
+ },
+ {
+  "id": 195,
+  "name": "Dragonleaf",
+  "stackable": true,
+  "value": 520
+ },
+ {
+  "id": 209,
+  "name": "Gravemaw skull",
+  "stackable": false,
+  "value": 250000
+ },
+ {
+  "id": 210,
+  "name": "Hollow crown",
+  "stackable": false,
+  "value": 1000000
+ },
+ {
+  "id": 211,
+  "name": "Riftborne heart",
+  "stackable": false,
+  "value": 4000000
+ },
+ {
+  "id": 212,
+  "name": "Colossus core",
+  "stackable": false,
+  "value": 15000000
+ },
+ {
+  "id": 213,
+  "name": "Wraith ash",
+  "stackable": true,
+  "value": 15000
+ },
+ {
+  "id": 214,
+  "name": "Stalker fang",
+  "stackable": true,
+  "value": 30000
+ },
+ {
+  "id": 215,
+  "name": "Troll tusk",
+  "stackable": true,
+  "value": 50000
+ },
+ {
+  "id": 216,
+  "name": "Wight crown",
+  "stackable": true,
+  "value": 120000
+ },
+ {
+  "id": 217,
+  "name": "Drake scale",
+  "stackable": true,
+  "value": 250000
+ },
+ {
+  "id": 218,
+  "name": "Colossus ember",
+  "stackable": true,
+  "value": 500000
+ },
+ {
+  "id": 220,
+  "name": "Gatherer's draught",
+  "stackable": true,
+  "value": 28
+ },
+ {
+  "id": 221,
+  "name": "Hunter's brew",
+  "stackable": true,
+  "value": 272
+ },
+ {
+  "id": 222,
+  "name": "Warrior's tonic",
+  "stackable": true,
+  "value": 835
+ },
+ {
+  "id": 223,
+  "name": "Elixir of the vein",
+  "stackable": true,
+  "value": 1643
+ },
+ {
+  "id": 224,
+  "name": "Abyssal tonic",
+  "stackable": true,
+  "value": 2103
+ },
+ {
+  "id": 225,
+  "name": "Swift draught",
+  "stackable": true,
+  "value": 96
+ },
+ {
+  "id": 226,
+  "name": "Nourishing draught",
+  "stackable": true,
+  "value": 387
+ },
+ {
+  "id": 227,
+  "name": "Haste draught",
+  "stackable": true,
+  "value": 1205
+ },
+ {
+  "id": 240,
+  "name": "Gnawer pelt",
+  "stackable": true,
+  "value": 5
+ },
+ {
+  "id": 241,
+  "name": "Bogling skin",
+  "stackable": true,
+  "value": 12
+ },
+ {
+  "id": 242,
+  "name": "Husk chitin",
+  "stackable": true,
+  "value": 60
+ },
+ {
+  "id": 243,
+  "name": "Cairn bone",
+  "stackable": true,
+  "value": 120
+ },
+ {
+  "id": 244,
+  "name": "Wraith dust",
+  "stackable": true,
+  "value": 200
+ },
+ {
+  "id": 245,
+  "name": "Rimewolf fur",
+  "stackable": true,
+  "value": 500
+ },
+ {
+  "id": 246,
+  "name": "Stalker claw",
+  "stackable": true,
+  "value": 700
+ },
+ {
+  "id": 247,
+  "name": "Ember scale",
+  "stackable": true,
+  "value": 1200
+ },
+ {
+  "id": 248,
+  "name": "Troll hide",
+  "stackable": true,
+  "value": 800
+ },
+ {
+  "id": 249,
+  "name": "Horror ichor",
+  "stackable": true,
+  "value": 1000
+ },
+ {
+  "id": 250,
+  "name": "Ice wight shard",
+  "stackable": true,
+  "value": 1500
+ },
+ {
+  "id": 251,
+  "name": "Drake hide",
+  "stackable": true,
+  "value": 2000
+ },
+ {
+  "id": 252,
+  "name": "Colossus chip",
+  "stackable": true,
+  "value": 3000
+ },
+ {
+  "id": 260,
+  "name": "Pelt coif",
+  "stackable": false,
+  "value": 15
+ },
+ {
+  "id": 261,
+  "name": "Pelt jerkin",
+  "stackable": false,
+  "value": 30
+ },
+ {
+  "id": 262,
+  "name": "Pelt chaps",
+  "stackable": false,
+  "value": 20
+ },
+ {
+  "id": 263,
+  "name": "Bogskin coif",
+  "stackable": false,
+  "value": 34
+ },
+ {
+  "id": 264,
+  "name": "Bogskin jerkin",
+  "stackable": false,
+  "value": 70
+ },
+ {
+  "id": 265,
+  "name": "Bogskin chaps",
+  "stackable": false,
+  "value": 46
+ },
+ {
+  "id": 266,
+  "name": "Chitin coif",
+  "stackable": false,
+  "value": 154
+ },
+ {
+  "id": 267,
+  "name": "Chitin jerkin",
+  "stackable": false,
+  "value": 334
+ },
+ {
+  "id": 268,
+  "name": "Chitin chaps",
+  "stackable": false,
+  "value": 214
+ },
+ {
+  "id": 269,
+  "name": "Fur coif",
+  "stackable": false,
+  "value": 1115
+ },
+ {
+  "id": 270,
+  "name": "Fur jerkin",
+  "stackable": false,
+  "value": 2615
+ },
+ {
+  "id": 271,
+  "name": "Fur chaps",
+  "stackable": false,
+  "value": 1615
+ },
+ {
+  "id": 272,
+  "name": "Scale coif",
+  "stackable": false,
+  "value": 2807
+ },
+ {
+  "id": 273,
+  "name": "Scale jerkin",
+  "stackable": false,
+  "value": 6407
+ },
+ {
+  "id": 274,
+  "name": "Scale chaps",
+  "stackable": false,
+  "value": 4007
+ },
+ {
+  "id": 300,
+  "name": "Homespun bolt",
+  "stackable": true,
+  "value": 12
+ },
+ {
+  "id": 301,
+  "name": "Silk bolt",
+  "stackable": true,
+  "value": 70
+ },
+ {
+  "id": 302,
+  "name": "Gilded bolt",
+  "stackable": true,
+  "value": 260
+ },
+ {
+  "id": 303,
+  "name": "Voidweave bolt",
+  "stackable": true,
+  "value": 900
+ },
+ {
+  "id": 304,
+  "name": "Homespun hood",
+  "stackable": false,
+  "value": 29
+ },
+ {
+  "id": 305,
+  "name": "Homespun robe",
+  "stackable": false,
+  "value": 65
+ },
+ {
+  "id": 306,
+  "name": "Homespun skirt",
+  "stackable": false,
+  "value": 41
+ },
+ {
+  "id": 307,
+  "name": "Silk hood",
+  "stackable": false,
+  "value": 166
+ },
+ {
+  "id": 308,
+  "name": "Silk robe",
+  "stackable": false,
+  "value": 376
+ },
+ {
+  "id": 309,
+  "name": "Silk skirt",
+  "stackable": false,
+  "value": 236
+ },
+ {
+  "id": 310,
+  "name": "Gilded hood",
+  "stackable": false,
+  "value": 597
+ },
+ {
+  "id": 311,
+  "name": "Gilded robe",
+  "stackable": false,
+  "value": 1377
+ },
+ {
+  "id": 312,
+  "name": "Gilded skirt",
+  "stackable": false,
+  "value": 857
+ },
+ {
+  "id": 313,
+  "name": "Voidweave hood",
+  "stackable": false,
+  "value": 2020
+ },
+ {
+  "id": 314,
+  "name": "Voidweave robe",
+  "stackable": false,
+  "value": 4720
+ },
+ {
+  "id": 315,
+  "name": "Voidweave skirt",
+  "stackable": false,
+  "value": 2920
+ },
+ {
+  "id": 316,
+  "name": "Rock mite nymph",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 317,
+  "name": "Fen lurker spawn",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 318,
+  "name": "Grave beetle grub",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 319,
+  "name": "Sump crawler hatchling",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 320,
+  "name": "Stone eater pebble",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 321,
+  "name": "Barrow pup",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 322,
+  "name": "Chalk wightling",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 323,
+  "name": "Pelt gloves",
+  "stackable": false,
+  "value": 75
+ },
+ {
+  "id": 324,
+  "name": "Bogskin gloves",
+  "stackable": false,
+  "value": 4000
+ },
+ {
+  "id": 325,
+  "name": "Chitin gloves",
+  "stackable": false,
+  "value": 12000
+ },
+ {
+  "id": 326,
+  "name": "Bone gloves",
+  "stackable": false,
+  "value": 40000
+ },
+ {
+  "id": 327,
+  "name": "Scale gloves",
+  "stackable": false,
+  "value": 350000
+ },
+ {
+  "id": 328,
+  "name": "Horse",
+  "stackable": false,
+  "value": 10000
+ },
+ {
+  "id": 329,
+  "name": "Pelt quiver",
+  "stackable": false,
+  "value": 18
+ },
+ {
+  "id": 330,
+  "name": "Bogskin quiver",
+  "stackable": false,
+  "value": 49
+ },
+ {
+  "id": 331,
+  "name": "Chitin quiver",
+  "stackable": false,
+  "value": 199
+ },
+ {
+  "id": 332,
+  "name": "Fur quiver",
+  "stackable": false,
+  "value": 1215
+ },
+ {
+  "id": 333,
+  "name": "Scale quiver",
+  "stackable": false,
+  "value": 3047
+ },
+ {
+  "id": 334,
+  "name": "Linen grimoire",
+  "stackable": false,
+  "value": 41
+ },
+ {
+  "id": 335,
+  "name": "Silk grimoire",
+  "stackable": false,
+  "value": 248
+ },
+ {
+  "id": 336,
+  "name": "Gilded grimoire",
+  "stackable": false,
+  "value": 1057
+ },
+ {
+  "id": 337,
+  "name": "Voidweave grimoire",
+  "stackable": false,
+  "value": 4320
+ },
+ {
+  "id": 338,
+  "name": "Troll coif",
+  "stackable": false,
+  "value": 2183
+ },
+ {
+  "id": 339,
+  "name": "Troll jerkin",
+  "stackable": false,
+  "value": 4583
+ },
+ {
+  "id": 340,
+  "name": "Troll chaps",
+  "stackable": false,
+  "value": 2983
+ },
+ {
+  "id": 341,
+  "name": "Drake coif",
+  "stackable": false,
+  "value": 4650
+ },
+ {
+  "id": 342,
+  "name": "Drake jerkin",
+  "stackable": false,
+  "value": 10650
+ },
+ {
+  "id": 343,
+  "name": "Drake chaps",
+  "stackable": false,
+  "value": 6650
+ },
+ {
+  "id": 344,
+  "name": "Wightweave hood",
+  "stackable": false,
+  "value": 3800
+ },
+ {
+  "id": 345,
+  "name": "Wightweave robe",
+  "stackable": false,
+  "value": 9500
+ },
+ {
+  "id": 346,
+  "name": "Wightweave skirt",
+  "stackable": false,
+  "value": 6200
+ },
+ {
+  "id": 347,
+  "name": "Troll quiver",
+  "stackable": false,
+  "value": 2783
+ },
+ {
+  "id": 348,
+  "name": "Drake quiver",
+  "stackable": false,
+  "value": 5850
+ },
+ {
+  "id": 349,
+  "name": "Wightweave grimoire",
+  "stackable": false,
+  "value": 6200
+ },
+ {
+  "id": 350,
+  "name": "Colossus blade",
+  "stackable": false,
+  "value": 11231
+ },
+ {
+  "id": 351,
+  "name": "Colossus shield",
+  "stackable": false,
+  "value": 11231
+ },
+ {
+  "id": 352,
+  "name": "Colossus helm",
+  "stackable": false,
+  "value": 6704
+ },
+ {
+  "id": 353,
+  "name": "Colossus plate",
+  "stackable": false,
+  "value": 17285
+ },
+ {
+  "id": 354,
+  "name": "Colossus greaves",
+  "stackable": false,
+  "value": 12758
+ },
+ {
+  "id": 355,
+  "name": "Leviathan scale",
+  "stackable": true,
+  "value": 20000
+ },
+ {
+  "id": 356,
+  "name": "Wyrm ember",
+  "stackable": true,
+  "value": 20000
+ },
+ {
+  "id": 357,
+  "name": "Leviathan amulet",
+  "stackable": false,
+  "value": 25593
+ },
+ {
+  "id": 358,
+  "name": "Wyrm ring",
+  "stackable": false,
+  "value": 25593
+ },
+ {
+  "id": 359,
+  "name": "Protection scroll",
+  "stackable": true,
+  "value": 10
+ },
+ {
+  "id": 360,
+  "name": "Bronze pan",
+  "stackable": false,
+  "value": 17
+ },
+ {
+  "id": 361,
+  "name": "Iron pan",
+  "stackable": false,
+  "value": 32
+ },
+ {
+  "id": 362,
+  "name": "Steel pan",
+  "stackable": false,
+  "value": 190
+ },
+ {
+  "id": 363,
+  "name": "Cobalt pan",
+  "stackable": false,
+  "value": 775
+ },
+ {
+  "id": 364,
+  "name": "Meteoric pan",
+  "stackable": false,
+  "value": 1934
+ },
+ {
+  "id": 365,
+  "name": "Bronze hammer",
+  "stackable": false,
+  "value": 29
+ },
+ {
+  "id": 366,
+  "name": "Iron hammer",
+  "stackable": false,
+  "value": 54
+ },
+ {
+  "id": 367,
+  "name": "Steel hammer",
+  "stackable": false,
+  "value": 346
+ },
+ {
+  "id": 368,
+  "name": "Cobalt hammer",
+  "stackable": false,
+  "value": 1435
+ },
+ {
+  "id": 369,
+  "name": "Meteoric hammer",
+  "stackable": false,
+  "value": 3461
+ },
+ {
+  "id": 370,
+  "name": "Bronze knife",
+  "stackable": false,
+  "value": 17
+ },
+ {
+  "id": 371,
+  "name": "Iron knife",
+  "stackable": false,
+  "value": 32
+ },
+ {
+  "id": 372,
+  "name": "Steel knife",
+  "stackable": false,
+  "value": 190
+ },
+ {
+  "id": 373,
+  "name": "Cobalt knife",
+  "stackable": false,
+  "value": 775
+ },
+ {
+  "id": 374,
+  "name": "Meteoric knife",
+  "stackable": false,
+  "value": 1934
+ },
+ {
+  "id": 375,
+  "name": "Bronze needle",
+  "stackable": false,
+  "value": 17
+ },
+ {
+  "id": 376,
+  "name": "Iron needle",
+  "stackable": false,
+  "value": 32
+ },
+ {
+  "id": 377,
+  "name": "Steel needle",
+  "stackable": false,
+  "value": 190
+ },
+ {
+  "id": 378,
+  "name": "Cobalt needle",
+  "stackable": false,
+  "value": 775
+ },
+ {
+  "id": 379,
+  "name": "Meteoric needle",
+  "stackable": false,
+  "value": 1934
+ },
+ {
+  "id": 380,
+  "name": "Bronze mortar",
+  "stackable": false,
+  "value": 29
+ },
+ {
+  "id": 381,
+  "name": "Iron mortar",
+  "stackable": false,
+  "value": 54
+ },
+ {
+  "id": 382,
+  "name": "Steel mortar",
+  "stackable": false,
+  "value": 346
+ },
+ {
+  "id": 383,
+  "name": "Cobalt mortar",
+  "stackable": false,
+  "value": 1435
+ },
+ {
+  "id": 384,
+  "name": "Meteoric mortar",
+  "stackable": false,
+  "value": 3461
+ },
+ {
+  "id": 385,
+  "name": "Bronze hoe",
+  "stackable": false,
+  "value": 23
+ },
+ {
+  "id": 386,
+  "name": "Iron hoe",
+  "stackable": false,
+  "value": 62
+ },
+ {
+  "id": 387,
+  "name": "Steel hoe",
+  "stackable": false,
+  "value": 280
+ },
+ {
+  "id": 388,
+  "name": "Cobalt hoe",
+  "stackable": false,
+  "value": 1255
+ },
+ {
+  "id": 389,
+  "name": "Meteoric hoe",
+  "stackable": false,
+  "value": 3134
+ },
+ {
+  "id": 390,
+  "name": "Bronze greatsword",
+  "stackable": false,
+  "value": 29
+ },
+ {
+  "id": 391,
+  "name": "Iron greatsword",
+  "stackable": false,
+  "value": 54
+ },
+ {
+  "id": 392,
+  "name": "Steel greatsword",
+  "stackable": false,
+  "value": 346
+ },
+ {
+  "id": 393,
+  "name": "Cobalt greatsword",
+  "stackable": false,
+  "value": 1435
+ },
+ {
+  "id": 394,
+  "name": "Meteoric greatsword",
+  "stackable": false,
+  "value": 3461
+ },
+ {
+  "id": 395,
+  "name": "Colossus greatsword",
+  "stackable": false,
+  "value": 12704
+ },
+ {
+  "id": 396,
+  "name": "Golden Week gift box",
+  "stackable": true,
+  "value": 25
+ },
+ {
+  "id": 280,
+  "name": "Gnawer pup",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 281,
+  "name": "Bogling tadpole",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 282,
+  "name": "Husk grub",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 283,
+  "name": "Cairn wisp",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 284,
+  "name": "Rimewolf cub",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 285,
+  "name": "Emberkin spark",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 286,
+  "name": "Horror spawn",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 287,
+  "name": "Wraith mote",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 288,
+  "name": "Stalker kit",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 289,
+  "name": "Frost troll whelp",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 290,
+  "name": "Ice wight shard-child",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 291,
+  "name": "Ash drake hatchling",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 292,
+  "name": "Cinder ember",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 293,
+  "name": "Gem pack",
+  "stackable": true,
+  "value": 10
+ },
+ {
+  "id": 294,
+  "name": "Pouch of gems",
+  "stackable": true,
+  "value": 1200
+ },
+ {
+  "id": 295,
+  "name": "Chest of gems",
+  "stackable": true,
+  "value": 2600
+ },
+ {
+  "id": 296,
+  "name": "Vein of gems",
+  "stackable": true,
+  "value": 7000
+ },
+ {
+  "id": 297,
+  "name": "Hoard of gems",
+  "stackable": true,
+  "value": 15000
+ }
+]

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DVI Tools · 里程碑上下文（v2026.10.02.8）</title>
+<style>
+  :root{
+    --bg:#faf9f7; --card:#fff; --ink:#2c2c2a; --muted:#5f5e5a; --line:#e3e0d8;
+    --blue:#185fa5; --blue-bg:#e6f1fb; --teal:#0f6e56; --teal-bg:#e1f5ee;
+    --amber:#854f0b; --amber-bg:#faeeda; --red:#a32d2d; --red-bg:#fcebeb;
+    --green:#3b6d11; --green-bg:#eaf3de; --gray-bg:#f1efe8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px 20px 72px;background:var(--bg);color:var(--ink);
+       font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:26px;font-weight:600;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+  h2{font-size:19px;font-weight:600;margin:38px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+  h3{font-size:15px;font-weight:600;margin:22px 0 8px;color:var(--blue)}
+  p{margin:10px 0}
+  code{background:var(--gray-bg);padding:1px 6px;border-radius:4px;
+       font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+  pre{background:#2c2c2a;color:#e8e6e1;padding:14px 16px;border-radius:8px;overflow-x:auto;
+      font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;margin:12px 0}
+  pre .c{color:#8f8b82}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--gray-bg);font-weight:600;font-size:13px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+  .ok{background:var(--green-bg);border-left:3px solid var(--green);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .warn{background:var(--amber-bg);border-left:3px solid var(--amber);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .bad{background:var(--red-bg);border-left:3px solid var(--red);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .info{background:var(--blue-bg);border-left:3px solid var(--blue);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600}
+  .t-ok{background:var(--green-bg);color:var(--green)}
+  .t-no{background:var(--red-bg);color:var(--red)}
+  .t-part{background:var(--amber-bg);color:var(--amber)}
+  ul{margin:10px 0;padding-left:22px}
+  li{margin:5px 0}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0;font-size:13px}
+  .flow .b{background:var(--blue-bg);border:1px solid #b5d4f4;color:#0c447c;
+           padding:8px 13px;border-radius:8px;font-weight:500}
+  .flow .a{color:var(--muted)}
+  .flow .g{background:var(--teal-bg);border-color:#9fe1cb;color:#04342c}
+  hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+  .foot{color:var(--muted);font-size:13px;text-align:center;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>DVI Tools · 里程碑上下文</h1>
+<div class="sub">
+  版本 <code>2026.10.02.8</code> · 2026-10-02 · 状态：<strong>已在真实浏览器验收通过</strong><br>
+  目标：为网页游戏 Deep Vein Idle 做一套仿 MWITools 的<strong>只读</strong>增强工具
+</div>
+
+<div class="ok">
+<strong>里程碑意义：</strong>内联注入首次在真实浏览器中生效 —— 作业列表 <strong>8/8 个行全部标注成功</strong>。
+此前长期卡在「插件代码整段不执行」，根因是打包结构缺陷（见第 4 节）。
+</div>
+
+<h2>1. 现在能做什么</h2>
+
+<p>进入游戏、打开作业面板后，每个作业行末尾会出现一枚小标注，<strong>就地告诉你以此刻配置还需多少次行动、多久能升到目标等级</strong>：</p>
+
+<pre>Copper  <span class="c">…… 需 128 次 · 12 分 4 秒   ← 悬停看完整明细</span></pre>
+
+<p>悬停展开的内容包含：经验明细、分段升级表，以及<strong>本次计算实际用到的实时参数</strong>：</p>
+
+<pre>采矿: 30 级（69,290 xp）
+Copper 需求: 1 级
+工具: Iron pickaxe +16%
+快捷特长: 4 级 +2.0%
+社区活动: 经验 ×1.25</pre>
+
+<div class="info">
+<strong>关键设计：</strong>没有一项配置需要手动填写。等级、装备、特长、增益层数、社区活动倍率
+全部<strong>从存档实时读取、每次渲染重新求值</strong>。换一件装备，下一次渲染数字就变。
+这份「当前配置」清单是刻意展示的 —— 让用户看得见数字来自实时状态，而不是写死的值。
+</div>
+
+<h2>2. 已验证的事实</h2>
+
+<table>
+  <tr><th>项目</th><th>结论</th><th>状态</th></tr>
+  <tr><td>真实浏览器运行</td><td>Quetta + Tampermonkey，主干与 2 个插件均正常加载、初始化、启用</td><td><span class="tag t-ok">已验证</span></td></tr>
+  <tr><td>内联锚点命中</td><td><code>[data-routes] [data-job]</code> 命中 8 个作业行，注入 8/8</td><td><span class="tag t-ok">已验证</span></td></tr>
+  <tr><td>耗时公式</td><td>与实测数据交叉验证，偏差 0.2%</td><td><span class="tag t-ok">已验证</span></td></tr>
+  <tr><td>时间单位</td><td><code>1 tick = 600ms</code>（不是 1 秒）</td><td><span class="tag t-ok">已验证</span></td></tr>
+  <tr><td>经验加成链</td><td>实测样本比值 1.313，理论预测 1.30</td><td><span class="tag t-ok">已验证</span></td></tr>
+  <tr><td>工具（装备）加成</td><td>从 bundle 提取加成表，铁斧 itemId 91 → ×1.16</td><td><span class="tag t-ok">已验证</span></td></tr>
+  <tr><td>只读约束</td><td><code>net</code> 刻意不暴露 <code>send</code>，架构级保证</td><td><span class="tag t-ok">已验证</span></td></tr>
+  <tr><td>强化装备（+N）额外加成</td><td>走另一条代码路径（<code>W$</code>），尚未展开</td><td><span class="tag t-no">未覆盖</span></td></tr>
+</table>
+
+<p>自动化测试：<strong>309 项断言全绿</strong>，覆盖 28 个小节。</p>
+
+<h2>3. 架构</h2>
+
+<div class="flow">
+  <span class="b">客户端 bundle</span><span class="a">→</span>
+  <span class="b">提取器 extract_*.py</span><span class="a">→</span>
+  <span class="b">数据层 DATA.balance</span>
+</div>
+<div class="flow">
+  <span class="b g">收包钩子（只读）</span><span class="a">→</span>
+  <span class="b g">状态归约</span><span class="a">→</span>
+  <span class="b g">计算引擎</span><span class="a">→</span>
+  <span class="b g">内联注入游戏界面</span>
+</div>
+
+<h3>构建期 / 运行期分离</h3>
+<p>游戏平衡常量（经验档位、增益倍率、特长系数、工具加成…）<strong>全部由提取器从 bundle 提取</strong>，
+经 <code>build.py</code> 并进数据层，运行期按玩家当前状态查表。<strong>游戏改版后只需重跑提取器 + 构建，逻辑代码一行不动。</strong></p>
+
+<h3>文件地图</h3>
+<table>
+  <tr><th>路径</th><th>作用</th></tr>
+  <tr><td><code>dvi-tools/dvi-tools.user.js</code></td><td><strong>唯一需要安装的文件</strong>。主干 + 数据 + 插件，单文件 178 KB</td></tr>
+  <tr><td><code>dvi-tools/src/core.js</code></td><td>主干源码（数据层 / 计算 / 事件总线 / 状态 / 网络 / 设置 / UI / 插件注册表 / 诊断）</td></tr>
+  <tr><td><code>dvi-tools/plugins/*.js</code></td><td>功能插件。按文件名排序打包</td></tr>
+  <tr><td><code>dvi-tools/build.py</code></td><td>内联数据 + 注入插件 → 单个用户脚本</td></tr>
+  <tr><td><code>dvi-tools/test/test.js</code></td><td>309 项断言，直接加载构建产物</td></tr>
+  <tr><td><code>dvi-tools/dvi-check.user.js</code></td><td>最小自检脚本，诊断用，可删</td></tr>
+  <tr><td><code>dvi_probe/extract_balance.py</code></td><td>从 bundle 提取 7 组系数表</td></tr>
+  <tr><td><code>dvi_probe/dvi-collector.user.js</code></td><td>数据采集器（开发用，默认不记录）</td></tr>
+</table>
+
+<h3>每次改完必须跑</h3>
+<pre>python build.py          <span class="c"># 构建</span>
+node --check dvi-tools.user.js   <span class="c"># 独立语法校验</span>
+node test/test.js        <span class="c"># 309 项断言</span></pre>
+
+<h2>4. 打包结构（改之前必读）</h2>
+
+<div class="bad">
+<strong>血泪教训：插件必须注入到主干 IIFE 内部，绝不能追加在文件末尾。</strong>
+</div>
+
+<p>曾经的布局是：主干 IIFE 占据文件前 3263 行，插件作为<strong>独立的顶层代码块</strong>追加在其后。
+两者只靠「文件顺序」维系 —— 实机上插件<strong>整段不执行</strong>，而且：</p>
+<ul>
+  <li>主干一切正常（版本、菜单、日志模块全部可用）</li>
+  <li>插件一个都没注册</li>
+  <li><strong>没有任何报错、没有任何痕迹</strong></li>
+</ul>
+
+<p>排查耗费了整整几轮，因为「失败也没有痕迹」意味着无从下手。最终靠<strong>启动痕迹</strong>
+（DOM 属性 + 页面全局双写）才确定是「代码根本没跑」，而非「跑了但出错」。</p>
+
+<p><strong>现在的做法：</strong><code>core.js</code> 里有注入点</p>
+<pre>ROOT[NS] = api;
+api.selfTest = selfTest;
+<span class="c">/*@DVI_PLUGINS@*/   ← build.py 把插件注入到这里</span></pre>
+<p><code>build.py</code> 在注入点未被替换时<strong>直接中止构建</strong>，不产出不可信产物。
+有 6 条断言守着这个结构（测试第 ㉘ 节）。</p>
+
+<h2>5. 诊断设施（排障第一站）</h2>
+
+<table>
+  <tr><th>工具</th><th>用法</th></tr>
+  <tr><td><strong>📄 保存运行日志（下载 txt）</strong></td><td>导出环境信息 + 全部日志。出问题的第一动作</td></tr>
+  <tr><td>🔎 查看最近日志（50 条）</td><td>快速扫一眼</td></tr>
+  <tr><td>🔍 检查内联注入</td><td>报告每个锚点的候选/命中/宿主数/注入数/错误 + 页面元素探测</td></tr>
+  <tr><td>▶ 运行 DVI 最小自检</td><td>独立脚本，7 段式报告，判断主干/插件/锚点各层状态</td></tr>
+  <tr><td>采集游戏界面结构</td><td>导出 DOM 结构，供对准锚点</td></tr>
+</table>
+
+<h3>内置机制</h3>
+<ul>
+  <li><code>DIAG</code> 环形缓冲 800 条，自动捕获 <code>onerror</code> 与 <code>unhandledrejection</code></li>
+  <li>插件启动痕迹：<code>data-dvi-plugin-*</code> DOM 属性 + <code>window.__dviBoot</code></li>
+  <li>插件失败留痕：<code>window.__dviPluginErrors</code></li>
+  <li>注入结果只在「总数变化时」记一条，避免每帧刷屏</li>
+</ul>
+
+<div class="ok">
+<strong>铁律：遇到「功能没出现」，先导出运行日志，不要先改代码。</strong>
+本项目的几次重大弯路，都源于「在证据不足时就开始加固代码」。
+</div>
+
+<h2>6. Tampermonkey 兼容（踩过的坑）</h2>
+
+<div class="warn">
+<code>GM_registerMenuCommand</code> <strong>第一个参数必须是字符串</strong>。
+传函数（动态标题）是 <strong>Violentmonkey</strong> 的用法，TM 上会抛
+<code>Uncaught (in promise) invalid name</code>，<strong>且抛错会中断其后的所有代码</strong>。
+主干和采集器<strong>都犯过这个错</strong>。
+</div>
+
+<div class="warn">
+插件<strong>不要</strong>写 <code>if (!DVI) return;</code>。
+依赖未就绪就静默退出 = 诊断黑洞。要<strong>重试 + 把失败原因写到别人能读到的地方</strong>。
+</div>
+
+<h2>7. 项目约定</h2>
+
+<table>
+  <tr><th>约定</th><th>原因</th></tr>
+  <tr><td><strong>不做剪贴板功能</strong>，导出统一走下载文件</td><td>导出内容动辄几十上百 KB，塞剪贴板既鸡肋又难粘贴。用户明确要求过</td></tr>
+  <tr><td><strong>UI 默认无痕迹</strong>，只从油猴菜单主动打开</td><td>不往游戏页面插常驻元素</td></tr>
+  <tr><td><strong>融入游戏而非浮在上面</strong></td><td>用 MutationObserver + <code>insertAdjacent*</code> 注入游戏已有元素，不另开悬浮窗</td></tr>
+  <tr><td><strong>逆向系数一律进数据层</strong></td><td>写死 = 游戏改版后静默算错且不报错。必须能从存档现算的就现算，不缓存快照</td></tr>
+  <tr><td><strong>只读是架构级约束</strong></td><td><code>net</code> 不暴露 <code>send</code>；不做自动化（服务端有封禁机制，且是单世界共享经济）</td></tr>
+  <tr><td><strong>版本号用日期式</strong></td><td>曾长期写死 <code>1.0.0</code>，导致用户无法分辨新旧构建，白折腾数轮</td></tr>
+</table>
+
+<h2>8. 反推出的游戏机制（可复用资产）</h2>
+
+<table>
+  <tr><th>机制</th><th>结论</th></tr>
+  <tr><td>经验曲线</td><td><code>round(100 × (1.12^(n-1) − 1) / 0.12)</code>，99 级后按 1.145 递增</td></tr>
+  <tr><td>行动耗时</td><td><code>baseTicks ÷ 速度因子</code>（<strong>除</strong>，不是乘）</td></tr>
+  <tr><td>时间单位</td><td><code>1 tick = 600ms</code></td></tr>
+  <tr><td>经验加成</td><td><code>round(base × 档位 × It(社区倍率, 各项增幅))</code>，档位表 <code>[1,1.5,3,8,25]</code></td></tr>
+  <tr><td>加成叠加</td><td><strong>各自减 1 再相加</strong>，不是连乘</td></tr>
+  <tr><td>增益层数</td><td>按 <code>brewBuckets</code> <strong>随时间衰减</strong>，层数查表得倍率</td></tr>
+  <tr><td>工具加成</td><td>工具系数 = <code>1 + 该装备的 bonus</code>（按 itemId 查表）</td></tr>
+  <tr><td>作业行 DOM</td><td><code>&lt;button class="route" data-job="{id}"&gt;</code>，容器 <code>[data-routes]</code></td></tr>
+</table>
+
+<h3>数据规模</h3>
+<p>游戏数据版本 <code>0.0.1164 / commit 1db7eb7</code> · 290 物品 · 221 配方 · 383 站点 · 20 怪物</p>
+
+<h2>9. 下一步（按价值排序）</h2>
+
+<ol>
+  <li><strong><code>git init</code></strong> —— 工作区没有版本控制，所有改动不可回溯。这是当前最大的工程风险</li>
+  <li><strong>强化装备加成</strong> —— 唯一未覆盖的配置项，影响"当前配置"的完整度</li>
+  <li><strong>目标等级的就地调整</strong> —— 目前默认"下一级"（零配置），想看"升到 50 级"需进面板改。可做成界面上直接点击切换</li>
+  <li><strong>更多插件</strong> —— 利润面板（<code>calc.analyse</code> 已就绪只差 UI）、行情记录、资产曲线</li>
+  <li><strong>删除采集器</strong> —— 普通使用不需要它；若已安装建议删掉（旧版还有 <code>invalid name</code> 报错）</li>
+</ol>
+
+<h2>10. 关于调试方法论</h2>
+
+<p>这次打通卡了多轮，复盘下来最有价值的不是任何一行代码，而是<strong>一个排查顺序</strong>：</p>
+
+<div class="card">
+<strong>当「功能没出现」时：</strong>
+<ol style="margin:8px 0 0">
+  <li><strong>先确认对方实际运行的是哪个构建</strong>（版本号是否可分辨？）</li>
+  <li><strong>再植入一个不可能失败的存活标记</strong>，把「代码没跑」和「代码跑了但出错」分开</li>
+  <li><strong>最后才改代码</strong></li>
+</ol>
+</div>
+
+<p>前几轮之所以低效，正是在证据不足时就开始加固代码 —— 测试全绿，但功能从未工作过。
+本项目的教训浓缩成一句：</p>
+
+<div class="bad" style="font-size:15px">
+<strong>测试通过 ≠ 功能可用。</strong>
+断言要打在<strong>产物行为</strong>上（锚点真的注入了），而不是<strong>中间状态</strong>上（插件被注册了）。
+</div>
+
+<p>以及：<strong>吞异常必须留痕</strong>。silent catch 会把「完全没工作」伪装成「一切正常」，
+而用户只会看到「什么都没发生」。</p>
+
+<hr>
+
+<div class="foot">
+DVI Tools · 里程碑上下文 · v2026.10.02.8 · 2026-10-02<br>
+只读增强工具，不发送任何游戏指令
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Vein Idle 脚本 —— 可行性测绘</title>
+<style>
+  :root{--bg:#f7f7f5;--card:#fff;--ink:#1c1f23;--muted:#5f6b76;--line:#e3e5e8;
+    --accent:#2f6fed;--ok:#1a9e6a;--warn:#c8791a;--bad:#c0392b;--code:#f4f5f7;
+    --t1:#e8f7f0;--t2:#fff8e8;--t3:#fdecea}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.72 -apple-system,"Segoe UI","Microsoft YaHei",Roboto,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:44px 26px 90px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:26px}
+  h1{margin:0 0 8px;font-size:27px;font-weight:650;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:14px}
+  h2{font-size:19px;margin:40px 0 14px;padding-left:11px;border-left:4px solid var(--accent);font-weight:620}
+  h3{font-size:15.5px;margin:24px 0 8px;font-weight:620}
+  p{margin:9px 0}
+  code{background:var(--code);padding:2px 6px;border-radius:4px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  pre{background:#1c1f23;color:#e6e8ea;padding:14px 16px;border-radius:8px;overflow-x:auto;
+      font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.6}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--card);
+        border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th{background:#f0f2f5;text-align:left;padding:9px 12px;font-weight:620;border-bottom:1px solid var(--line)}
+  td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  .ok{color:var(--ok);font-weight:620}.warn{color:var(--warn);font-weight:620}.bad{color:var(--bad);font-weight:620}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  .stat b{display:block;font-size:20px;font-weight:650;letter-spacing:-.3px}
+  .stat span{font-size:12.5px;color:var(--muted)}
+  .note{border-left:3px solid var(--warn);background:#fffaf0;padding:11px 15px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+  .note.sec{border-left-color:var(--bad);background:#fdf3f2}
+  ul{margin:8px 0;padding-left:22px}li{margin:5px 0}
+  .tier{padding:2px 8px;border-radius:5px;font-size:12px;font-weight:620}
+  .tier1{background:var(--t1);color:var(--ok)}
+  .tier2{background:var(--t2);color:var(--warn)}
+  .tier3{background:var(--t3);color:var(--bad)}
+  footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Deep Vein Idle 脚本 —— 可行性测绘</h1>
+  <div class="sub">依据：33 个 MilkyWayIdle 用户脚本的功能图谱 · DVI 公开 API 实测 · DVI 客户端 bundle 静态数据表提取</div>
+</header>
+
+<p>结论先说：<strong>DVI 能支撑的脚本比 MWI 更完整，而且在两个地方明显更强。</strong>它的 bundle 里直接内嵌了完整的游戏数据库，登录时服务端还会主动推送一份完整的<strong>离线收益报告</strong>——这两点让"利润计算"和"离线统计"类脚本几乎不需要逆向工作。</p>
+
+<div class="grid">
+  <div class="stat"><b>290</b><span>物品（含基础价值）</span></div>
+  <div class="stat"><b>221</b><span>配方/行动（含输入输出）</span></div>
+  <div class="stat"><b>20</b><span>怪物（含掉落与金币区间）</span></div>
+  <div class="stat"><b>79</b><span>存档字段</span></div>
+  <div class="stat"><b>90+</b><span>客户端指令</span></div>
+</div>
+
+<h2>1. 数据资产盘点</h2>
+<p>写脚本的前提是知道数据在哪。DVI 的数据分三层，全部已实测确认：</p>
+
+<h3>第 1 层：静态数据库（内嵌在 bundle，一次抓取即可离线使用）</h3>
+<p>这是<strong>最有价值的发现</strong>。DVI 把整个游戏数值表打在前端包里，压缩变量解出来后是干净的 JSON：</p>
+<table>
+  <tr><th>表</th><th>条目</th><th>字段</th><th>用途</th></tr>
+  <tr><td>物品表</td><td>290</td><td class="mono">id, name, stackable, value, heals</td><td>基础价值 → 兜底定价、食物回血</td></tr>
+  <tr><td>配方表</td><td>221</td><td class="mono">id, name, skill, group, levelReq, baseTicks, xp, inputs[], output, grow, burn, bonus, caught</td><td>利润计算的核心</td></tr>
+  <tr><td>怪物表</td><td>20</td><td class="mono">id, name, level, hp, maxHit, attack, defence, speed, xp, gold[lo,hi], bonus, drop</td><td>战斗收益、掉落期望</td></tr>
+  <tr><td>经验曲线</td><td>—</td><td class="mono">dp[]</td><td>升级进度、还需多少次</td></tr>
+</table>
+<pre>// 配方表样例：铁锭 = 1 铁矿 → 耗时 4 tick，经验 8
+{id:42, name:"Iron bar", skill:"smithing", group:"Bars",
+ levelReq:15, baseTicks:4, xp:8,
+ inputs:[{itemId:3,qty:1}], output:{itemId:41,qty:1}}
+
+// 怪物表样例：含金币区间与稀有掉落概率
+{id:4, name:"Cairn wight", level:40, hp:75, maxHit:10, attack:40,
+ defence:38, speed:4, xp:165, gold:[117,217],
+ bonus:{itemId:204,chance:0.001}, drop:242}</pre>
+<div class="note"><strong>注意：</strong>配方表里的 <span class="mono">burn</span>（烧焦）、<span class="mono">caught</span>（被抓住）、<span class="mono">bonus</span>（稀有额外产出）都是<strong>带概率的</strong>。这意味着"期望收益"可以算得比 MWI 更精确——MWI 的很多概率只能靠玩家实测统计。</div>
+
+<h3>第 2 层：实时增量（WebSocket 推送）</h3>
+<p>帧格式 <span class="mono">{tick, m:[…], a}</span>，约 1.6 帧/秒。已确认的消息类型：</p>
+<table>
+  <tr><th>消息</th><th>载荷</th><th>能支撑什么脚本</th></tr>
+  <tr><td class="mono">batch</td><td class="mono">{kind:"produced", jobId, itemId, xp, tier, wire}</td><td><strong>产出统计、掉落追踪</strong>（对应 Better Loot Tracker）</td></tr>
+  <tr><td class="mono">work</td><td class="mono">{siteId, tool, item}</td><td>实时判断"我在做什么"，利润面板的输入</td></tr>
+  <tr><td class="mono">enter / leave</td><td class="mono">{id, name, x, y, gear, mount, tag, title}</td><td>在线名单、角色名片、社交功能</td></tr>
+  <tr><td class="mono">move</td><td class="mono">{x, y, path[], speed}</td><td>地图可视化、路线规划</td></tr>
+  <tr><td class="mono">chat</td><td class="mono">{name, text, tick, channel, c}</td><td>聊天增强、关键词提醒</td></tr>
+</table>
+
+<h3>第 3 层：按需拉取 + 服务端主动推送</h3>
+<table>
+  <tr><th>数据</th><th>来源</th><th>内容</th></tr>
+  <tr><td>完整存档</td><td class="mono">resync → snapshot.you</td><td>79 字段：bank / pack / coins / gems / equipment(18槽) / skills(16) / plots / quests / perks / house / titles / masteries…</td></tr>
+  <tr><td>市场盘口</td><td class="mono">marketBook / marketDepth</td><td class="mono">{itemId, bid, bidQty, ask, askQty, floor}</td></tr>
+  <tr><td>成交历史</td><td class="mono">marketHistory</td><td>历史成交（可按时间窗聚合）</td></tr>
+  <tr><td>在售清单</td><td class="mono">marketStock</td><td>409 个有挂单的物品 ID</td></tr>
+  <tr><td>排行榜</td><td class="mono">leaderboard</td><td>22 个榜 × 各 20 名（总榜/经验/战斗/财富/收集 + 16 技能榜）</td></tr>
+  <tr><td>世界状态</td><td class="mono">welcome</td><td class="mono">online(1266) / windows(83 活动) / bossNext / goals / contracts / guildBoard</td></tr>
+</table>
+
+<div class="note sec">
+<strong>最强的一张牌：离线收益报告是服务端直接送的。</strong>
+<span class="mono">welcome.offline</span> 已含完整结算结果，不需要你自己重放时间：
+<pre style="margin:8px 0 0">{"ticksElapsed":32, "ticksApplied":32, "ticksSkipped":0,
+ "skills":{"mining":{"xp":14,"levelBefore":5,"levelAfter":5}},
+ "itemsGained":{"1":7}, "coins":0, "drops":0, "kills":0, "deaths":0,
+ "burnt":0, "stoppedEarly":false,
+ "segments":[{"task":{"kind":"job","jobId":1}, "ticks":32,
+              "xp":{"mining":14}, "items":{"1":7}, "end":"running"}]}</pre>
+这意味着"离线收益统计"类脚本在 DVI 上<strong>几乎是白送的</strong>——MWI 那套要自己攒，这里只要读一个字段。
+</div>
+
+<h2>2. 可行性矩阵</h2>
+<p>把 MWI 生态的功能逐项对到 DVI 上。<span class="tier tier1">可直接做</span> 数据齐全；<span class="tier tier2">需补工作</span> 部分数据要自建；<span class="tier tier3">不建议</span> 有风险或无价值。</p>
+
+<h3><span class="tier tier1">第一梯队</span> — 基础设施（其他一切的前提）</h3>
+<table>
+  <tr><th>要写的模块</th><th>对应 MWI</th><th>依赖数据</th><th>难点</th></tr>
+  <tr>
+    <td><strong>DVI 核心库</strong><br><span class="mono">DVICommon</span></td>
+    <td class="mono">mooket + MWICommon</td>
+    <td>全部三层</td>
+    <td><strong>WebSocket 分片重组</strong>（DVI 独有，MWI 没有这个问题）；建立共享命名空间与事件总线</td>
+  </tr>
+  <tr>
+    <td><strong>静态数据包</strong><br><span class="mono">DVIData</span></td>
+    <td class="mono">MWITools 的内置表</td>
+    <td>第 1 层</td>
+    <td>已解决：三张表已提取成 JSON，可直接内嵌</td>
+  </tr>
+</table>
+<p>核心库要做的事：<strong>「劫持 <span class="mono">MessageEvent.data</span> → 拼帧 → 遍历 <span class="mono">m[]</span> 按 <span class="mono">.t</span> 分派 → 派发 <span class="mono">CustomEvent</span>」</strong>。注意 DVI 与 MWI 的差异：MWI 一条消息一个 <span class="mono">type</span>，DVI 是<strong>一帧装多条消息</strong>，要循环。</p>
+
+<h3><span class="tier tier1">第一梯队</span> — 数据与分析类</h3>
+<table>
+  <tr><th>脚本</th><th>对应 MWI</th><th>实现要点</th></tr>
+  <tr>
+    <td><strong>利润计算面板</strong></td>
+    <td class="mono">MWI Profit Panel / AlchemyCalc</td>
+    <td>配方表给 <span class="mono">inputs/output/baseTicks</span>，市场给 <span class="mono">bid/ask</span> → 算每 tick 毛利、扣 <span class="mono">marketTaxBp(200bp=2%)</span> 得净利。还能算 <span class="mono">xp/tick</span>。这是对标 MWI 最核心的一个。</td>
+  </tr>
+  <tr>
+    <td><strong>市场行情与历史</strong></td>
+    <td class="mono">mooket / Market List History / Watch Market</td>
+    <td><span class="mono">marketBook</span> 轮询 + <span class="mono">marketHistory</span> 拉历史，本地 <span class="mono">localStorage</span> 攒时间序列，画折线/多日对比。注意：<strong>DVI 没有公开历史行情 API</strong>，历史要自己攒。</td>
+  </tr>
+  <tr>
+    <td><strong>产出与掉落统计</strong></td>
+    <td class="mono">Better Loot Tracker / 食用工具</td>
+    <td>监听 <span class="mono">batch</span> 消息累积产出；配合怪物表的 <span class="mono">bonus.chance</span> 算实际爆率 vs 理论爆率。</td>
+  </tr>
+  <tr>
+    <td><strong>离线收益报告</strong></td>
+    <td class="mono">食用工具·离线统计</td>
+    <td>直接读 <span class="mono">welcome.offline</span>，把 <span class="mono">segments[]</span> 渲染成表格/图表。<strong>成本最低、收益最直观</strong>。</td>
+  </tr>
+  <tr>
+    <td><strong>每日资产曲线</strong></td>
+    <td class="mono">Everyday Profit Plus / Pro</td>
+    <td>每日对 <span class="mono">bank+pack+equipment+coins</span> 按市场价估值快照，存本地，画净值曲线 + 分项（装备/库存/订单/房子/技能）变化图。</td>
+  </tr>
+  <tr>
+    <td><strong>材料计算 + 购物清单</strong></td>
+    <td class="mono">生产采集增强 / 市场伴侣</td>
+    <td>递归展开配方 <span class="mono">inputs</span> → 对比存档 <span class="mono">bank/pack</span> → 输出缺料清单并挂上市场价。MWI 的"一键购买"在 DVI 上<strong>不要做</strong>（见第 4 节）。</td>
+  </tr>
+  <tr>
+    <td><strong>行动面板增强</strong></td>
+    <td class="mono">ActionDetailPlus / MWITools</td>
+    <td>显示单次耗时、预计完成时间、还需多少次升级、当前 <span class="mono">work</span> 的实时进度。</td>
+  </tr>
+</table>
+
+<h3><span class="tier tier1">第一梯队</span> — 零数据依赖，最快出成果</h3>
+<table>
+  <tr><th>脚本</th><th>对应 MWI</th><th>说明</th></tr>
+  <tr><td><strong>主题/配色</strong></td><td class="mono">VSCode dark / HBuilderX green</td><td>纯 CSS 注入，不碰任何数据。最适合当第一个练手项目，用来验证注入链路是否通。</td></tr>
+  <tr><td><strong>角色名片</strong></td><td class="mono">MWI角色名片插件</td><td><span class="mono">enter</span> 消息自带 <span class="mono">gear/mount/tag/title</span>，配合 <span class="mono">inspect</span> 指令可做名片图。</td></tr>
+  <tr><td><strong>通知推送</strong></td><td class="mono">强化通知到QQ</td><td>监听本地事件（作业完成 / 背包满 / 被击败 / 世界 Boss），推送到 webhook。</td></tr>
+  <tr><td><strong>聊天增强</strong></td><td class="mono">食用工具·食物警察</td><td><span class="mono">chat</span> 消息带 <span class="mono">channel</span>（含 <span class="mono">zh</span>），可做关键词高亮、屏蔽、翻译。</td></tr>
+</table>
+
+<h3><span class="tier tier2">第二梯队</span> — 可行但要额外投入</h3>
+<table>
+  <tr><th>脚本</th><th>对应 MWI</th><th>缺什么</th></tr>
+  <tr>
+    <td><strong>跨玩家行情服务</strong></td>
+    <td class="mono">mooket 云端 / NiuMart / milkyway.market</td>
+    <td>需要自建后端 + 众筹数据。但 DVI 是<strong>单世界、在线仅 1266 人</strong>，市场规模比 MWI 小一到两个数量级——投入产出比要重新评估。</td>
+  </tr>
+  <tr>
+    <td><strong>强化/精通统计</strong></td>
+    <td class="mono">强化在线统计 / 康康运气</td>
+    <td>存档有 <span class="mono">enhance / masteries / workRarity</span> 字段，但<strong>强化概率机制不在静态表里</strong>，需要额外逆向或实测采样。</td>
+  </tr>
+  <tr>
+    <td><strong>战斗收益分析</strong></td>
+    <td class="mono">Better Loot Tracker 战斗部分</td>
+    <td>怪物表只有 20 条（等级 2–95），且 <span class="mono">maxHit: 22</span> 次说明另有少量未提取表。数据偏薄，不适合做战斗模拟器。</td>
+  </tr>
+  <tr>
+    <td><strong>公会增强</strong></td>
+    <td class="mono">食用工具·公会钉钉</td>
+    <td>指令齐全（<span class="mono">guildInfo/Chat/Board/Rank/Donate/Deposit/Withdraw</span>），数据也在 <span class="mono">welcome</span> 里，但要先摸清权限模型。</td>
+  </tr>
+</table>
+
+<h3><span class="tier tier3">第三梯队</span> — 不建议</h3>
+<table>
+  <tr><th>类型</th><th>原因</th></tr>
+  <tr>
+    <td><strong>自动操作类</strong><br><span class="mono">自动采集 / 自动买料 / 自动收订单</span></td>
+    <td>技术上完全可行（<span class="mono">send</span> 可拦截、指令明文可发），但——</td>
+  </tr>
+  <tr>
+    <td><strong>完整汉化</strong></td>
+    <td>DVI 原生中英双语（客户端有内置翻译函数），没有需求。</td>
+  </tr>
+  <tr>
+    <td><strong>战斗模拟器</strong></td>
+    <td>MWI 有成熟模拟器是因为怪物/技能数据厚；DVI 只有 20 条怪物数据，做不出有意义的模拟。</td>
+  </tr>
+</table>
+
+<h2>3. 为什么"自动操作"是红线</h2>
+<div class="note sec">
+DVI 的客户端<strong>内置了封禁机制</strong>——这是我在 bundle 里确认的：
+<pre style="margin:8px 0 0">// WS 关闭码处理
+if (code === 4001 || code === 4002) {
+  this.closed = true;
+  this.setState(code === 4002 ? "banned" : "elsewhere");
+}</pre>
+<ul style="margin:8px 0 0">
+  <li><span class="mono">4002 → "banned"</span>：服务端可以主动封禁账号并强制断开，客户端有专门的状态 UI。</li>
+  <li><span class="mono">4001 → "elsewhere"</span>：异地登录检测。</li>
+  <li>存档里还有 <span class="mono">ironman</span> 标志——说明官方在认真维护游戏完整性。</li>
+</ul>
+</div>
+<p>更关键的是<strong>这不是单机游戏</strong>：1266 人共享同一个世界，市场是零和博弈。自动化采集/交易会直接损害其他玩家的利益，也会让开发者针对脚本做对抗。MWI 生态里那些"一键购买""自动收订单"的功能，在 DVI 上应当明确排除。</p>
+<p><strong>可做的边界</strong>：只读分析、可视化、提醒、本地统计——所有<strong>不代替玩家做决策、不发送游戏指令</strong>的功能。这也恰好是 MWI 生态里最有价值的那一半。</p>
+
+<h2>4. 建议的实现顺序</h2>
+<table>
+  <tr><th>阶段</th><th>产出</th><th>目的</th></tr>
+  <tr><td><strong>P0 打通链路</strong></td><td>一个主题配色脚本</td><td>验证 <span class="mono">document-start</span> 注入、DOM 观察是否可靠</td></tr>
+  <tr><td><strong>P1 核心库</strong></td><td><span class="mono">DVICommon</span> + 数据表</td><td>分片重组、消息分派、事件总线、三张静态表内嵌</td></tr>
+  <tr><td><strong>P2 最高性价比</strong></td><td>离线收益报告</td><td>数据是服务端送的，一两天就能出成品，用来验证整条管线</td></tr>
+  <tr><td><strong>P3 核心价值</strong></td><td>利润计算面板 + 市场行情记录</td><td>对标 MWI 最核心的两个插件</td></tr>
+  <tr><td><strong>P4 沉淀</strong></td><td>每日资产曲线 + 产出统计</td><td>需要时间积累数据，但用户黏性最强</td></tr>
+</table>
+
+<h2>5. 还缺什么（写代码前要补的侦察）</h2>
+<ul>
+  <li><strong>速度加成的计算方式</strong>——利润面板要精确到"每 tick 收益"，必须知道装备/等级/加成如何影响 <span class="mono">baseTicks</span>。这是目前最大的未知。</li>
+  <li><strong><span class="mono">marketHistory</span> 的返回结构</strong>和可回溯时间范围（决定行情脚本的天花板）。</li>
+  <li><strong>强化/精通的随机机制</strong>（若要写强化统计）。</li>
+  <li><strong>站点表（siteId → 地图坐标/工具/产出）</strong>——目前只在 <span class="mono">work</span> 消息里见过 <span class="mono">siteId</span> 数字，还没有 id→名称的映射，地图类脚本需要它。</li>
+  <li><strong>DVI 的目标 DOM 结构</strong>——UI 挂载点需要实际打开页面确认（MWI 靠 <span class="mono">.GamePage</span> 类名和 React fiber，DVI 的渲染方式不同）。</li>
+</ul>
+
+<footer>
+本报告基于公开接口的只读探测与客户端 bundle 分析。提取出的数据表已存为 JSON：
+<span class="mono">items.json (290)</span> · <span class="mono">actions.json (221)</span> · <span class="mono">monsters.json (20)</span>，位于 <span class="mono">dvi_probe/</span>，可直接作为脚本的静态数据源。
+</footer>
+
+</div>
+</body>
+</html>

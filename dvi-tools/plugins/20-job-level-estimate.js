@@ -1,0 +1,310 @@
+// ==UserScript==
+// @name         DVI Tools · 作业升级预估（内联）
+// @namespace    dvi.tools.plugins
+// @version      1.0.0
+// @description  在游戏的作业列表里就地显示「还需几次行动、多长时间才能升到目标等级」。直接注入到游戏界面，不是悬浮窗。只读。
+// @author       -
+// @match        https://deepveinidle.com/*
+// @grant        none
+// @run-at       document-idle
+// ==/UserScript==
+
+/*
+ * 这是「融入游戏」的示范：内容长在游戏自己的作业行里。
+ *
+ * 锚点 button.route[data-job] 是从客户端代码里读出来的——
+ * 游戏的作业行就是 <button class="route" data-job="{配方id}">，
+ * 并且它有一套原生 tooltip 约定（data-tip-name / data-tip-lines），
+ * 所以注入的提示看起来和游戏自带的没有区别。
+ */
+
+(function () {
+  'use strict';
+
+  /* ── 启动痕迹 ──
+   * 目的只有一个：证明「这段代码到底有没有被执行」。
+   * 同时写到 DOM 属性（元素面板里直接可见）和页面全局，双保险，
+   * 且都包 try/catch —— 任何情况下都不会因此中断。 */
+  try {
+    if (document.documentElement) {
+      document.documentElement.setAttribute('data-dvi-plugin-20', '1');
+    }
+  } catch (e) {}
+  try {
+    const r0 = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
+    (r0.__dviBoot = r0.__dviBoot || []).push('20-job-level-estimate');
+  } catch (e) {}
+  try { console.info('[DVI] 插件 20-job-level-estimate 代码已执行'); } catch (e) {}
+
+  /* ── 引导：等主干就绪，并且失败时要留痕 ──
+   * 之前这里是一句 `if (!DVI) return;` —— 找不到主干就静默退出。
+   * 后果是：功能完全不出现，而用户和开发者都看不到任何原因。
+   * 现在改成重试 + 把失败原因写到一个诊断能读到的地方。 */
+  const PLUGIN_ID = 'job-level-estimate';
+
+  function pageRoot() {
+    try { return (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window; }
+    catch (e) { return window; }
+  }
+  function findTrunk() {
+    try { return pageRoot().DVI || window.DVI; } catch (e) { return null; }
+  }
+  function noteFailure(reason) {
+    try {
+      const r = pageRoot();
+      const list = r.__dviPluginErrors || (r.__dviPluginErrors = []);
+      list.push({ plugin: PLUGIN_ID, reason: String(reason), at: new Date().toISOString() });
+    } catch (e) { /* 尽力而为 */ }
+    try { console.error('[DVI 升级预估] ' + reason); } catch (e) {}
+  }
+
+  function whenTrunk(fn) {
+    let tries = 0;
+    (function attempt() {
+      const D = findTrunk();
+      if (D) {
+        try { fn(D); }
+        catch (e) { noteFailure('注册时抛异常：' + ((e && e.message) || e)); }
+        return;
+      }
+      if (++tries >= 50) {          // 约 5 秒
+        noteFailure('等待 5 秒仍未找到 DVI 主干（插件未注册）');
+        return;
+      }
+      setTimeout(attempt, 100);
+    })();
+  }
+
+  whenTrunk(function (DVI) {
+  const { calc, data } = DVI;
+
+  DVI.plugin.register({
+    id: 'job-level-estimate',
+    name: '作业升级预估',
+    nameEn: 'Job level estimate',
+    description: '在每个作业旁就地显示还需几次行动升级',
+    api: 1,
+    defaultEnabled: true,
+
+    settings: [
+      { key: 'target', label: '目标等级（0 = 下一级）', type: 'number',
+        default: 0, min: 0, max: 120 },
+      { key: 'showTime', label: '同时显示所需时间', type: 'bool', default: true },
+      { key: 'refreshMode', label: '刷新方式（0 = 按需，1 = 自动）', type: 'number',
+        default: 0, min: 0, max: 1 },
+    ],
+
+    /* ══════════ 为什么是「按需」而不是「即时」 ══════════
+     * 计算（actionsToLevel）比重新注入贵得多：
+     * 前者要按等级逐级累加经验，后者只是 Map 查表 + 插一个节点。
+     * 而游戏每次重绘都会重跑 render，如果每次都重算，
+     * 每秒几十次地做无用功，对浏览器和设备都是负担。
+     *
+     * 所以拆成两件事：
+     *   render（便宜、高频）→ 只读缓存
+     *   recompute（贵、低频）→ 只在「页面加载 / 用户点刷新 / 自动模式且已隔 ≥30 秒」时跑
+     */
+    setup(ctx) {
+      this.ctx = ctx;
+      this.cache = new Map();      // jobId → 渲染好的 HTML
+      this.lastCalc = 0;           // 上次重算的时间戳
+      this.MIN_GAP = 30 * 1000;    // 自动模式下的最小重算间隔
+
+      // 关键：注入到游戏界面，而不是另开窗口。
+      // 候选选择器按可靠度排序，逐个回退 —— 游戏改版时不会一步失效。
+      //   [data-routes] 是客户端里作业列表的容器（rowFor 的父级）
+      //   button.route[data-job] 是每一行本身
+      //   [data-job] 是最宽的回退
+      ctx.ui.inline({
+        id: 'job-level-estimate',
+        selector: ['[data-routes] [data-job]', 'button.route[data-job]', '[data-job]'],
+        where: 'beforeend',
+        render: (host) => this.renderRow(ctx, host),
+      });
+
+      // 一个就地可点的刷新入口，省得为一次重算去翻油猴菜单
+      ctx.ui.inline({
+        id: 'job-level-refresh',
+        selector: ['[data-routes]'],
+        where: 'beforebegin',
+        render: () => this.renderRefreshButton(ctx),
+      });
+
+      // 用户主动要求重算
+      ctx.bus.on(ctx.EVT.REFRESH, () => this.recompute(ctx, true));
+
+      /* 内联刷新按钮的点击 —— 用**事件委托**而不是逐个绑监听：
+       * 按钮会被游戏重绘反复替换，绑在节点上的监听会随之丢失。
+       * 捕获阶段 + stopPropagation：抢在游戏自己的点击处理之前，
+       * 并阻止它把我们的小按钮当成作业行。 */
+      this.onDocClick = (e) => {
+        const t = e.target;
+        if (t && t.closest && t.closest('.dvi-refresh')) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.recompute(ctx, true);
+          ctx.log('用户点击「重算预估」');
+        }
+      };
+      document.addEventListener('click', this.onDocClick, true);
+
+      // 自动模式：只在状态真的变了、且距上次重算超过 MIN_GAP 时才重算
+      ctx.bus.on(ctx.EVT.SNAPSHOT, () => {
+        if (this.isAuto(ctx)) this.recompute(ctx, false);
+      });
+      ctx.core.settings.onChange((k) => {
+        if (k.startsWith(ctx.id + '.')) this.recompute(ctx, true);
+      });
+
+      // 首次进入：算一次
+      this.recompute(ctx, true);
+      ctx.log('已注入作业列表');
+    },
+
+    /** 自动模式？（设置项 refreshMode = 1） */
+    isAuto(ctx) {
+      return Number(ctx.settings.get('refreshMode')) === 1;
+    },
+
+    /**
+     * 重算并刷新。
+     * @param {boolean} force 忽略节流立即重算（用户主动触发时为 true）
+     */
+    recompute(ctx, force) {
+      const now = Date.now();
+      if (!force && now - this.lastCalc < this.MIN_GAP) return false;
+      this.cache.clear();          // 丢掉旧结果，下次 render 会重新算
+      this.lastCalc = now;
+      ctx.ui.inline.refresh();
+      return true;
+    },
+
+    /** 就地刷新按钮：长得像游戏自己的小链接，不抢眼 */
+    renderRefreshButton(ctx) {
+      const me = ctx.state.me;
+      if (!me) return null;                       // 还没登录就不显示
+      let age = '';
+      if (this.lastCalc) {
+        const s = Math.round((Date.now() - this.lastCalc) / 1000);
+        age = s < 60 ? `${s} 秒前` : `${Math.round(s / 60)} 分钟前`;
+      }
+      return `<button class="dvi-inline-note dvi-refresh" type="button"
+        data-tone="link"
+        ${ctx.ui.tip('升级预估', [
+          '点一下就用当前状态重算',
+          this.isAuto(ctx) ? '当前：自动模式（状态变化后最多 30 秒重算一次）'
+                           : '当前：按需模式（只在点击或刷新页面时重算）',
+          age ? `上次重算：${age}` : '尚未重算',
+        ])}>重算预估${age ? ` · ${age}` : ''}</button>`;
+    },
+
+    enable(ctx) {
+      ctx.ui.inline.refresh();
+      ctx.log('已启用');
+    },
+
+    disable(ctx) {
+      if (this.onDocClick) {
+        document.removeEventListener('click', this.onDocClick, true);
+        this.onDocClick = null;
+      }
+      if (this.cache) this.cache.clear();
+      ctx.ui.uninline();
+    },
+
+    /* ── 目标等级：0 表示「下一级」 ── */
+    resolveTarget(ctx, skill, xp) {
+      const cur = calc.levelForXp(xp);
+      const want = Number(ctx.settings.get('target')) || 0;
+      if (want > 0) return want;
+      return cur + 1;
+    },
+
+    /* ── 每个作业行渲染一次 ──
+     * 高频路径，只读缓存：游戏每次重绘都会走这里，
+     * 所以这里**绝不能做重活**。缓存未命中时才算一次（懒计算）。 */
+    renderRow(ctx, host) {
+      const jobId = Number(host.dataset.job);
+      if (!Number.isFinite(jobId)) return null;
+
+      if (this.cache.has(jobId)) return this.cache.get(jobId);
+
+      const html = this.computeRow(ctx, jobId);
+      this.cache.set(jobId, html);
+      return html;
+    },
+
+    /* ── 真正计算一行（贵）── */
+    computeRow(ctx, jobId) {
+      const action = data.ACTION.get(jobId);
+      if (!action) return null;
+
+      const me = ctx.state.me;
+      if (!me) return null;                       // 还没登录，什么都不显示
+
+      const skill = action.skill;
+      const xp = (me.skills && me.skills[skill]) || 0;
+      const level = calc.levelForXp(xp);
+
+      // 未达技能等级要求：这行游戏自己会标灰，我们只在行末给一句提示
+      if (level < action.levelReq) {
+        return `<span class="dvi-inline-note" data-tone="warn"
+          ${ctx.ui.tip('升级预估', [
+            `需要 ${data.skillName(skill)} ${action.levelReq} 级`,
+            `当前 ${level} 级，还差 ${action.levelReq - level} 级`,
+            `这个行动暂时做不了`,
+          ])}>差 ${action.levelReq - level} 级</span>`;
+      }
+
+      // 不求经验的行动（比如某些采集）直接跳过
+      if (!action.xp) return null;
+
+      // 即时取「当前配置」：等级、当前装备的工具、特长、增益、社区活动、精通。
+      // 全部从实时状态现算 —— 换装备或增益到期，下一次渲染就变。
+      const opts = ctx.state.actionContext(action);
+
+      const target = this.resolveTarget(ctx, skill, xp);
+      if (target <= level) {
+        return `<span class="dvi-inline-note" data-tone="done"
+          ${ctx.ui.tip('升级预估', [`已经是 ${level} 级`])}>已达标</span>`;
+      }
+
+      const est = calc.actionsToLevel(action, xp, target, opts);
+      if (!est) return null;
+
+      const showTime = ctx.settings.get('showTime');
+      const label = showTime
+        ? `需 ${est.actions.toLocaleString()} 次 · ${calc.humanDuration(est.seconds)}`
+        : `需 ${est.actions.toLocaleString()} 次`;
+
+      // tooltip：分段明细 + 「当前配置」如实展示
+      const lines = [
+        `${data.skillName(skill)} ${est.fromLevel} → ${est.toLevel} 级`,
+        `经验 ${est.xpNeeded.toLocaleString()}（每次 ${est.xpPerAction}）`,
+        `共 ${est.actions.toLocaleString()} 次`,
+        `纯作业耗时 ${calc.humanDuration(est.seconds)}`,
+      ];
+
+      // 把这次计算实际用到的实时参数列出来，让人看得见不是写死的
+      const cfg = ctx.state.configSummary(action);
+      if (cfg.length) {
+        lines.push('— 当前配置 —');
+        for (const c of cfg) lines.push(`${c.label}: ${c.value}`);
+      }
+
+      if (est.perLevel.length > 1) {
+        lines.push('— 分段 —');
+        for (const seg of est.perLevel.slice(0, 10)) {
+          lines.push(`${seg.level}→${seg.level + 1}: ${seg.actions} 次`);
+        }
+        if (est.perLevel.length > 10) lines.push(`…共 ${est.perLevel.length} 段`);
+      }
+      lines.push('不含赶路时间；强化装备的额外加成暂未计入');
+
+      return `<span class="dvi-inline-note" data-tone="${est.actions > 1000 ? 'warn' : ''}"
+        ${ctx.ui.tip('升级预估 · ' + action.name, lines)}>${label}</span>`;
+    },
+  });
+
+  });   // whenTrunk
+})();

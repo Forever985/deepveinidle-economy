@@ -1,0 +1,4420 @@
+[
+ {
+  "id": 1,
+  "name": "Copper",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 2,
+  "inputs": [],
+  "output": {
+   "itemId": 1,
+   "qty": 1
+  }
+ },
+ {
+  "id": 2,
+  "name": "Tin",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 3,
+  "inputs": [],
+  "output": {
+   "itemId": 2,
+   "qty": 1
+  }
+ },
+ {
+  "id": 3,
+  "name": "Iron",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 15,
+  "baseTicks": 6,
+  "xp": 5,
+  "inputs": [],
+  "output": {
+   "itemId": 3,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 100,
+   "chance": 0.0005
+  }
+ },
+ {
+  "id": 4,
+  "name": "Silver",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 30,
+  "baseTicks": 7,
+  "xp": 9,
+  "inputs": [],
+  "output": {
+   "itemId": 4,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 100,
+   "chance": 0.001
+  }
+ },
+ {
+  "id": 5,
+  "name": "Coal",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 40,
+  "baseTicks": 8,
+  "xp": 14,
+  "inputs": [],
+  "output": {
+   "itemId": 5,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 100,
+   "chance": 0.001
+  }
+ },
+ {
+  "id": 6,
+  "name": "Gold",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 55,
+  "baseTicks": 9,
+  "xp": 22,
+  "inputs": [],
+  "output": {
+   "itemId": 6,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 100,
+   "chance": 0.002
+  }
+ },
+ {
+  "id": 7,
+  "name": "Cobalt",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 65,
+  "baseTicks": 11,
+  "xp": 37,
+  "inputs": [],
+  "output": {
+   "itemId": 7,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 100,
+   "chance": 0.003
+  }
+ },
+ {
+  "id": 8,
+  "name": "Meteoric",
+  "skill": "mining",
+  "group": "Ore",
+  "levelReq": 85,
+  "baseTicks": 13,
+  "xp": 59,
+  "inputs": [],
+  "output": {
+   "itemId": 8,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 100,
+   "chance": 0.005
+  }
+ },
+ {
+  "id": 21,
+  "name": "Shrimp",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 2,
+  "inputs": [],
+  "output": {
+   "itemId": 20,
+   "qty": 1
+  }
+ },
+ {
+  "id": 22,
+  "name": "Sardine",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 5,
+  "baseTicks": 5,
+  "xp": 3,
+  "inputs": [],
+  "output": {
+   "itemId": 21,
+   "qty": 1
+  }
+ },
+ {
+  "id": 23,
+  "name": "Trout",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 20,
+  "baseTicks": 6,
+  "xp": 7,
+  "inputs": [],
+  "output": {
+   "itemId": 22,
+   "qty": 1
+  }
+ },
+ {
+  "id": 24,
+  "name": "Salmon",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 30,
+  "baseTicks": 7,
+  "xp": 11,
+  "inputs": [],
+  "output": {
+   "itemId": 23,
+   "qty": 1
+  }
+ },
+ {
+  "id": 25,
+  "name": "Tuna",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 45,
+  "baseTicks": 8,
+  "xp": 17,
+  "inputs": [],
+  "output": {
+   "itemId": 24,
+   "qty": 1
+  }
+ },
+ {
+  "id": 26,
+  "name": "Lobster",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 60,
+  "baseTicks": 10,
+  "xp": 28,
+  "inputs": [],
+  "output": {
+   "itemId": 25,
+   "qty": 1
+  }
+ },
+ {
+  "id": 27,
+  "name": "Swordfish",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 75,
+  "baseTicks": 11,
+  "xp": 44,
+  "inputs": [],
+  "output": {
+   "itemId": 26,
+   "qty": 1
+  }
+ },
+ {
+  "id": 28,
+  "name": "Shark",
+  "skill": "fishing",
+  "group": "Fish",
+  "levelReq": 90,
+  "baseTicks": 13,
+  "xp": 60,
+  "inputs": [],
+  "output": {
+   "itemId": 27,
+   "qty": 1
+  }
+ },
+ {
+  "id": 30,
+  "name": "Tree",
+  "skill": "woodcutting",
+  "group": "Wood",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 3,
+  "inputs": [],
+  "output": {
+   "itemId": 10,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 160,
+   "chance": 0.0125
+  }
+ },
+ {
+  "id": 31,
+  "name": "Oak",
+  "skill": "woodcutting",
+  "group": "Wood",
+  "levelReq": 15,
+  "baseTicks": 6,
+  "xp": 7,
+  "inputs": [],
+  "output": {
+   "itemId": 11,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 161,
+   "chance": 0.008333333333333333
+  }
+ },
+ {
+  "id": 32,
+  "name": "Willow",
+  "skill": "woodcutting",
+  "group": "Wood",
+  "levelReq": 30,
+  "baseTicks": 7,
+  "xp": 11,
+  "inputs": [],
+  "output": {
+   "itemId": 12,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 162,
+   "chance": 0.005555555555555556
+  }
+ },
+ {
+  "id": 33,
+  "name": "Maple",
+  "skill": "woodcutting",
+  "group": "Wood",
+  "levelReq": 45,
+  "baseTicks": 8,
+  "xp": 18,
+  "inputs": [],
+  "output": {
+   "itemId": 13,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 163,
+   "chance": 0.0038461538461538464
+  }
+ },
+ {
+  "id": 34,
+  "name": "Yew",
+  "skill": "woodcutting",
+  "group": "Wood",
+  "levelReq": 60,
+  "baseTicks": 10,
+  "xp": 29,
+  "inputs": [],
+  "output": {
+   "itemId": 14,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 164,
+   "chance": 0.002777777777777778
+  }
+ },
+ {
+  "id": 35,
+  "name": "Magic",
+  "skill": "woodcutting",
+  "group": "Wood",
+  "levelReq": 75,
+  "baseTicks": 12,
+  "xp": 48,
+  "inputs": [],
+  "output": {
+   "itemId": 15,
+   "qty": 1
+  },
+  "bonus": {
+   "itemId": 165,
+   "chance": 0.0022222222222222222
+  }
+ },
+ {
+  "id": 160,
+  "name": "Potato",
+  "skill": "farming",
+  "group": "Crops",
+  "levelReq": 1,
+  "baseTicks": 2,
+  "xp": 110,
+  "inputs": [
+   {
+    "itemId": 160,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 170,
+   "qty": 1
+  },
+  "grow": 800
+ },
+ {
+  "id": 161,
+  "name": "Glowcap",
+  "skill": "farming",
+  "group": "Crops",
+  "levelReq": 15,
+  "baseTicks": 2,
+  "xp": 380,
+  "inputs": [
+   {
+    "itemId": 161,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 171,
+   "qty": 1
+  },
+  "grow": 1500
+ },
+ {
+  "id": 162,
+  "name": "Cave turnip",
+  "skill": "farming",
+  "group": "Crops",
+  "levelReq": 30,
+  "baseTicks": 2,
+  "xp": 900,
+  "inputs": [
+   {
+    "itemId": 162,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 172,
+   "qty": 1
+  },
+  "grow": 2500
+ },
+ {
+  "id": 163,
+  "name": "Bitterroot",
+  "skill": "farming",
+  "group": "Crops",
+  "levelReq": 45,
+  "baseTicks": 2,
+  "xp": 1900,
+  "inputs": [
+   {
+    "itemId": 163,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 173,
+   "qty": 1
+  },
+  "grow": 4000
+ },
+ {
+  "id": 164,
+  "name": "Voidmelon",
+  "skill": "farming",
+  "group": "Crops",
+  "levelReq": 60,
+  "baseTicks": 2,
+  "xp": 3800,
+  "inputs": [
+   {
+    "itemId": 164,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 174,
+   "qty": 1
+  },
+  "grow": 6000
+ },
+ {
+  "id": 165,
+  "name": "Ember pepper",
+  "skill": "farming",
+  "group": "Crops",
+  "levelReq": 75,
+  "baseTicks": 2,
+  "xp": 6500,
+  "inputs": [
+   {
+    "itemId": 165,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 175,
+   "qty": 1
+  },
+  "grow": 9000
+ },
+ {
+  "id": 41,
+  "name": "Bronze bar",
+  "skill": "smithing",
+  "group": "Bars",
+  "levelReq": 1,
+  "baseTicks": 4,
+  "xp": 6,
+  "inputs": [
+   {
+    "itemId": 1,
+    "qty": 1
+   },
+   {
+    "itemId": 2,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 40,
+   "qty": 1
+  }
+ },
+ {
+  "id": 42,
+  "name": "Iron bar",
+  "skill": "smithing",
+  "group": "Bars",
+  "levelReq": 15,
+  "baseTicks": 4,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 3,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 41,
+   "qty": 1
+  }
+ },
+ {
+  "id": 43,
+  "name": "Steel bar",
+  "skill": "smithing",
+  "group": "Bars",
+  "levelReq": 30,
+  "baseTicks": 4,
+  "xp": 35,
+  "inputs": [
+   {
+    "itemId": 3,
+    "qty": 1
+   },
+   {
+    "itemId": 5,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 42,
+   "qty": 1
+  }
+ },
+ {
+  "id": 44,
+  "name": "Cobalt bar",
+  "skill": "smithing",
+  "group": "Bars",
+  "levelReq": 60,
+  "baseTicks": 4,
+  "xp": 108,
+  "inputs": [
+   {
+    "itemId": 7,
+    "qty": 1
+   },
+   {
+    "itemId": 5,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 43,
+   "qty": 1
+  }
+ },
+ {
+  "id": 45,
+  "name": "Meteoric bar",
+  "skill": "smithing",
+  "group": "Bars",
+  "levelReq": 85,
+  "baseTicks": 4,
+  "xp": 253,
+  "inputs": [
+   {
+    "itemId": 8,
+    "qty": 1
+   },
+   {
+    "itemId": 5,
+    "qty": 4
+   }
+  ],
+  "output": {
+   "itemId": 44,
+   "qty": 1
+  }
+ },
+ {
+  "id": 51,
+  "name": "Bronze pickaxe",
+  "skill": "smithing",
+  "group": "Pickaxes",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 80,
+   "qty": 1
+  }
+ },
+ {
+  "id": 52,
+  "name": "Iron pickaxe",
+  "skill": "smithing",
+  "group": "Pickaxes",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 81,
+   "qty": 1
+  }
+ },
+ {
+  "id": 53,
+  "name": "Steel pickaxe",
+  "skill": "smithing",
+  "group": "Pickaxes",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 83,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 82,
+   "qty": 1
+  }
+ },
+ {
+  "id": 54,
+  "name": "Cobalt pickaxe",
+  "skill": "smithing",
+  "group": "Pickaxes",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 83,
+   "qty": 1
+  }
+ },
+ {
+  "id": 55,
+  "name": "Meteoric pickaxe",
+  "skill": "smithing",
+  "group": "Pickaxes",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 552,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 84,
+   "qty": 1
+  }
+ },
+ {
+  "id": 56,
+  "name": "Bronze rod",
+  "skill": "fletching",
+  "group": "Rods",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 1
+   },
+   {
+    "itemId": 10,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 85,
+   "qty": 1
+  }
+ },
+ {
+  "id": 57,
+  "name": "Iron rod",
+  "skill": "fletching",
+  "group": "Rods",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 13,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 1
+   },
+   {
+    "itemId": 11,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 86,
+   "qty": 1
+  }
+ },
+ {
+  "id": 58,
+  "name": "Steel rod",
+  "skill": "fletching",
+  "group": "Rods",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 41,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 1
+   },
+   {
+    "itemId": 12,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 87,
+   "qty": 1
+  }
+ },
+ {
+  "id": 59,
+  "name": "Cobalt rod",
+  "skill": "fletching",
+  "group": "Rods",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 120,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 1
+   },
+   {
+    "itemId": 14,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 88,
+   "qty": 1
+  }
+ },
+ {
+  "id": 60,
+  "name": "Meteoric rod",
+  "skill": "fletching",
+  "group": "Rods",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 276,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   },
+   {
+    "itemId": 15,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 89,
+   "qty": 1
+  }
+ },
+ {
+  "id": 308,
+  "name": "Bronze pan",
+  "skill": "smithing",
+  "group": "Pans",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 360,
+   "qty": 1
+  }
+ },
+ {
+  "id": 309,
+  "name": "Iron pan",
+  "skill": "smithing",
+  "group": "Pans",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 13,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 361,
+   "qty": 1
+  }
+ },
+ {
+  "id": 310,
+  "name": "Steel pan",
+  "skill": "smithing",
+  "group": "Pans",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 41,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 362,
+   "qty": 1
+  }
+ },
+ {
+  "id": 311,
+  "name": "Cobalt pan",
+  "skill": "smithing",
+  "group": "Pans",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 120,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 363,
+   "qty": 1
+  }
+ },
+ {
+  "id": 312,
+  "name": "Meteoric pan",
+  "skill": "smithing",
+  "group": "Pans",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 276,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 364,
+   "qty": 1
+  }
+ },
+ {
+  "id": 313,
+  "name": "Bronze hammer",
+  "skill": "smithing",
+  "group": "Hammers",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 365,
+   "qty": 1
+  }
+ },
+ {
+  "id": 314,
+  "name": "Iron hammer",
+  "skill": "smithing",
+  "group": "Hammers",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 366,
+   "qty": 1
+  }
+ },
+ {
+  "id": 315,
+  "name": "Steel hammer",
+  "skill": "smithing",
+  "group": "Hammers",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 83,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 367,
+   "qty": 1
+  }
+ },
+ {
+  "id": 316,
+  "name": "Cobalt hammer",
+  "skill": "smithing",
+  "group": "Hammers",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 368,
+   "qty": 1
+  }
+ },
+ {
+  "id": 317,
+  "name": "Meteoric hammer",
+  "skill": "smithing",
+  "group": "Hammers",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 552,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 369,
+   "qty": 1
+  }
+ },
+ {
+  "id": 318,
+  "name": "Bronze knife",
+  "skill": "smithing",
+  "group": "Knives",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 370,
+   "qty": 1
+  }
+ },
+ {
+  "id": 319,
+  "name": "Iron knife",
+  "skill": "smithing",
+  "group": "Knives",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 13,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 371,
+   "qty": 1
+  }
+ },
+ {
+  "id": 320,
+  "name": "Steel knife",
+  "skill": "smithing",
+  "group": "Knives",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 41,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 372,
+   "qty": 1
+  }
+ },
+ {
+  "id": 321,
+  "name": "Cobalt knife",
+  "skill": "smithing",
+  "group": "Knives",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 120,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 373,
+   "qty": 1
+  }
+ },
+ {
+  "id": 322,
+  "name": "Meteoric knife",
+  "skill": "smithing",
+  "group": "Knives",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 276,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 374,
+   "qty": 1
+  }
+ },
+ {
+  "id": 323,
+  "name": "Bronze needle",
+  "skill": "crafting",
+  "group": "Needles",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 375,
+   "qty": 1
+  }
+ },
+ {
+  "id": 324,
+  "name": "Iron needle",
+  "skill": "crafting",
+  "group": "Needles",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 13,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 376,
+   "qty": 1
+  }
+ },
+ {
+  "id": 325,
+  "name": "Steel needle",
+  "skill": "crafting",
+  "group": "Needles",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 41,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 377,
+   "qty": 1
+  }
+ },
+ {
+  "id": 326,
+  "name": "Cobalt needle",
+  "skill": "crafting",
+  "group": "Needles",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 120,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 378,
+   "qty": 1
+  }
+ },
+ {
+  "id": 327,
+  "name": "Meteoric needle",
+  "skill": "crafting",
+  "group": "Needles",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 276,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 379,
+   "qty": 1
+  }
+ },
+ {
+  "id": 328,
+  "name": "Bronze mortar",
+  "skill": "crafting",
+  "group": "Mortars",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 380,
+   "qty": 1
+  }
+ },
+ {
+  "id": 329,
+  "name": "Iron mortar",
+  "skill": "crafting",
+  "group": "Mortars",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 381,
+   "qty": 1
+  }
+ },
+ {
+  "id": 330,
+  "name": "Steel mortar",
+  "skill": "crafting",
+  "group": "Mortars",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 83,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 382,
+   "qty": 1
+  }
+ },
+ {
+  "id": 331,
+  "name": "Cobalt mortar",
+  "skill": "crafting",
+  "group": "Mortars",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 383,
+   "qty": 1
+  }
+ },
+ {
+  "id": 332,
+  "name": "Meteoric mortar",
+  "skill": "crafting",
+  "group": "Mortars",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 552,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 384,
+   "qty": 1
+  }
+ },
+ {
+  "id": 333,
+  "name": "Bronze hoe",
+  "skill": "fletching",
+  "group": "Hoes",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 1
+   },
+   {
+    "itemId": 10,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 385,
+   "qty": 1
+  }
+ },
+ {
+  "id": 334,
+  "name": "Iron hoe",
+  "skill": "fletching",
+  "group": "Hoes",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 1
+   },
+   {
+    "itemId": 11,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 386,
+   "qty": 1
+  }
+ },
+ {
+  "id": 335,
+  "name": "Steel hoe",
+  "skill": "fletching",
+  "group": "Hoes",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 83,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 1
+   },
+   {
+    "itemId": 12,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 387,
+   "qty": 1
+  }
+ },
+ {
+  "id": 336,
+  "name": "Cobalt hoe",
+  "skill": "fletching",
+  "group": "Hoes",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 1
+   },
+   {
+    "itemId": 14,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 388,
+   "qty": 1
+  }
+ },
+ {
+  "id": 337,
+  "name": "Meteoric hoe",
+  "skill": "fletching",
+  "group": "Hoes",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 552,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   },
+   {
+    "itemId": 15,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 389,
+   "qty": 1
+  }
+ },
+ {
+  "id": 46,
+  "name": "Bronze axe",
+  "skill": "smithing",
+  "group": "Axes",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 90,
+   "qty": 1
+  }
+ },
+ {
+  "id": 47,
+  "name": "Iron axe",
+  "skill": "smithing",
+  "group": "Axes",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 91,
+   "qty": 1
+  }
+ },
+ {
+  "id": 48,
+  "name": "Steel axe",
+  "skill": "smithing",
+  "group": "Axes",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 83,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 92,
+   "qty": 1
+  }
+ },
+ {
+  "id": 49,
+  "name": "Cobalt axe",
+  "skill": "smithing",
+  "group": "Axes",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 93,
+   "qty": 1
+  }
+ },
+ {
+  "id": 50,
+  "name": "Meteoric axe",
+  "skill": "smithing",
+  "group": "Axes",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 552,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 94,
+   "qty": 1
+  }
+ },
+ {
+  "id": 61,
+  "name": "Cook shrimp",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 1,
+  "baseTicks": 4,
+  "xp": 4,
+  "inputs": [
+   {
+    "itemId": 20,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 60,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 26
+  }
+ },
+ {
+  "id": 62,
+  "name": "Cook sardine",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 5,
+  "baseTicks": 4,
+  "xp": 5,
+  "inputs": [
+   {
+    "itemId": 21,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 61,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 30
+  }
+ },
+ {
+  "id": 63,
+  "name": "Cook trout",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 20,
+  "baseTicks": 4,
+  "xp": 10,
+  "inputs": [
+   {
+    "itemId": 22,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 62,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 45
+  }
+ },
+ {
+  "id": 64,
+  "name": "Cook salmon",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 30,
+  "baseTicks": 4,
+  "xp": 14,
+  "inputs": [
+   {
+    "itemId": 23,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 63,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 55
+  }
+ },
+ {
+  "id": 65,
+  "name": "Cook tuna",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 45,
+  "baseTicks": 4,
+  "xp": 22,
+  "inputs": [
+   {
+    "itemId": 24,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 64,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 70
+  }
+ },
+ {
+  "id": 66,
+  "name": "Cook lobster",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 60,
+  "baseTicks": 4,
+  "xp": 36,
+  "inputs": [
+   {
+    "itemId": 25,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 65,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 85
+  }
+ },
+ {
+  "id": 67,
+  "name": "Cook swordfish",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 75,
+  "baseTicks": 4,
+  "xp": 59,
+  "inputs": [
+   {
+    "itemId": 26,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 66,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 100
+  }
+ },
+ {
+  "id": 68,
+  "name": "Cook shark",
+  "skill": "cooking",
+  "group": "Food",
+  "levelReq": 90,
+  "baseTicks": 4,
+  "xp": 92,
+  "inputs": [
+   {
+    "itemId": 27,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 67,
+   "qty": 1
+  },
+  "burn": {
+   "itemId": 70,
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 115
+  }
+ },
+ {
+  "id": 110,
+  "name": "Bronze blade",
+  "skill": "smithing",
+  "group": "Weapons",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 110,
+   "qty": 1
+  }
+ },
+ {
+  "id": 111,
+  "name": "Iron blade",
+  "skill": "smithing",
+  "group": "Weapons",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 13,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 111,
+   "qty": 1
+  }
+ },
+ {
+  "id": 112,
+  "name": "Steel blade",
+  "skill": "smithing",
+  "group": "Weapons",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 41,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 112,
+   "qty": 1
+  }
+ },
+ {
+  "id": 113,
+  "name": "Cobalt blade",
+  "skill": "smithing",
+  "group": "Weapons",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 120,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 113,
+   "qty": 1
+  }
+ },
+ {
+  "id": 114,
+  "name": "Meteoric blade",
+  "skill": "smithing",
+  "group": "Weapons",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 276,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 114,
+   "qty": 1
+  }
+ },
+ {
+  "id": 338,
+  "name": "Bronze greatsword",
+  "skill": "smithing",
+  "group": "Two-handers",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 390,
+   "qty": 1
+  }
+ },
+ {
+  "id": 339,
+  "name": "Iron greatsword",
+  "skill": "smithing",
+  "group": "Two-handers",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 391,
+   "qty": 1
+  }
+ },
+ {
+  "id": 340,
+  "name": "Steel greatsword",
+  "skill": "smithing",
+  "group": "Two-handers",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 83,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 392,
+   "qty": 1
+  }
+ },
+ {
+  "id": 341,
+  "name": "Cobalt greatsword",
+  "skill": "smithing",
+  "group": "Two-handers",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 393,
+   "qty": 1
+  }
+ },
+ {
+  "id": 342,
+  "name": "Meteoric greatsword",
+  "skill": "smithing",
+  "group": "Two-handers",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 552,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 394,
+   "qty": 1
+  }
+ },
+ {
+  "id": 343,
+  "name": "Colossus greatsword",
+  "skill": "smithing",
+  "group": "Two-handers",
+  "levelReq": 99,
+  "baseTicks": 6,
+  "xp": 1350,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   },
+   {
+    "itemId": 252,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 395,
+   "qty": 1
+  }
+ },
+ {
+  "id": 115,
+  "name": "Bronze shield",
+  "skill": "smithing",
+  "group": "Shields",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 25,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 115,
+   "qty": 1
+  }
+ },
+ {
+  "id": 116,
+  "name": "Iron shield",
+  "skill": "smithing",
+  "group": "Shields",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 40,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 116,
+   "qty": 1
+  }
+ },
+ {
+  "id": 117,
+  "name": "Steel shield",
+  "skill": "smithing",
+  "group": "Shields",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 124,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 117,
+   "qty": 1
+  }
+ },
+ {
+  "id": 118,
+  "name": "Cobalt shield",
+  "skill": "smithing",
+  "group": "Shields",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 360,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 118,
+   "qty": 1
+  }
+ },
+ {
+  "id": 119,
+  "name": "Meteoric shield",
+  "skill": "smithing",
+  "group": "Shields",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 828,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 119,
+   "qty": 1
+  }
+ },
+ {
+  "id": 120,
+  "name": "Bronze helm",
+  "skill": "smithing",
+  "group": "Helmets",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 120,
+   "qty": 1
+  }
+ },
+ {
+  "id": 121,
+  "name": "Iron helm",
+  "skill": "smithing",
+  "group": "Helmets",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 121,
+   "qty": 1
+  }
+ },
+ {
+  "id": 122,
+  "name": "Steel helm",
+  "skill": "smithing",
+  "group": "Helmets",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 83,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 122,
+   "qty": 1
+  }
+ },
+ {
+  "id": 123,
+  "name": "Cobalt helm",
+  "skill": "smithing",
+  "group": "Helmets",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 123,
+   "qty": 1
+  }
+ },
+ {
+  "id": 124,
+  "name": "Meteoric helm",
+  "skill": "smithing",
+  "group": "Helmets",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 552,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 124,
+   "qty": 1
+  }
+ },
+ {
+  "id": 125,
+  "name": "Bronze plate",
+  "skill": "smithing",
+  "group": "Bodies",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 42,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 125,
+   "qty": 1
+  }
+ },
+ {
+  "id": 126,
+  "name": "Iron plate",
+  "skill": "smithing",
+  "group": "Bodies",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 67,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 126,
+   "qty": 1
+  }
+ },
+ {
+  "id": 127,
+  "name": "Steel plate",
+  "skill": "smithing",
+  "group": "Bodies",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 207,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 127,
+   "qty": 1
+  }
+ },
+ {
+  "id": 128,
+  "name": "Cobalt plate",
+  "skill": "smithing",
+  "group": "Bodies",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 600,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 128,
+   "qty": 1
+  }
+ },
+ {
+  "id": 129,
+  "name": "Meteoric plate",
+  "skill": "smithing",
+  "group": "Bodies",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 1380,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 129,
+   "qty": 1
+  }
+ },
+ {
+  "id": 130,
+  "name": "Bronze greaves",
+  "skill": "smithing",
+  "group": "Legs",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 34,
+  "inputs": [
+   {
+    "itemId": 40,
+    "qty": 4
+   }
+  ],
+  "output": {
+   "itemId": 130,
+   "qty": 1
+  }
+ },
+ {
+  "id": 131,
+  "name": "Iron greaves",
+  "skill": "smithing",
+  "group": "Legs",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 53,
+  "inputs": [
+   {
+    "itemId": 41,
+    "qty": 4
+   }
+  ],
+  "output": {
+   "itemId": 131,
+   "qty": 1
+  }
+ },
+ {
+  "id": 132,
+  "name": "Steel greaves",
+  "skill": "smithing",
+  "group": "Legs",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 165,
+  "inputs": [
+   {
+    "itemId": 42,
+    "qty": 4
+   }
+  ],
+  "output": {
+   "itemId": 132,
+   "qty": 1
+  }
+ },
+ {
+  "id": 133,
+  "name": "Cobalt greaves",
+  "skill": "smithing",
+  "group": "Legs",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 480,
+  "inputs": [
+   {
+    "itemId": 43,
+    "qty": 4
+   }
+  ],
+  "output": {
+   "itemId": 133,
+   "qty": 1
+  }
+ },
+ {
+  "id": 134,
+  "name": "Meteoric greaves",
+  "skill": "smithing",
+  "group": "Legs",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 1104,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 4
+   }
+  ],
+  "output": {
+   "itemId": 134,
+   "qty": 1
+  }
+ },
+ {
+  "id": 301,
+  "name": "Colossus blade",
+  "skill": "smithing",
+  "group": "Weapons",
+  "levelReq": 99,
+  "baseTicks": 6,
+  "xp": 1900,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 3
+   },
+   {
+    "itemId": 252,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 350,
+   "qty": 1
+  }
+ },
+ {
+  "id": 302,
+  "name": "Colossus shield",
+  "skill": "smithing",
+  "group": "Shields",
+  "levelReq": 99,
+  "baseTicks": 6,
+  "xp": 1900,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 3
+   },
+   {
+    "itemId": 252,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 351,
+   "qty": 1
+  }
+ },
+ {
+  "id": 303,
+  "name": "Colossus helm",
+  "skill": "smithing",
+  "group": "Helmets",
+  "levelReq": 99,
+  "baseTicks": 6,
+  "xp": 1250,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 2
+   },
+   {
+    "itemId": 252,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 352,
+   "qty": 1
+  }
+ },
+ {
+  "id": 304,
+  "name": "Colossus plate",
+  "skill": "smithing",
+  "group": "Bodies",
+  "levelReq": 99,
+  "baseTicks": 6,
+  "xp": 3100,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 5
+   },
+   {
+    "itemId": 252,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 353,
+   "qty": 1
+  }
+ },
+ {
+  "id": 305,
+  "name": "Colossus greaves",
+  "skill": "smithing",
+  "group": "Legs",
+  "levelReq": 99,
+  "baseTicks": 6,
+  "xp": 2500,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 4
+   },
+   {
+    "itemId": 252,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 354,
+   "qty": 1
+  }
+ },
+ {
+  "id": 140,
+  "name": "Shortbow",
+  "skill": "fletching",
+  "group": "Shortbows",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 5,
+  "inputs": [
+   {
+    "itemId": 10,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 140,
+   "qty": 1
+  }
+ },
+ {
+  "id": 141,
+  "name": "Oak shortbow",
+  "skill": "fletching",
+  "group": "Shortbows",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 11,
+  "inputs": [
+   {
+    "itemId": 11,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 141,
+   "qty": 1
+  }
+ },
+ {
+  "id": 142,
+  "name": "Willow shortbow",
+  "skill": "fletching",
+  "group": "Shortbows",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 17,
+  "inputs": [
+   {
+    "itemId": 12,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 142,
+   "qty": 1
+  }
+ },
+ {
+  "id": 143,
+  "name": "Maple shortbow",
+  "skill": "fletching",
+  "group": "Shortbows",
+  "levelReq": 45,
+  "baseTicks": 5,
+  "xp": 27,
+  "inputs": [
+   {
+    "itemId": 13,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 143,
+   "qty": 1
+  }
+ },
+ {
+  "id": 144,
+  "name": "Yew shortbow",
+  "skill": "fletching",
+  "group": "Shortbows",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 43,
+  "inputs": [
+   {
+    "itemId": 14,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 144,
+   "qty": 1
+  }
+ },
+ {
+  "id": 145,
+  "name": "Magic shortbow",
+  "skill": "fletching",
+  "group": "Shortbows",
+  "levelReq": 75,
+  "baseTicks": 5,
+  "xp": 70,
+  "inputs": [
+   {
+    "itemId": 15,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 145,
+   "qty": 1
+  }
+ },
+ {
+  "id": 146,
+  "name": "Longbow",
+  "skill": "fletching",
+  "group": "Longbows",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 10,
+  "inputs": [
+   {
+    "itemId": 10,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 146,
+   "qty": 1
+  }
+ },
+ {
+  "id": 147,
+  "name": "Oak longbow",
+  "skill": "fletching",
+  "group": "Longbows",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 22,
+  "inputs": [
+   {
+    "itemId": 11,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 147,
+   "qty": 1
+  }
+ },
+ {
+  "id": 148,
+  "name": "Willow longbow",
+  "skill": "fletching",
+  "group": "Longbows",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 34,
+  "inputs": [
+   {
+    "itemId": 12,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 148,
+   "qty": 1
+  }
+ },
+ {
+  "id": 149,
+  "name": "Maple longbow",
+  "skill": "fletching",
+  "group": "Longbows",
+  "levelReq": 45,
+  "baseTicks": 5,
+  "xp": 54,
+  "inputs": [
+   {
+    "itemId": 13,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 149,
+   "qty": 1
+  }
+ },
+ {
+  "id": 150,
+  "name": "Yew longbow",
+  "skill": "fletching",
+  "group": "Longbows",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 86,
+  "inputs": [
+   {
+    "itemId": 14,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 150,
+   "qty": 1
+  }
+ },
+ {
+  "id": 151,
+  "name": "Magic longbow",
+  "skill": "fletching",
+  "group": "Longbows",
+  "levelReq": 75,
+  "baseTicks": 5,
+  "xp": 140,
+  "inputs": [
+   {
+    "itemId": 15,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 151,
+   "qty": 1
+  }
+ },
+ {
+  "id": 200,
+  "name": "Staff",
+  "skill": "fletching",
+  "group": "Staffs",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 10,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 152,
+   "qty": 1
+  }
+ },
+ {
+  "id": 201,
+  "name": "Oak staff",
+  "skill": "fletching",
+  "group": "Staffs",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 22,
+  "inputs": [
+   {
+    "itemId": 11,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 153,
+   "qty": 1
+  }
+ },
+ {
+  "id": 202,
+  "name": "Willow staff",
+  "skill": "fletching",
+  "group": "Staffs",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 40,
+  "inputs": [
+   {
+    "itemId": 12,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 154,
+   "qty": 1
+  }
+ },
+ {
+  "id": 203,
+  "name": "Maple staff",
+  "skill": "fletching",
+  "group": "Staffs",
+  "levelReq": 45,
+  "baseTicks": 5,
+  "xp": 65,
+  "inputs": [
+   {
+    "itemId": 13,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 155,
+   "qty": 1
+  }
+ },
+ {
+  "id": 204,
+  "name": "Yew staff",
+  "skill": "fletching",
+  "group": "Staffs",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 100,
+  "inputs": [
+   {
+    "itemId": 14,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 156,
+   "qty": 1
+  }
+ },
+ {
+  "id": 205,
+  "name": "Magic staff",
+  "skill": "fletching",
+  "group": "Staffs",
+  "levelReq": 75,
+  "baseTicks": 5,
+  "xp": 150,
+  "inputs": [
+   {
+    "itemId": 15,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 157,
+   "qty": 1
+  }
+ },
+ {
+  "id": 210,
+  "name": "Sage",
+  "skill": "farming",
+  "group": "Herbs",
+  "levelReq": 10,
+  "baseTicks": 2,
+  "xp": 260,
+  "inputs": [
+   {
+    "itemId": 190,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 193,
+   "qty": 1
+  },
+  "grow": 1200
+ },
+ {
+  "id": 211,
+  "name": "Nightshade",
+  "skill": "farming",
+  "group": "Herbs",
+  "levelReq": 35,
+  "baseTicks": 2,
+  "xp": 1200,
+  "inputs": [
+   {
+    "itemId": 191,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 194,
+   "qty": 1
+  },
+  "grow": 3000
+ },
+ {
+  "id": 212,
+  "name": "Dragonleaf",
+  "skill": "farming",
+  "group": "Herbs",
+  "levelReq": 65,
+  "baseTicks": 2,
+  "xp": 4600,
+  "inputs": [
+   {
+    "itemId": 192,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 195,
+   "qty": 1
+  },
+  "grow": 7000
+ },
+ {
+  "id": 220,
+  "name": "Gatherer's draught",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 30,
+  "inputs": [
+   {
+    "itemId": 193,
+    "qty": 1
+   },
+   {
+    "itemId": 240,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 220,
+   "qty": 1
+  }
+ },
+ {
+  "id": 225,
+  "name": "Swift draught",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 20,
+  "baseTicks": 6,
+  "xp": 70,
+  "inputs": [
+   {
+    "itemId": 193,
+    "qty": 1
+   },
+   {
+    "itemId": 242,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 225,
+   "qty": 1
+  }
+ },
+ {
+  "id": 226,
+  "name": "Nourishing draught",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 50,
+  "baseTicks": 6,
+  "xp": 240,
+  "inputs": [
+   {
+    "itemId": 194,
+    "qty": 1
+   },
+   {
+    "itemId": 244,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 226,
+   "qty": 1
+  }
+ },
+ {
+  "id": 227,
+  "name": "Haste draught",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 70,
+  "baseTicks": 7,
+  "xp": 460,
+  "inputs": [
+   {
+    "itemId": 195,
+    "qty": 1
+   },
+   {
+    "itemId": 245,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 227,
+   "qty": 1
+  }
+ },
+ {
+  "id": 221,
+  "name": "Hunter's brew",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 35,
+  "baseTicks": 6,
+  "xp": 120,
+  "inputs": [
+   {
+    "itemId": 194,
+    "qty": 1
+   },
+   {
+    "itemId": 243,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 221,
+   "qty": 1
+  }
+ },
+ {
+  "id": 222,
+  "name": "Warrior's tonic",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 60,
+  "baseTicks": 6,
+  "xp": 300,
+  "inputs": [
+   {
+    "itemId": 195,
+    "qty": 1
+   },
+   {
+    "itemId": 244,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 222,
+   "qty": 1
+  }
+ },
+ {
+  "id": 223,
+  "name": "Elixir of the vein",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 80,
+  "baseTicks": 7,
+  "xp": 700,
+  "inputs": [
+   {
+    "itemId": 194,
+    "qty": 1
+   },
+   {
+    "itemId": 195,
+    "qty": 1
+   },
+   {
+    "itemId": 246,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 223,
+   "qty": 1
+  }
+ },
+ {
+  "id": 224,
+  "name": "Abyssal tonic",
+  "skill": "herblore",
+  "group": "Potions",
+  "levelReq": 95,
+  "baseTicks": 7,
+  "xp": 1600,
+  "inputs": [
+   {
+    "itemId": 195,
+    "qty": 1
+   },
+   {
+    "itemId": 249,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 224,
+   "qty": 1
+  }
+ },
+ {
+  "id": 230,
+  "name": "Cut gem",
+  "skill": "crafting",
+  "group": "Gems",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 16,
+  "inputs": [
+   {
+    "itemId": 100,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 180,
+   "qty": 1
+  }
+ },
+ {
+  "id": 231,
+  "name": "Silver ring",
+  "skill": "crafting",
+  "group": "Rings",
+  "levelReq": 20,
+  "baseTicks": 6,
+  "xp": 58,
+  "inputs": [
+   {
+    "itemId": 4,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 181,
+   "qty": 1
+  }
+ },
+ {
+  "id": 232,
+  "name": "Gold ring",
+  "skill": "crafting",
+  "group": "Rings",
+  "levelReq": 45,
+  "baseTicks": 6,
+  "xp": 156,
+  "inputs": [
+   {
+    "itemId": 6,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 182,
+   "qty": 1
+  }
+ },
+ {
+  "id": 233,
+  "name": "Meteoric ring",
+  "skill": "crafting",
+  "group": "Rings",
+  "levelReq": 75,
+  "baseTicks": 7,
+  "xp": 455,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 183,
+   "qty": 1
+  }
+ },
+ {
+  "id": 307,
+  "name": "Wyrm ring",
+  "skill": "crafting",
+  "group": "Rings",
+  "levelReq": 95,
+  "baseTicks": 8,
+  "xp": 1200,
+  "inputs": [
+   {
+    "itemId": 356,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 358,
+   "qty": 1
+  }
+ },
+ {
+  "id": 234,
+  "name": "Silver amulet",
+  "skill": "crafting",
+  "group": "Amulets",
+  "levelReq": 30,
+  "baseTicks": 6,
+  "xp": 84,
+  "inputs": [
+   {
+    "itemId": 4,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 184,
+   "qty": 1
+  }
+ },
+ {
+  "id": 235,
+  "name": "Gold amulet",
+  "skill": "crafting",
+  "group": "Amulets",
+  "levelReq": 55,
+  "baseTicks": 6,
+  "xp": 221,
+  "inputs": [
+   {
+    "itemId": 6,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 185,
+   "qty": 1
+  }
+ },
+ {
+  "id": 236,
+  "name": "Meteoric amulet",
+  "skill": "crafting",
+  "group": "Amulets",
+  "levelReq": 85,
+  "baseTicks": 7,
+  "xp": 618,
+  "inputs": [
+   {
+    "itemId": 44,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 186,
+   "qty": 1
+  }
+ },
+ {
+  "id": 306,
+  "name": "Leviathan amulet",
+  "skill": "crafting",
+  "group": "Amulets",
+  "levelReq": 95,
+  "baseTicks": 8,
+  "xp": 1400,
+  "inputs": [
+   {
+    "itemId": 355,
+    "qty": 1
+   },
+   {
+    "itemId": 180,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 357,
+   "qty": 1
+  }
+ },
+ {
+  "id": 260,
+  "name": "Pelt coif",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 8,
+  "inputs": [
+   {
+    "itemId": 240,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 260,
+   "qty": 1
+  }
+ },
+ {
+  "id": 261,
+  "name": "Pelt chaps",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 12,
+  "inputs": [
+   {
+    "itemId": 240,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 262,
+   "qty": 1
+  }
+ },
+ {
+  "id": 262,
+  "name": "Pelt jerkin",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 20,
+  "inputs": [
+   {
+    "itemId": 240,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 261,
+   "qty": 1
+  }
+ },
+ {
+  "id": 263,
+  "name": "Bogskin coif",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 15,
+  "baseTicks": 6,
+  "xp": 22,
+  "inputs": [
+   {
+    "itemId": 241,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 263,
+   "qty": 1
+  }
+ },
+ {
+  "id": 264,
+  "name": "Bogskin chaps",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 15,
+  "baseTicks": 6,
+  "xp": 33,
+  "inputs": [
+   {
+    "itemId": 241,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 265,
+   "qty": 1
+  }
+ },
+ {
+  "id": 265,
+  "name": "Bogskin jerkin",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 15,
+  "baseTicks": 6,
+  "xp": 55,
+  "inputs": [
+   {
+    "itemId": 241,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 264,
+   "qty": 1
+  }
+ },
+ {
+  "id": 266,
+  "name": "Chitin coif",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 30,
+  "baseTicks": 6,
+  "xp": 60,
+  "inputs": [
+   {
+    "itemId": 242,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 266,
+   "qty": 1
+  }
+ },
+ {
+  "id": 267,
+  "name": "Chitin chaps",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 30,
+  "baseTicks": 6,
+  "xp": 90,
+  "inputs": [
+   {
+    "itemId": 242,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 268,
+   "qty": 1
+  }
+ },
+ {
+  "id": 268,
+  "name": "Chitin jerkin",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 30,
+  "baseTicks": 6,
+  "xp": 150,
+  "inputs": [
+   {
+    "itemId": 242,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 267,
+   "qty": 1
+  }
+ },
+ {
+  "id": 269,
+  "name": "Fur coif",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 60,
+  "baseTicks": 7,
+  "xp": 180,
+  "inputs": [
+   {
+    "itemId": 245,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 269,
+   "qty": 1
+  }
+ },
+ {
+  "id": 270,
+  "name": "Fur chaps",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 60,
+  "baseTicks": 7,
+  "xp": 270,
+  "inputs": [
+   {
+    "itemId": 245,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 271,
+   "qty": 1
+  }
+ },
+ {
+  "id": 271,
+  "name": "Fur jerkin",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 60,
+  "baseTicks": 7,
+  "xp": 450,
+  "inputs": [
+   {
+    "itemId": 245,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 270,
+   "qty": 1
+  }
+ },
+ {
+  "id": 272,
+  "name": "Scale coif",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 85,
+  "baseTicks": 7,
+  "xp": 460,
+  "inputs": [
+   {
+    "itemId": 247,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 272,
+   "qty": 1
+  }
+ },
+ {
+  "id": 273,
+  "name": "Scale chaps",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 85,
+  "baseTicks": 7,
+  "xp": 690,
+  "inputs": [
+   {
+    "itemId": 247,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 274,
+   "qty": 1
+  }
+ },
+ {
+  "id": 274,
+  "name": "Scale jerkin",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 85,
+  "baseTicks": 7,
+  "xp": 1150,
+  "inputs": [
+   {
+    "itemId": 247,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 273,
+   "qty": 1
+  }
+ },
+ {
+  "id": 289,
+  "name": "Troll coif",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 95,
+  "baseTicks": 8,
+  "xp": 1250,
+  "inputs": [
+   {
+    "itemId": 248,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 338,
+   "qty": 1
+  }
+ },
+ {
+  "id": 290,
+  "name": "Troll chaps",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 95,
+  "baseTicks": 8,
+  "xp": 1900,
+  "inputs": [
+   {
+    "itemId": 248,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 340,
+   "qty": 1
+  }
+ },
+ {
+  "id": 291,
+  "name": "Troll jerkin",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 95,
+  "baseTicks": 8,
+  "xp": 3100,
+  "inputs": [
+   {
+    "itemId": 248,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 339,
+   "qty": 1
+  }
+ },
+ {
+  "id": 292,
+  "name": "Drake coif",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 99,
+  "baseTicks": 8,
+  "xp": 3300,
+  "inputs": [
+   {
+    "itemId": 251,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 341,
+   "qty": 1
+  }
+ },
+ {
+  "id": 293,
+  "name": "Drake chaps",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 99,
+  "baseTicks": 8,
+  "xp": 5000,
+  "inputs": [
+   {
+    "itemId": 251,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 343,
+   "qty": 1
+  }
+ },
+ {
+  "id": 294,
+  "name": "Drake jerkin",
+  "skill": "crafting",
+  "group": "Leather",
+  "levelReq": 99,
+  "baseTicks": 8,
+  "xp": 8300,
+  "inputs": [
+   {
+    "itemId": 251,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 342,
+   "qty": 1
+  }
+ },
+ {
+  "id": 240,
+  "name": "Bread stall",
+  "skill": "thieving",
+  "group": "Stalls",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 8,
+  "inputs": [],
+  "output": {
+   "itemId": 200,
+   "qty": 6
+  },
+  "caught": {
+   "chanceAtReq": 0.25,
+   "safeAtLevel": 30,
+   "stunTicks": 8
+  }
+ },
+ {
+  "id": 241,
+  "name": "Silk stall",
+  "skill": "thieving",
+  "group": "Stalls",
+  "levelReq": 25,
+  "baseTicks": 7,
+  "xp": 30,
+  "inputs": [],
+  "output": {
+   "itemId": 200,
+   "qty": 28
+  },
+  "caught": {
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 60,
+   "stunTicks": 10
+  },
+  "bonus": {
+   "itemId": 191,
+   "chance": 0.03333333333333333
+  }
+ },
+ {
+  "id": 242,
+  "name": "Gem stall",
+  "skill": "thieving",
+  "group": "Stalls",
+  "levelReq": 50,
+  "baseTicks": 8,
+  "xp": 80,
+  "inputs": [],
+  "output": {
+   "itemId": 200,
+   "qty": 90
+  },
+  "bonus": {
+   "itemId": 100,
+   "chance": 0.04
+  },
+  "caught": {
+   "chanceAtReq": 0.32,
+   "safeAtLevel": 85,
+   "stunTicks": 12
+  }
+ },
+ {
+  "id": 243,
+  "name": "Relic stall",
+  "skill": "thieving",
+  "group": "Stalls",
+  "levelReq": 75,
+  "baseTicks": 9,
+  "xp": 200,
+  "inputs": [],
+  "output": {
+   "itemId": 200,
+   "qty": 260
+  },
+  "bonus": {
+   "itemId": 208,
+   "chance": 0.03
+  },
+  "caught": {
+   "chanceAtReq": 0.35,
+   "safeAtLevel": 110,
+   "stunTicks": 15
+  }
+ },
+ {
+  "id": 244,
+  "name": "Linen line",
+  "skill": "thieving",
+  "group": "Cloth",
+  "levelReq": 1,
+  "baseTicks": 7,
+  "xp": 7,
+  "inputs": [],
+  "output": {
+   "itemId": 300,
+   "qty": 1
+  },
+  "caught": {
+   "chanceAtReq": 0.25,
+   "safeAtLevel": 30,
+   "stunTicks": 8
+  }
+ },
+ {
+  "id": 245,
+  "name": "Silk cart",
+  "skill": "thieving",
+  "group": "Cloth",
+  "levelReq": 25,
+  "baseTicks": 8,
+  "xp": 26,
+  "inputs": [],
+  "output": {
+   "itemId": 301,
+   "qty": 1
+  },
+  "caught": {
+   "chanceAtReq": 0.3,
+   "safeAtLevel": 60,
+   "stunTicks": 10
+  }
+ },
+ {
+  "id": 246,
+  "name": "Gilded loom",
+  "skill": "thieving",
+  "group": "Cloth",
+  "levelReq": 50,
+  "baseTicks": 9,
+  "xp": 70,
+  "inputs": [],
+  "output": {
+   "itemId": 302,
+   "qty": 1
+  },
+  "caught": {
+   "chanceAtReq": 0.32,
+   "safeAtLevel": 85,
+   "stunTicks": 12
+  }
+ },
+ {
+  "id": 247,
+  "name": "Reliquary vestry",
+  "skill": "thieving",
+  "group": "Cloth",
+  "levelReq": 75,
+  "baseTicks": 10,
+  "xp": 175,
+  "inputs": [],
+  "output": {
+   "itemId": 303,
+   "qty": 1
+  },
+  "caught": {
+   "chanceAtReq": 0.35,
+   "safeAtLevel": 110,
+   "stunTicks": 15
+  }
+ },
+ {
+  "id": 248,
+  "name": "Homespun hood",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 9,
+  "inputs": [
+   {
+    "itemId": 300,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 304,
+   "qty": 1
+  }
+ },
+ {
+  "id": 249,
+  "name": "Homespun skirt",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 14,
+  "inputs": [
+   {
+    "itemId": 300,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 306,
+   "qty": 1
+  }
+ },
+ {
+  "id": 250,
+  "name": "Homespun robe",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 23,
+  "inputs": [
+   {
+    "itemId": 300,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 305,
+   "qty": 1
+  }
+ },
+ {
+  "id": 251,
+  "name": "Silk hood",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 25,
+  "baseTicks": 6,
+  "xp": 50,
+  "inputs": [
+   {
+    "itemId": 301,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 307,
+   "qty": 1
+  }
+ },
+ {
+  "id": 252,
+  "name": "Silk skirt",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 25,
+  "baseTicks": 6,
+  "xp": 75,
+  "inputs": [
+   {
+    "itemId": 301,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 309,
+   "qty": 1
+  }
+ },
+ {
+  "id": 253,
+  "name": "Silk robe",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 25,
+  "baseTicks": 6,
+  "xp": 125,
+  "inputs": [
+   {
+    "itemId": 301,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 308,
+   "qty": 1
+  }
+ },
+ {
+  "id": 254,
+  "name": "Gilded hood",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 50,
+  "baseTicks": 7,
+  "xp": 145,
+  "inputs": [
+   {
+    "itemId": 302,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 310,
+   "qty": 1
+  }
+ },
+ {
+  "id": 255,
+  "name": "Gilded skirt",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 50,
+  "baseTicks": 7,
+  "xp": 215,
+  "inputs": [
+   {
+    "itemId": 302,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 312,
+   "qty": 1
+  }
+ },
+ {
+  "id": 256,
+  "name": "Gilded robe",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 50,
+  "baseTicks": 7,
+  "xp": 360,
+  "inputs": [
+   {
+    "itemId": 302,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 311,
+   "qty": 1
+  }
+ },
+ {
+  "id": 257,
+  "name": "Voidweave hood",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 75,
+  "baseTicks": 7,
+  "xp": 380,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 313,
+   "qty": 1
+  }
+ },
+ {
+  "id": 258,
+  "name": "Voidweave skirt",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 75,
+  "baseTicks": 7,
+  "xp": 570,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 315,
+   "qty": 1
+  }
+ },
+ {
+  "id": 259,
+  "name": "Voidweave robe",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 75,
+  "baseTicks": 7,
+  "xp": 950,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 5
+   }
+  ],
+  "output": {
+   "itemId": 314,
+   "qty": 1
+  }
+ },
+ {
+  "id": 295,
+  "name": "Wightweave hood",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 90,
+  "baseTicks": 8,
+  "xp": 1000,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 2
+   },
+   {
+    "itemId": 250,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 344,
+   "qty": 1
+  }
+ },
+ {
+  "id": 296,
+  "name": "Wightweave skirt",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 90,
+  "baseTicks": 8,
+  "xp": 1500,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 3
+   },
+   {
+    "itemId": 250,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 346,
+   "qty": 1
+  }
+ },
+ {
+  "id": 297,
+  "name": "Wightweave robe",
+  "skill": "crafting",
+  "group": "Cloth",
+  "levelReq": 90,
+  "baseTicks": 8,
+  "xp": 2500,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 5
+   },
+   {
+    "itemId": 250,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 345,
+   "qty": 1
+  }
+ },
+ {
+  "id": 275,
+  "name": "Pelt gloves",
+  "skill": "crafting",
+  "group": "Gloves",
+  "levelReq": 5,
+  "baseTicks": 6,
+  "xp": 10,
+  "inputs": [
+   {
+    "itemId": 240,
+    "qty": 4
+   }
+  ],
+  "output": {
+   "itemId": 323,
+   "qty": 1
+  }
+ },
+ {
+  "id": 276,
+  "name": "Bogskin gloves",
+  "skill": "crafting",
+  "group": "Gloves",
+  "levelReq": 25,
+  "baseTicks": 6,
+  "xp": 28,
+  "inputs": [
+   {
+    "itemId": 241,
+    "qty": 2
+   },
+   {
+    "itemId": 202,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 324,
+   "qty": 1
+  }
+ },
+ {
+  "id": 277,
+  "name": "Chitin gloves",
+  "skill": "crafting",
+  "group": "Gloves",
+  "levelReq": 45,
+  "baseTicks": 6,
+  "xp": 75,
+  "inputs": [
+   {
+    "itemId": 242,
+    "qty": 2
+   },
+   {
+    "itemId": 203,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 325,
+   "qty": 1
+  }
+ },
+ {
+  "id": 278,
+  "name": "Bone gloves",
+  "skill": "crafting",
+  "group": "Gloves",
+  "levelReq": 65,
+  "baseTicks": 7,
+  "xp": 225,
+  "inputs": [
+   {
+    "itemId": 243,
+    "qty": 2
+   },
+   {
+    "itemId": 204,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 326,
+   "qty": 1
+  }
+ },
+ {
+  "id": 280,
+  "name": "Pelt quiver",
+  "skill": "fletching",
+  "group": "Quivers",
+  "levelReq": 1,
+  "baseTicks": 5,
+  "xp": 14,
+  "inputs": [
+   {
+    "itemId": 240,
+    "qty": 2
+   },
+   {
+    "itemId": 10,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 329,
+   "qty": 1
+  }
+ },
+ {
+  "id": 281,
+  "name": "Bogskin quiver",
+  "skill": "fletching",
+  "group": "Quivers",
+  "levelReq": 15,
+  "baseTicks": 5,
+  "xp": 34,
+  "inputs": [
+   {
+    "itemId": 241,
+    "qty": 2
+   },
+   {
+    "itemId": 11,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 330,
+   "qty": 1
+  }
+ },
+ {
+  "id": 282,
+  "name": "Chitin quiver",
+  "skill": "fletching",
+  "group": "Quivers",
+  "levelReq": 30,
+  "baseTicks": 5,
+  "xp": 70,
+  "inputs": [
+   {
+    "itemId": 242,
+    "qty": 2
+   },
+   {
+    "itemId": 12,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 331,
+   "qty": 1
+  }
+ },
+ {
+  "id": 283,
+  "name": "Fur quiver",
+  "skill": "fletching",
+  "group": "Quivers",
+  "levelReq": 60,
+  "baseTicks": 5,
+  "xp": 150,
+  "inputs": [
+   {
+    "itemId": 245,
+    "qty": 2
+   },
+   {
+    "itemId": 13,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 332,
+   "qty": 1
+  }
+ },
+ {
+  "id": 284,
+  "name": "Scale quiver",
+  "skill": "fletching",
+  "group": "Quivers",
+  "levelReq": 85,
+  "baseTicks": 5,
+  "xp": 320,
+  "inputs": [
+   {
+    "itemId": 247,
+    "qty": 2
+   },
+   {
+    "itemId": 14,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 333,
+   "qty": 1
+  }
+ },
+ {
+  "id": 298,
+  "name": "Troll quiver",
+  "skill": "fletching",
+  "group": "Quivers",
+  "levelReq": 95,
+  "baseTicks": 6,
+  "xp": 700,
+  "inputs": [
+   {
+    "itemId": 248,
+    "qty": 2
+   },
+   {
+    "itemId": 15,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 347,
+   "qty": 1
+  }
+ },
+ {
+  "id": 299,
+  "name": "Drake quiver",
+  "skill": "fletching",
+  "group": "Quivers",
+  "levelReq": 99,
+  "baseTicks": 6,
+  "xp": 1400,
+  "inputs": [
+   {
+    "itemId": 251,
+    "qty": 2
+   },
+   {
+    "itemId": 15,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 348,
+   "qty": 1
+  }
+ },
+ {
+  "id": 285,
+  "name": "Linen grimoire",
+  "skill": "crafting",
+  "group": "Grimoires",
+  "levelReq": 1,
+  "baseTicks": 6,
+  "xp": 16,
+  "inputs": [
+   {
+    "itemId": 300,
+    "qty": 3
+   }
+  ],
+  "output": {
+   "itemId": 334,
+   "qty": 1
+  }
+ },
+ {
+  "id": 286,
+  "name": "Silk grimoire",
+  "skill": "crafting",
+  "group": "Grimoires",
+  "levelReq": 25,
+  "baseTicks": 6,
+  "xp": 85,
+  "inputs": [
+   {
+    "itemId": 301,
+    "qty": 3
+   },
+   {
+    "itemId": 241,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 335,
+   "qty": 1
+  }
+ },
+ {
+  "id": 287,
+  "name": "Gilded grimoire",
+  "skill": "crafting",
+  "group": "Grimoires",
+  "levelReq": 50,
+  "baseTicks": 7,
+  "xp": 230,
+  "inputs": [
+   {
+    "itemId": 302,
+    "qty": 3
+   },
+   {
+    "itemId": 244,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 336,
+   "qty": 1
+  }
+ },
+ {
+  "id": 288,
+  "name": "Voidweave grimoire",
+  "skill": "crafting",
+  "group": "Grimoires",
+  "levelReq": 75,
+  "baseTicks": 7,
+  "xp": 560,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 3
+   },
+   {
+    "itemId": 246,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 337,
+   "qty": 1
+  }
+ },
+ {
+  "id": 300,
+  "name": "Wightweave grimoire",
+  "skill": "crafting",
+  "group": "Grimoires",
+  "levelReq": 90,
+  "baseTicks": 8,
+  "xp": 1200,
+  "inputs": [
+   {
+    "itemId": 303,
+    "qty": 3
+   },
+   {
+    "itemId": 250,
+    "qty": 2
+   }
+  ],
+  "output": {
+   "itemId": 349,
+   "qty": 1
+  }
+ },
+ {
+  "id": 279,
+  "name": "Scale gloves",
+  "skill": "crafting",
+  "group": "Gloves",
+  "levelReq": 85,
+  "baseTicks": 7,
+  "xp": 575,
+  "inputs": [
+   {
+    "itemId": 247,
+    "qty": 2
+   },
+   {
+    "itemId": 206,
+    "qty": 1
+   }
+  ],
+  "output": {
+   "itemId": 327,
+   "qty": 1
+  }
+ }
+]

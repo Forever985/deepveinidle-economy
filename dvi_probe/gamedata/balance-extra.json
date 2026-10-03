@@ -1,0 +1,368 @@
+{
+ "_source": "index.js",
+ "_note": "由 extract_balance.py 提取；游戏更新后重跑",
+ "buffTierMults": [
+  1.0,
+  1.3,
+  1.6,
+  2.2,
+  3.0
+ ],
+ "buffPerRank": {
+  "gatherer": 0.1,
+  "elixir": 0.1,
+  "hunter": 0.25
+ },
+ "blessing": {
+  "gather": 1.05,
+  "combat": 1.1
+ },
+ "xpTierMults": [
+  1.0,
+  1.5,
+  3.0,
+  8.0,
+  25.0
+ ],
+ "perks": [
+  {
+   "id": "xp",
+   "name": "XP gain",
+   "lane": "efficiency",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "gather",
+   "name": "Gather speed",
+   "lane": "efficiency",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "craft",
+   "name": "Craft speed",
+   "lane": "efficiency",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "offline",
+   "name": "Offline hours",
+   "lane": "efficiency",
+   "perRank": 0.005,
+   "unit": "hours"
+  },
+  {
+   "id": "move",
+   "name": "Move speed",
+   "lane": "efficiency",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "hp",
+   "name": "Max HP",
+   "lane": "efficiency",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "maxhit",
+   "name": "Max hit",
+   "lane": "power",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "accuracy",
+   "name": "Accuracy",
+   "lane": "power",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "rare",
+   "name": "Rare-find",
+   "lane": "power",
+   "perRank": 0.005,
+   "unit": "percent"
+  },
+  {
+   "id": "enhance",
+   "name": "Enhance odds",
+   "lane": "power",
+   "perRank": 0.0025,
+   "unit": "percent"
+  }
+ ],
+ "toolBonuses": [
+  {
+   "itemId": 80,
+   "slot": "pickaxe",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 81,
+   "slot": "pickaxe",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 82,
+   "slot": "pickaxe",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 83,
+   "slot": "pickaxe",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 84,
+   "slot": "pickaxe",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 85,
+   "slot": "rod",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 86,
+   "slot": "rod",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 87,
+   "slot": "rod",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 88,
+   "slot": "rod",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 89,
+   "slot": "rod",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 90,
+   "slot": "axe",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 91,
+   "slot": "axe",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 92,
+   "slot": "axe",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 93,
+   "slot": "axe",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 94,
+   "slot": "axe",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 323,
+   "slot": "gloves",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 324,
+   "slot": "gloves",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 325,
+   "slot": "gloves",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 326,
+   "slot": "gloves",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 327,
+   "slot": "gloves",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 360,
+   "slot": "pan",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 361,
+   "slot": "pan",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 362,
+   "slot": "pan",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 363,
+   "slot": "pan",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 364,
+   "slot": "pan",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 365,
+   "slot": "hammer",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 366,
+   "slot": "hammer",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 367,
+   "slot": "hammer",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 368,
+   "slot": "hammer",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 369,
+   "slot": "hammer",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 370,
+   "slot": "knife",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 371,
+   "slot": "knife",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 372,
+   "slot": "knife",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 373,
+   "slot": "knife",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 374,
+   "slot": "knife",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 375,
+   "slot": "needle",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 376,
+   "slot": "needle",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 377,
+   "slot": "needle",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 378,
+   "slot": "needle",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 379,
+   "slot": "needle",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 380,
+   "slot": "mortar",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 381,
+   "slot": "mortar",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 382,
+   "slot": "mortar",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 383,
+   "slot": "mortar",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 384,
+   "slot": "mortar",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 385,
+   "slot": "hoe",
+   "bonus": 0.08
+  },
+  {
+   "itemId": 386,
+   "slot": "hoe",
+   "bonus": 0.16
+  },
+  {
+   "itemId": 387,
+   "slot": "hoe",
+   "bonus": 0.25
+  },
+  {
+   "itemId": 388,
+   "slot": "hoe",
+   "bonus": 0.35
+  },
+  {
+   "itemId": 389,
+   "slot": "hoe",
+   "bonus": 0.5
+  },
+  {
+   "itemId": 328,
+   "slot": "mount",
+   "bonus": 0.12
+  }
+ ],
+ "toolSlots": {
+  "pickaxe": "mining",
+  "rod": "fishing",
+  "axe": "woodcutting",
+  "gloves": "thieving",
+  "pan": "cooking",
+  "hammer": "smithing",
+  "knife": "fletching",
+  "needle": "crafting",
+  "mortar": "herblore",
+  "hoe": "farming"
+ }
+}

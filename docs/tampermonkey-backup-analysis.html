@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tampermonkey 备份包 — 逆向阅读笔记</title>
+<style>
+  :root{
+    --bg:#f7f7f5; --card:#fff; --ink:#1c1f23; --muted:#5f6b76; --line:#e3e5e8;
+    --accent:#2f6fed; --ok:#1a9e6a; --warn:#c8791a; --bad:#c0392b; --code:#f4f5f7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.72 -apple-system,"Segoe UI","Microsoft YaHei",Roboto,sans-serif}
+  .wrap{max-width:980px;margin:0 auto;padding:44px 26px 80px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:28px}
+  h1{margin:0 0 8px;font-size:27px;font-weight:650;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:14px}
+  .badges{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .badge{font-size:12.5px;padding:3px 10px;border-radius:20px;background:#eef1f5;color:#3a4753;border:1px solid var(--line)}
+  .badge.ok{background:#e8f7f0;color:var(--ok);border-color:#c6e9da}
+  .badge.bad{background:#fdecea;color:var(--bad);border-color:#f5cdc8}
+  h2{font-size:19px;margin:40px 0 14px;padding-left:11px;border-left:4px solid var(--accent);font-weight:620}
+  h3{font-size:15.5px;margin:24px 0 8px;font-weight:620}
+  p{margin:9px 0}
+  code{background:var(--code);padding:2px 6px;border-radius:4px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+  pre{background:#1c1f23;color:#e6e8ea;padding:15px 17px;border-radius:8px;overflow-x:auto;
+      font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.62}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--card);
+        border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th{background:#f0f2f5;text-align:left;padding:9px 12px;font-weight:620;border-bottom:1px solid var(--line)}
+  td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:16px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  .stat b{display:block;font-size:20px;font-weight:650;letter-spacing:-.3px}
+  .stat span{font-size:12.5px;color:var(--muted)}
+  .ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+  .note{border-left:3px solid var(--warn);background:#fffaf0;padding:11px 15px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+  .note.sec{border-left-color:var(--bad);background:#fdf3f2}
+  ul{margin:8px 0;padding-left:22px}li{margin:5px 0}
+  .tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:4px;background:#eef1f5;color:#4a5560;margin-right:5px}
+  footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Tampermonkey 备份包 — 逆向阅读笔记</h1>
+  <div class="sub">源文件 <span class="mono">tampermonkey-backup-chrome-2026-10-01T01-45-49-113Z.txt</span> · 20.7 MB · 分析时间 2026-10-01</div>
+  <div class="badges">
+    <span class="badge">33 个用户脚本</span>
+    <span class="badge">标准 TM v1 备份格式</span>
+    <span class="badge ok">MWI 生态 27 个</span>
+    <span class="badge bad">含 7 处明文凭据</span>
+  </div>
+</header>
+
+<p>这是一份 Tampermonkey 的 JSON 备份：<span class="mono">{"created_by":"Tampermonkey","version":"1","scripts":[…]}</span>，33 个脚本的源码以 <strong>base64 内嵌</strong>在 <span class="mono">source</span> 字段里。解出来共约 <strong>6.7 MB</strong> JavaScript——它本质上是一个围绕放置类游戏<strong>《银河奶牛》(Milky Way Idle)</strong> 的用户脚本生态快照。</p>
+
+<div class="grid">
+  <div class="stat"><b>33</b><span>脚本总数</span></div>
+  <div class="stat"><b>27</b><span>MilkyWayIdle 相关</span></div>
+  <div class="stat"><b>6.7 MB</b><span>解码后 JS 总量</span></div>
+  <div class="stat"><b>最多 1.2 MB</b><span>单脚本（PSChina 汉化）</span></div>
+  <div class="stat"><b>3</b><span>不同游戏/站点</span></div>
+</div>
+
+<h2>1. 生态构成</h2>
+<p>33 个脚本按用途分成四类，其中压倒性多数服务于同一款游戏：</p>
+<table>
+  <tr><th>类别</th><th>数量</th><th>代表脚本</th></tr>
+  <tr><td><strong>MWI 基础设施</strong><br><span class="tag">被其他脚本依赖</span></td><td>4</td><td><span class="mono">mooket</span>（根注入器）、<span class="mono">MWICommon</span>、<span class="mono">MWI_Toolkit</span>、<span class="mono">@mwm/addon</span></td></tr>
+  <tr><td><strong>MWI 数据/利润分析</strong></td><td>9</td><td><span class="mono">MWI Profit Panel</span>（532 KB）、<span class="mono">Everyday Profit Pro</span>（528 KB）、<span class="mono">mooket</span>、<span class="mono">Better Loot Tracker</span></td></tr>
+  <tr><td><strong>MWI 功能增强/汉化/皮肤</strong></td><td>14</td><td><span class="mono">Ranged Way Idle</span>（382 KB）、<span class="mono">生产采集增强</span>、<span class="mono">角色名片</span>、<span class="mono">VSCode 深色配色</span></td></tr>
+  <tr><td><strong>其他站点</strong></td><td>3</td><td><span class="mono">PSChina 汉化</span>（Pokémon Showdown）、<span class="mono">FF14 跨区小助手</span>、<span class="mono">ETERNALS:online</span> ×2</td></tr>
+</table>
+
+<h2>2. 核心技术机制</h2>
+<p>这是整份备份里最有价值的部分。这些脚本<strong>不修改游戏代码、也不替换 <span class="mono">window.WebSocket</span></strong>，而是用三层"旁路"把自己挂进游戏的数据流。</p>
+
+<h3>第一层：劫持 <span class="mono">MessageEvent.prototype.data</span> 的 getter</h3>
+<p>游戏用 <span class="mono">ws.onmessage = e =&gt; …e.data…</span> 收包。既然每个 handler 都要读 <span class="mono">e.data</span>，那么给这个属性装个 getter，就能在游戏拿到数据之前截胡——而且游戏完全无感。</p>
+<pre>const oriGet = Object.getOwnPropertyDescriptor(MessageEvent.prototype, "data").get;
+
+function hookedGet() {
+  const socket = this.currentTarget;
+  if (!(socket instanceof WebSocket)) return oriGet.call(this);
+  if (!socket.url.includes("wss://api.milkywayidle")) return oriGet.call(this);
+  const message = oriGet.call(this);
+  Object.defineProperty(this, "data", { value: message });   // 防重入：同一条消息只派发一次
+  try { dispatchEvent(new CustomEvent("MWI_" + JSON.parse(message).type, {detail: obj})); } catch {}
+  return message;                                            // 原样交还给游戏
+}</pre>
+<div class="card">
+<strong>两个细节值得注意：</strong>
+<ul>
+  <li><strong>防重入</strong>：一条消息可能被多个 <span class="mono">onmessage</span> 监听器读取。脚本用 <span class="mono">defineProperty</span> 把实例上的 <span class="mono">data</span> 换成固定值，确保 JSON 只解析一次、事件只派发一次。</li>
+  <li><strong>URL 白名单</strong>：只对含 <span class="mono">api.milkywayidle</span> 的连接生效，避免污染站内其他 WebSocket。</li>
+  <li><strong>Promise 微任务时机</strong>：部分脚本把处理逻辑塞进 <span class="mono">new Promise(r=&gt;r()).then(...)</span>，把自身执行推迟到游戏 handler 之后，从而实现"后置钩子"。</li>
+</ul>
+</div>
+
+<h3>第二层：劫持 <span class="mono">WebSocket.prototype.send</span>（可拦截发件）</h3>
+<p>Ranged Way Idle 走得更远——连<strong>发出去的包</strong>也能拦，靠一个 <span class="mono">blockCurrentSendMessage</span> 开关决定是否放行：</p>
+<pre>WebSocket.prototype.send = async function (message) {
+  if (!this.url.includes("wss://api.milkywayidle")) return originalSend.call(this, message);
+  globalVariables.blockCurrentSendMessage = false;
+  globalVariables.webSocketMessageProcessor(message, 'send');   // 先给插件过一遍
+  if (globalVariables.blockCurrentSendMessage) return;           // 插件可吞掉这条指令
+  return originalSend.call(this, message);
+};</pre>
+<p>它的配置项里甚至暴露了 <span class="mono">debugPrintWSMessages</span>、<span class="mono">blockWSMessageByType</span>——即"打印/屏蔽指定 type 的 WS 消息"，说明这套钩子是为深度调试设计的。</p>
+
+<h3>第三层：从 React Fiber 里掏出游戏对象</h3>
+<p>光有消息流还不够，要调用游戏自己的 API（打开市场、查询背包）就得拿到 React 组件实例。<span class="mono">__reactFiber$</span> 是 React 挂在 DOM 节点上的内部属性，顺着它能爬到 <span class="mono">stateNode</span>：</p>
+<pre>window[injectSpace].game = (el =&gt;
+  el?.[Reflect.ownKeys(el).find(k =&gt; k.startsWith('__reactFiber$'))]?.return?.stateNode
+)(document.querySelector('[class^="GamePage"]'));</pre>
+<p>共 6 个脚本用这招（<span class="mono">市场伴侣</span>、<span class="mono">MWI_Toolkit</span>、<span class="mono">Ranged Way Idle</span>、<span class="mono">mooket</span> 等）。代价是<strong>强耦合 React 内部实现</strong>——游戏一升级 React 或改类名就会失效。</p>
+
+<h2>3. 脚本之间的依赖链</h2>
+<p>这不是 33 个独立脚本，而是有<strong>明确分层</strong>的生态。注入空间通过 <span class="mono">window[命名空间]</span> 共享：</p>
+<table>
+  <tr><th>命名空间</th><th>提供方</th><th>消费者</th></tr>
+  <tr><td class="mono">window.mwi</td><td>mooket（根注入器）</td><td>MWICommon、MWIAlchemyCalc、Profit Panel、市场伴侣</td></tr>
+  <tr><td class="mono">window.mwi_common</td><td>MWICommon</td><td>MWISubscribe</td></tr>
+  <tr><td class="mono">window.MWIMM</td><td>市场伴侣</td><td>自身模块（on/ready/addToCart）</td></tr>
+  <tr><td class="mono">window.MWIModules</td><td>生产采集增强</td><td>内部 12 个子模块</td></tr>
+</table>
+<div class="note">
+<strong>关键发现：</strong><span class="mono">MWICommon</span>（自称 "Common API for MWIScript"）并不是自给自足的——它的第 589 行直接读 <span class="mono">window[mooketSpace].game</span>。也就是说 <strong>mooket 是整个生态的根</strong>，装了对应用户脚本的人一旦禁用 mooket，依赖它的插件会集体失效。
+</div>
+
+<h2>4. 游戏协议：脚本监听的消息类型</h2>
+<p>从脚本里反推出的游戏 WS 协议（<span class="mono">init_*</span> 为全量，其余为增量推送）：</p>
+<pre>init_character_data      init_client_data        login_reply
+actions_updated          action_completed        items_updated
+skills_updated           abilities_updated       quests_updated
+loot_opened              loot_log_updated        new_battle
+battle_updated           battle_unit_fetched     party_updated
+market_listings_updated  market_item_order_books_updated
+item_price_change_info   guild_updated           guild_characters_updated
+house_rooms_updated      community_buffs_updated consumable_buffs_updated
+equipment_buffs_updated  chat_message_received   profile_shared</pre>
+<p>其中 <span class="mono">init_character_data</span> 是整个生态的基石——它一次性拿到角色全量状态，被 4 个以上脚本缓存复用。</p>
+<p>另有一组 <span class="mono">*_reply</span> / <span class="mono">*_request</span> 型消息（如 <span class="mono">query_transaction_history_reply</span>、<span class="mono">get_listing_create_time_reply</span>），说明游戏走的是<strong>请求-应答</strong>模式，脚本可以主动查询市场成交历史与挂单创建时间——这正是那些"利润面板"类插件的数据来源。</p>
+
+<h2>5. 数据外发与第三方服务</h2>
+<p>部分脚本会把游戏数据发到站外。按其 <span class="mono">@connect</span> 声明与代码引用汇总：</p>
+<table>
+  <tr><th>域名</th><th>用途</th></tr>
+  <tr><td class="mono">tupian.li</td><td>图床（被引用 58 次，用于怪物换皮/自定义图片）</td></tr>
+  <tr><td class="mono">milkyway.market<br>niumart.colacola.cloud<br>api.colacola.cloud</td><td><strong>第三方交易平台</strong>——上传角色身份、市场订单，做跨玩家订单撮合</td></tr>
+  <tr><td class="mono">mooket.qi-e.top</td><td>历史价格数据服务</td></tr>
+  <tr><td class="mono">alphb.cn<br>papiyas.chat</td><td>Ranged Way Idle 的数据同步/统计后端</td></tr>
+  <tr><td class="mono">qmsg.zendee.cn</td><td>QQ 推送网关（强化完成/挂机提醒）</td></tr>
+  <tr><td class="mono">raw.githubusercontent.com<br>ghproxy.net</td><td>拉取共享行情 JSON 与脚本更新</td></tr>
+</table>
+<div class="note"><strong>隐私提示：</strong>中间三个平台会接收你的<strong>角色 ID、库存与市场挂单</strong>。这不是恶意行为——它们是公开运营的 MWI 辅助站点——但值得知道：装了这些脚本后，你的游戏数据有一部分是离开 milkywayidle.com 的。</div>
+
+<h2>6. 安全警告</h2>
+<div class="note sec">
+<strong>这个备份文件里有 7 处明文凭据，不要把它分享给任何人。</strong>
+</div>
+<table>
+  <tr><th>所在脚本</th><th>字段</th><th>脱敏值</th><th>性质</th></tr>
+  <tr><td>NiuMart 牛市</td><td class="mono">niumart_token</td><td class="mono">skRd…U8Ir</td><td class="bad">第三方平台账号令牌（33 位）</td></tr>
+  <tr><td>强化通知到QQ</td><td class="mono">qmsgKey</td><td class="mono">72a4…5823</td><td class="bad">Qmsg酱 API 密钥（32 位）</td></tr>
+  <tr><td>Ranged Way Idle</td><td class="mono">…/password</td><td class="mono">s255…d236</td><td class="bad">65 字节加密串（疑为同步口令）</td></tr>
+  <tr><td>Ranged Way Idle</td><td class="mono">…/password</td><td class="mono">3811…abcd</td><td class="bad">8 位明文短密码</td></tr>
+  <tr><td>MWITools</td><td class="mono">guestPassword</td><td class="mono">gues…9685</td><td class="warn">游戏访客账号密码</td></tr>
+  <tr><td>@mwm/addon</td><td class="mono">guestPassword</td><td class="mono">gues…9685</td><td class="warn">同上（缓存副本）</td></tr>
+  <tr><td>Ranged Way Idle</td><td class="mono">listing_sort_keys</td><td class="mono">crea…Time</td><td>非敏感（排序字段名）</td></tr>
+</table>
+<p>此外，<span class="mono">MWITools</span> 与 <span class="mono">@mwm/addon</span> 的存储里各缓存了一份 <strong>4.0 MB / 0.5 MB 的 <span class="mono">init_character_data</span> 全量快照</strong>——包含角色 ID <span class="mono">638331</span>、背包、装备、财产等完整存档。</p>
+<div class="card">
+<strong>处置建议：</strong>
+<ul>
+  <li><strong>不要</strong>把这份备份上传到网盘、贴群、或提交给 AI 服务（包括现在这次）——里面是可用的令牌。</li>
+  <li>建议立刻在 <strong>NiuMart 与 Qmsg 酱</strong> 后台<strong>重置这两个 key</strong>，因为文件可能已落到 Downloads 之外的位置或同步盘。</li>
+  <li>如果游戏角色是访客号，<span class="mono">guestPassword</span> 泄露等于账号可被接管——建议尽快在游戏内绑定正式账号（<span class="mono">/api/account/claim</span>）。</li>
+  <li>以后导出 TM 备份用于分享，先在「设置 → 高级 → 备份」里排除脚本存储，或导出后手动清理 <span class="mono">storage</span> 段。</li>
+</ul>
+</div>
+
+<h2>7. 值得借鉴的工程手法</h2>
+<div class="card">
+<ul>
+  <li><strong>getter 劫持 &gt; 替换构造函数</strong>：改 <span class="mono">MessageEvent.prototype.data</span> 比替换 <span class="mono">window.WebSocket</span> 隐蔽得多，不会破坏 <span class="mono">instanceof</span> 检查，也不与游戏自身的重连逻辑冲突。</li>
+  <li><strong>事件总线解耦</strong>：所有脚本统一用 <span class="mono">CustomEvent("MWI_" + type)</span> 派发，插件之间不需要互相引用——只要约定消息类型即可。这是可扩展的关键。</li>
+  <li><strong>防重入模式</strong>：<span class="mono">Object.defineProperty(this, "data", {value})</span> 把自己换成定值，是处理"多处读取同一开销属性"的通用技巧。</li>
+  <li><strong>响应缓存 + 失效时间</strong>：MWICommon 把市场行情写进 <span class="mono">localStorage</span> 并记录 <span class="mono">timestamp + 6h</span> 作为失效点，避免每次刷新都重新拉取。</li>
+  <li><strong>配置驱动</strong>：300+ 条中英双语配置项集中管理，配合 <span class="mono">debugPrintWSMessages</span> 之类的调试开关，把"生产脚本"当"可观测系统"来做。</li>
+</ul>
+</div>
+
+<h2>8. 与上一轮工作的关联</h2>
+<p>你刚让我测过 <span class="mono">deepveinidle.com</span>——它和这里的 MWI 是<strong>同一种架构</strong>：Vite SPA + 一条承载全部世界状态的 WebSocket。<strong>这份备份正好是从零写一个 DVI 增强脚本的完整参考实现</strong>：</p>
+<table>
+  <tr><th>环节</th><th>MWI 的做法</th><th>迁移到 DVI</th></tr>
+  <tr><td>建立会话</td><td>登录后 cookie 认证</td><td><span class="mono">POST /api/guest</span> 拿 <span class="mono">sid</span></td></tr>
+  <tr><td>接入数据流</td><td>劫持 <span class="mono">MessageEvent.data</span>，过滤 <span class="mono">api.milkywayidle</span></td><td>改为过滤 <span class="mono">/ws</span>，解析 <span class="mono">{tick, m:[…]}</span></td></tr>
+  <tr><td>解析消息</td><td><span class="mono">obj.type</span> 单层分派</td><td>DVI 无 <span class="mono">type</span> 字段，需遍历 <span class="mono">m[]</span> 数组按 <span class="mono">m[i].t</span> 分派</td></tr>
+  <tr><td>分包处理</td><td>无（MWI 帧不分片）</td><td><strong>必须处理 WS 分片</strong>（continuation + FIN），否则大快照解析失败</td></tr>
+  <tr><td>获取游戏对象</td><td><span class="mono">__reactFiber$</span> → <span class="mono">stateNode</span></td><td>DVI 是 Vue/自研渲染器，需另找挂载点或纯靠消息流重建状态</td></tr>
+</table>
+<p>DVI 有个额外便利：它的客户端指令是明文 <span class="mono">{"t":"…"}</span>、90+ 个 opcode 全部可枚举，比 MWI 的协议更透明。</p>
+
+<footer>
+分析方式：解 base64 → 提取元信息 → 横切统计注入手段 → 精读核心钩子 → 递归扫描存储凭据。所有凭据在本文档中均已脱敏。<br>
+解码产物：<span class="mono">tm_decode/</span>（33 个独立 .js 文件，便于用编辑器逐份阅读）
+</footer>
+
+</div>
+</body>
+</html>

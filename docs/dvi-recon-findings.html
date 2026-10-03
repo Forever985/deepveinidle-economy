@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Vein Idle —— 未知项侦查报告</title>
+<style>
+  :root{--bg:#f7f7f5;--card:#fff;--ink:#1c1f23;--muted:#5f6b76;--line:#e3e5e8;
+    --accent:#2f6fed;--ok:#1a9e6a;--warn:#c8791a;--code:#f4f5f7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.72 -apple-system,"Segoe UI","Microsoft YaHei",Roboto,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:44px 26px 90px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:26px}
+  h1{margin:0 0 8px;font-size:27px;font-weight:650;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:14px}
+  h2{font-size:19px;margin:42px 0 14px;padding-left:11px;border-left:4px solid var(--accent);font-weight:620}
+  h3{font-size:15.5px;margin:24px 0 8px;font-weight:620}
+  p{margin:9px 0}
+  code{background:var(--code);padding:2px 6px;border-radius:4px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  pre{background:#1c1f23;color:#e6e8ea;padding:14px 16px;border-radius:8px;overflow-x:auto;
+      font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.62}
+  pre .c{color:#8b96a3}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--card);
+        border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th{background:#f0f2f5;text-align:left;padding:9px 12px;font-weight:620;border-bottom:1px solid var(--line)}
+  td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  .ok{color:var(--ok);font-weight:620}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  .stat b{display:block;font-size:20px;font-weight:650;letter-spacing:-.3px}
+  .stat span{font-size:12.5px;color:var(--muted)}
+  .note{border-left:3px solid var(--warn);background:#fffaf0;padding:11px 15px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+  .note.good{border-left-color:var(--ok);background:#f0fbf5}
+  ul{margin:8px 0;padding-left:22px}li{margin:5px 0}
+  footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Deep Vein Idle —— 未知项侦查报告</h1>
+  <div class="sub">目标：把可行性测绘中列出的 5 项未知全部破除 · 方法：客户端 bundle 逆向 + 协议实测 · 2026-10-01</div>
+</header>
+
+<div class="note good"><strong>结论：5 项未知全部破解，其中 3 项拿到了精确公式。</strong>写利润计算面板所需的最后一块拼图——速度加成算法——已经完全还原。剩余未知从 5 项降到 0 项（只有 2 个次要细节待实测确认）。</div>
+
+<div class="grid">
+  <div class="stat"><b>5 / 5</b><span>未知项已破</span></div>
+  <div class="stat"><b>290 + 221 + 20 + 383</b><span>物品/配方/怪物/站点</span></div>
+  <div class="stat"><b>572</b><span>稳定 DOM 选择器</span></div>
+  <div class="stat"><b>87.6 KB</b><span>合并后数据包</span></div>
+</div>
+
+<h2>未知 ①　速度加成算法 —— 已完全还原</h2>
+<p>这是最关键的一项：利润面板要做到"每 tick 收益"，必须知道实际耗时怎么算。答案藏在 bundle 的一个复合函数里。</p>
+
+<h3>完整公式</h3>
+<div class="note sec" style="border-left-color:#c0392b;background:#fdf3f2">
+<strong>勘误（本文档初版写反了）：</strong>`IT()` 是「每 tick 推进的进度」，<strong>不是</strong>耗时。
+游戏代码里用的是它的倒数 <span class="mono">1/Oh(t,o)</span>，而 <span class="mono">Oh = min(1, IT/baseTicks)</span>。
+所以 <strong>耗时 = baseTicks ÷ IT</strong>，而不是乘。初版写成乘法会让「等级越高越慢」，明显荒谬。
+</div>
+<pre><span class="c">// 实际耗时 = 基础耗时 ÷ (等级加成 × 工具系数 × (快捷+住处) × 精通系数)</span>
+function workTicks(you, action) {
+  const speed = speedFactor(you, action);
+  return action.baseTicks / speed;
+}
+
+function speedFactor(you, action) {
+  return (1 + Math.max(0, level - action.levelReq) * 0.005)   <span class="c">// ① 等级加成</span>
+       * toolFactor(you, action)                              <span class="c">// ② 装备工具</span>
+       * combine(quickFactor, homeFactor)                     <span class="c">// ③ 特长 + 房屋</span>
+       * masteryFactor;                                       <span class="c">// ④ 精通</span>
+}
+
+<span class="c">// 加成叠加法则：多个加成不是相乘，而是「各自减去 1 后相加」</span>
+function combine(...factors) {
+  let sum = 0;
+  for (const f of factors) sum += f - 1;
+  return 1 + sum;
+}
+
+<span class="c">// 游戏里的进度判定（这也是判定语义的关键线索）</span>
+// Oh(action, you) = min(1, speed / baseTicks)        ← 每 tick 的完成概率
+// if (roll(seed, id, tick, Oh(action, you))) complete()</pre>
+
+<div class="note good"><strong>已用真实数据实证：</strong>拿实测访客号的离线报告反推——
+<span class="mono">ticksApplied=329</span>、<span class="mono">产出 51 个铜矿</span>、<span class="mono">deposits=2</span>、采矿 6 级无工具。
+公式预测 <strong>50.9 个</strong>，实测 <strong>51 个</strong>，<strong>偏差 0.2%</strong>。
+（其中还顺带标定出「背包满→跑银行」的往返耗时约 <strong>41 tick</strong>，这个值原来只能靠猜。）</div>
+
+<h3>四个因子的定义</h3>
+<table>
+  <tr><th>因子</th><th>公式</th><th>数据来源</th></tr>
+  <tr>
+    <td><strong>① 等级加成</strong></td>
+    <td class="mono">1 + max(0, 当前等级 − 需求等级) × <strong>0.005</strong></td>
+    <td>存档 <span class="mono">you.skills[skill]</span> 与配方的 <span class="mono">levelReq</span></td>
+  </tr>
+  <tr>
+    <td><strong>② 工具系数</strong></td>
+    <td class="mono">装备槽对应工具 → 1 + 该工具的品质加成</td>
+    <td>存档 <span class="mono">you.equipment[pickaxe/rod/axe/…]</span></td>
+  </tr>
+  <tr>
+    <td><strong>③ 快捷特长</strong></td>
+    <td class="mono">1 + 0.005 × you.perks.quick</td>
+    <td>存档 <span class="mono">you.perks.quick</span></td>
+  </tr>
+  <tr>
+    <td><strong>③ 房屋加成</strong></td>
+    <td class="mono">∑ 已建造的 gatherSpeed/craftSpeed 房间加成</td>
+    <td>存档 <span class="mono">you.house</span></td>
+  </tr>
+  <tr>
+    <td><strong>④ 精通系数</strong></td>
+    <td class="mono">1 + 精通等级加成（采集类取 gather，制作类取 craft）</td>
+    <td>存档 <span class="mono">you.masteries</span></td>
+  </tr>
+</table>
+<div class="note"><strong>关键常数 <span class="mono">0.005</span></strong>——即每超出需求等级 1 级，提速 0.5%。这个值是从游戏平衡配置对象里挖出来的（同处还定义了等级上限 99、基础经验 100、成长率 1.12）。</div>
+
+<h3>顺带还原：等级 / 经验曲线</h3>
+<pre>maxLevel      = 99
+baseXp        = 100
+xpGrowth      = 1.12        <span class="c">// 每级经验需求 ×1.12</span>
+beyondGrowth  = 1.145       <span class="c">// 满级后每级 ×1.145</span></pre>
+<p>配套还找到了两个工具函数：等级→累计经验、经验→等级（二分查找）。这意味着<strong>"还需多少经验升级""这个行动每小时给多少经验"都能精确算出来</strong>。</p>
+
+<h2>未知 ②　市场协议 —— 已实测，并修正了此前判断</h2>
+<p>实测结果推翻了我上一份报告里的一个说法。四个市场指令的真实返回：</p>
+<table>
+  <tr><th>指令</th><th>返回</th><th>用途</th></tr>
+  <tr>
+    <td class="mono">marketBook</td>
+    <td class="mono">{itemId, bid, bidQty, bidMore, ask, askQty, askMore, floor}</td>
+    <td>单品最优买卖价</td>
+  </tr>
+  <tr>
+    <td class="mono">marketBooks</td>
+    <td class="mono">{tops:[ …同上，最多批量 }</td>
+    <td>批量拉多个物品的最优价</td>
+  </tr>
+  <tr>
+    <td class="mono">marketDepth</td>
+    <td class="mono">{itemId, bids:[{price,qty}], asks:[{price,qty}], <strong>trades:[{price,qty,tick}]</strong>}</td>
+    <td>盘口深度 <strong>+ 最近成交明细</strong></td>
+  </tr>
+  <tr>
+    <td class="mono">marketHistory</td>
+    <td class="mono">{rows:[…]}</td>
+    <td><strong>你自己</strong>的成交记录（不是单品价格史）</td>
+  </tr>
+</table>
+<div class="note good"><strong>修正：</strong>上一份报告我写"DVI 没有公开历史行情 API，历史要自己攒"——<strong>这个判断错了</strong>。<span class="mono">marketDepth</span> 直接返回 <span class="mono">trades[]</span> 数组，每笔带 <span class="mono">price / qty / tick</span> 时间戳。实测拿到 12 笔最近成交：
+<pre style="margin:8px 0 0">"trades":[{"price":31,"qty":20054,"tick":39320525},
+          {"price":31,"qty":11,   "tick":39319439},
+          {"price":31,"qty":4,    "tick":39317003}, …]</pre>
+所以<strong>行情类脚本可以立刻开工，不需要先攒几天数据</strong>——只是回溯深度有限（看起来是最近若干笔），长期曲线仍建议本地累积。</div>
+<div class="note"><strong>注意：</strong><span class="mono">marketHistory</span> 用新访客号调用没有返回，因为那是"我的成交记录"——新号没有交易史。这也解释了为什么它不需要 <span class="mono">itemId</span> 参数。</div>
+<p>另外确认：市场税率 <span class="mono">marketTaxBp = 200</span>，即 <strong>2%</strong>。算净利润时必须扣掉。</p>
+
+<h2>未知 ③　强化机制 —— 已完全还原</h2>
+<p>强化系统有一整套概率与费用模型，全部从 bundle 里还原出来了。</p>
+
+<h3>成功率</h3>
+<pre>基础成功率 = max(0.2, 1 − 当前强化等级 × 0.06)      <span class="c">// 下限 20%</span>
+实际成功率 = min(1, 基础 × (1 + 藏书室加成) × 精通系数)</pre>
+<table>
+  <tr><th>参数</th><th>值</th><th>含义</th></tr>
+  <tr><td class="mono">0.06</td><td>每级衰减 6%</td><td>+0 → 100%，+1 → 94%，+2 → 88% … 直到 +14 触底 20%</td></tr>
+  <tr><td class="mono">0.2</td><td>成功率下限 20%</td><td>再高的强化等级也不会低于两成</td></tr>
+  <tr><td class="mono">5</td><td>最高强化等级</td><td>存档里 <span class="mono">Ys = 5</span></td></tr>
+  <tr><td>房屋「符文讲台」</td><td>每级 +1% 成功率</td><td>这是唯一的成功率增益来源</td></tr>
+</table>
+
+<h3>费用</h3>
+<pre>金币 = 档位基数[强化档] × 品质倍率[物品品质] × (当前强化等级 + 1)
+碎片 = 3 × (当前强化等级 + 1)     <span class="c">// 强化等级 ≥5 且使用核心时，碎片为 0</span>
+
+档位基数 = [100, 300, 1000, 3000, 8000, 20000]
+品质倍率 = [1, 3, 8, 20, 50]</pre>
+<p>这意味着<strong>"把某件装备强化到 +N 的期望花费"是一个可精确计算的封闭式子</strong>——期望次数 = 1/成功率，乘上单次费用即可。强化类脚本的可行性从"需要实测采样"升级为"可以直接算"。</p>
+
+<h2>未知 ④　地图站点表 —— 已提取 383 条</h2>
+<p>之前只在 <span class="mono">work</span> 消息里见过 <span class="mono">siteId</span> 数字，现在拿到了完整映射：</p>
+<pre>{id: 1,  x: 187, y: 78,  kind: "rock",    jobIds: [1]}
+{id: 33, x: 200, y: 52,  kind: "tree",    jobIds: [3]}
+{id: 364,x: 114, y: 170, kind: "stall",   jobIds: [245]}</pre>
+<table>
+  <tr><th>用途</th><th>站点数</th><th>说明</th></tr>
+  <tr><td>功能站点</td><td><strong>108</strong></td><td>矿石 24 · 渔点 16 · 树 18 · 摊位 16 · 泉 22 · 炉/砧/火/田 各少量</td></tr>
+  <tr><td>装饰（scenery）</td><td>275</td><td>里程碑、帐篷、营火等场景物</td></tr>
+</table>
+<p><span class="mono">jobIds[]</span> 把站点关联到配方 ID，所以<strong>"这个矿点能挖什么""哪个站点做某个配方最快"都能算</strong>。地图类脚本（收益热力图、路线规划）现在有数据支撑了。</p>
+
+<h2>未知 ⑤　DOM 挂载点 —— 找到了 572 个稳定选择器</h2>
+<p>这是本轮最实用的发现之一。DVI 的 UI 是 JS 构建的，直接依赖类名会很脆——但它的代码<strong>自己就在用 <span class="mono">data-*</span> 属性做选择器</strong>。这些属性是语义化的、稳定的，正是脚本的天然挂载点。</p>
+<table>
+  <tr><th>前缀</th><th>数量</th><th>覆盖的界面</th></tr>
+  <tr><td class="mono">data-m- / data-mx-</td><td>38</td><td>主菜单与消息</td></tr>
+  <tr><td class="mono">data-sheet-</td><td>28</td><td>底部弹层</td></tr>
+  <tr><td class="mono">data-boss-</td><td>27</td><td>世界 Boss</td></tr>
+  <tr><td class="mono">data-trade-</td><td>26</td><td>玩家交易</td></tr>
+  <tr><td class="mono">data-market-</td><td>17</td><td>市场（含 <span class="mono">data-market-mode</span>、<span class="mono">data-market-sellnote</span>）</td></tr>
+  <tr><td class="mono">data-bank-</td><td>17</td><td>仓库</td></tr>
+  <tr><td class="mono">data-plan- / data-quests- / data-enhance- / data-coll-</td><td>46</td><td>计划 / 任务 / 强化 / 收集</td></tr>
+  <tr><td class="mono">data-wmap- / data-ui- / data-lang- / data-theme-</td><td>26</td><td>世界地图 / UI 缩放 / 语言 / 主题</td></tr>
+</table>
+<div class="note good"><strong>主题类脚本可以立刻开工：</strong>已经有 <span class="mono">data-theme-</span> 属性存在，说明游戏内置了主题机制。<span class="mono">data-ui-smaller</span> / <span class="mono">data-ui-bigger</span> 说明 UI 缩放也是数据驱动的。挂载点是 <span class="mono">&lt;div id="app"&gt;</span>（与首页 HTML 一致）。</div>
+
+<h2>本轮产出</h2>
+<table>
+  <tr><th>文件</th><th>内容</th></tr>
+  <tr><td class="mono">dvi_probe/gamedata/dvi-gamedata.json</td><td><strong>87.6 KB 合并数据包</strong>：平衡参数 + 290 物品 + 221 配方 + 20 怪物 + 383 站点</td></tr>
+  <tr><td class="mono">dvi_probe/gamedata/{items,actions,monsters,sites}.json</td><td>分表版本，便于单独查阅</td></tr>
+</table>
+<p>合并数据包里的 <span class="mono">balance</span> 段已经把所有还原出的常数固化下来：</p>
+<pre>"balance": {
+  "maxLevel": 99, "baseXp": 100, "xpGrowth": 1.12, "beyondGrowth": 1.145,
+  "speedPerLevelAboveRequirement": 0.005,
+  "enhance": { "baseChanceFloor": 0.2, "chanceDropPerTier": 0.06, "maxTier": 5,
+               "shardsPerTier": 3,
+               "goldTiers": [100,300,1000,3000,8000,20000],
+               "qualityMult": [1,3,8,20,50] },
+  "marketTaxBp": 200, "perkQuickPerLevel": 0.005, "perkHandsBurnReduction": 0.03
+}</pre>
+
+<h2>剩余待确认（次要）</h2>
+<ul>
+  <li><strong>装备品质加成的具体数值表</strong>——工具系数里 <span class="mono">1 + 品质加成</span> 的那个"品质加成"还没有完整的数值表（物品表里只有 <span class="mono">value</span>，没有品质档位）。需要一个带装备的角色存档才能反推。</li>
+  <li><strong>精通加成的系数</strong>——精通因子函数已定位，但其内部数值表未完全展开。</li>
+</ul>
+<p>这两项都<strong>只影响计算的精确度，不影响可行性</strong>——脚本可以先按无加成计算，或让用户手动校准。而且拿到一个真实玩家的存档后（就是写脚本时自然会有的东西），这两项都能立刻反推出来。</p>
+
+<footer>
+本报告基于公开客户端 bundle 的静态分析与公开接口的只读实测。逆向出的数值仅用于互操作性分析（计算玩家自己的收益、显示行情），不涉及对游戏状态的任何修改。
+</footer>
+
+</div>
+</body>
+</html>

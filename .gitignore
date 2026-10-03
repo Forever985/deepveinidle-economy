@@ -1,0 +1,29 @@
+# ── 第三方产物：不入库 ──
+# 游戏客户端 bundle（别人打包的代码，体积大且会随版本变）
+dvi_probe/index.js
+dvi_probe/*.ldb
+
+# 参考用的第三方油猴脚本（仅本地研究用，不随本项目分发）
+tm_decode/
+
+# ── 个人数据：不入库 ──
+# 采集到的游戏存档快照（含角色名、背包、坐标等）
+dvi-capture-*.json
+*.capture.json
+dvi_probe/offline-report.json
+dvi_probe/*.jsonl
+
+# ── 系统与编辑器 ──
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# ── 依赖（如需）──
+node_modules/
+__pycache__/
+*.pyc
+.venv/

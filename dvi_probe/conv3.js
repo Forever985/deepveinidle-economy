@@ -1,0 +1,10 @@
+const fs=require('fs');
+const arr=new Function('return '+fs.readFileSync('sites_raw.txt','utf8')+';')();
+fs.writeFileSync('sites.json',JSON.stringify(arr,null,1));
+console.log('sites:',arr.length);
+const kinds={};for(const s of arr)kinds[s.kind]=(kinds[s.kind]||0)+1;
+console.log('kind 分布:',JSON.stringify(kinds));
+console.log('样例:',JSON.stringify(arr.slice(0,3)));
+const withJobs=arr.filter(s=>s.jobIds&&s.jobIds.length);
+console.log('带 jobIds 的站点:',withJobs.length,'  最多 jobIds:',Math.max(...withJobs.map(s=>s.jobIds.length)));
+console.log('样例(多作业):',JSON.stringify(withJobs.slice(-3)));

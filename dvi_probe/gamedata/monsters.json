@@ -1,0 +1,402 @@
+[
+ {
+  "id": 1,
+  "name": "Gnawer",
+  "level": 2,
+  "hp": 8,
+  "maxHit": 1,
+  "attack": 1,
+  "defence": 1,
+  "speed": 4,
+  "xp": 8,
+  "gold": [
+   1,
+   2
+  ],
+  "bonus": {
+   "itemId": 201,
+   "chance": 0.0004
+  },
+  "drop": 240
+ },
+ {
+  "id": 2,
+  "name": "Bogling",
+  "level": 8,
+  "hp": 18,
+  "maxHit": 3,
+  "attack": 8,
+  "defence": 6,
+  "speed": 4,
+  "xp": 22,
+  "gold": [
+   2,
+   4
+  ],
+  "bonus": {
+   "itemId": 202,
+   "chance": 0.0006
+  },
+  "drop": 241
+ },
+ {
+  "id": 3,
+  "name": "Husk",
+  "level": 20,
+  "hp": 40,
+  "maxHit": 6,
+  "attack": 20,
+  "defence": 18,
+  "speed": 4,
+  "xp": 60,
+  "gold": [
+   17,
+   32
+  ],
+  "bonus": {
+   "itemId": 203,
+   "chance": 0.0008
+  },
+  "drop": 242
+ },
+ {
+  "id": 4,
+  "name": "Cairn wight",
+  "level": 40,
+  "hp": 75,
+  "maxHit": 10,
+  "attack": 40,
+  "defence": 38,
+  "speed": 4,
+  "xp": 165,
+  "gold": [
+   117,
+   217
+  ],
+  "bonus": {
+   "itemId": 204,
+   "chance": 0.001
+  },
+  "drop": 243
+ },
+ {
+  "id": 5,
+  "name": "Rimewolf",
+  "level": 60,
+  "hp": 120,
+  "maxHit": 15,
+  "attack": 62,
+  "defence": 58,
+  "speed": 4,
+  "xp": 380,
+  "gold": [
+   369,
+   685
+  ],
+  "bonus": {
+   "itemId": 205,
+   "chance": 0.0014
+  },
+  "drop": 245
+ },
+ {
+  "id": 6,
+  "name": "Emberkin",
+  "level": 80,
+  "hp": 180,
+  "maxHit": 22,
+  "attack": 85,
+  "defence": 80,
+  "speed": 5,
+  "xp": 780,
+  "gold": [
+   837,
+   1554
+  ],
+  "bonus": {
+   "itemId": 206,
+   "chance": 0.002
+  },
+  "drop": 247
+ },
+ {
+  "id": 7,
+  "name": "Deep horror",
+  "level": 95,
+  "hp": 260,
+  "maxHit": 30,
+  "attack": 100,
+  "defence": 96,
+  "speed": 5,
+  "xp": 1500,
+  "gold": [
+   1365,
+   2535
+  ],
+  "bonus": {
+   "itemId": 207,
+   "chance": 0.003
+  },
+  "drop": 249
+ },
+ {
+  "id": 8,
+  "name": "Sand wraith",
+  "level": 50,
+  "hp": 95,
+  "maxHit": 12,
+  "attack": 50,
+  "defence": 48,
+  "speed": 4,
+  "xp": 250,
+  "gold": [
+   220,
+   409
+  ],
+  "bonus": {
+   "itemId": 213,
+   "chance": 0.0012
+  },
+  "drop": 244
+ },
+ {
+  "id": 9,
+  "name": "Dune stalker",
+  "level": 70,
+  "hp": 150,
+  "maxHit": 18,
+  "attack": 72,
+  "defence": 68,
+  "speed": 4,
+  "xp": 550,
+  "gold": [
+   572,
+   1063
+  ],
+  "bonus": {
+   "itemId": 214,
+   "chance": 0.0016
+  },
+  "drop": 246
+ },
+ {
+  "id": 10,
+  "name": "Frost troll",
+  "level": 85,
+  "hp": 210,
+  "maxHit": 25,
+  "attack": 90,
+  "defence": 84,
+  "speed": 5,
+  "xp": 1000,
+  "gold": [
+   994,
+   1847
+  ],
+  "bonus": {
+   "itemId": 215,
+   "chance": 0.0022
+  },
+  "drop": 248
+ },
+ {
+  "id": 11,
+  "name": "Ice wight",
+  "level": 105,
+  "hp": 300,
+  "maxHit": 34,
+  "attack": 112,
+  "defence": 106,
+  "speed": 5,
+  "xp": 2000,
+  "gold": [
+   1815,
+   3371
+  ],
+  "bonus": {
+   "itemId": 216,
+   "chance": 0.003
+  },
+  "drop": 250
+ },
+ {
+  "id": 12,
+  "name": "Ash drake",
+  "level": 120,
+  "hp": 360,
+  "maxHit": 40,
+  "attack": 128,
+  "defence": 120,
+  "speed": 5,
+  "xp": 2800,
+  "gold": [
+   2655,
+   4932
+  ],
+  "bonus": {
+   "itemId": 217,
+   "chance": 0.0035
+  },
+  "drop": 251
+ },
+ {
+  "id": 13,
+  "name": "Cinder colossus",
+  "level": 140,
+  "hp": 440,
+  "maxHit": 48,
+  "attack": 150,
+  "defence": 140,
+  "speed": 6,
+  "xp": 4000,
+  "gold": [
+   4120,
+   7651
+  ],
+  "bonus": {
+   "itemId": 218,
+   "chance": 0.004
+  },
+  "drop": 252
+ },
+ {
+  "id": 14,
+  "name": "Rock mite",
+  "level": 3,
+  "hp": 10,
+  "maxHit": 1,
+  "attack": 3,
+  "defence": 2,
+  "speed": 4,
+  "xp": 11,
+  "gold": [
+   1,
+   2
+  ],
+  "bonus": {
+   "itemId": 201,
+   "chance": 0.0004
+  },
+  "drop": 240
+ },
+ {
+  "id": 15,
+  "name": "Fen lurker",
+  "level": 5,
+  "hp": 13,
+  "maxHit": 2,
+  "attack": 5,
+  "defence": 4,
+  "speed": 4,
+  "xp": 15,
+  "gold": [
+   1,
+   2
+  ],
+  "bonus": {
+   "itemId": 201,
+   "chance": 0.0005
+  },
+  "drop": 240
+ },
+ {
+  "id": 16,
+  "name": "Grave beetle",
+  "level": 12,
+  "hp": 26,
+  "maxHit": 4,
+  "attack": 12,
+  "defence": 10,
+  "speed": 4,
+  "xp": 34,
+  "gold": [
+   4,
+   9
+  ],
+  "bonus": {
+   "itemId": 202,
+   "chance": 0.0006
+  },
+  "drop": 241
+ },
+ {
+  "id": 17,
+  "name": "Sump crawler",
+  "level": 16,
+  "hp": 33,
+  "maxHit": 5,
+  "attack": 16,
+  "defence": 14,
+  "speed": 4,
+  "xp": 46,
+  "gold": [
+   9,
+   18
+  ],
+  "bonus": {
+   "itemId": 202,
+   "chance": 0.0007
+  },
+  "drop": 241
+ },
+ {
+  "id": 18,
+  "name": "Stone eater",
+  "level": 22,
+  "hp": 44,
+  "maxHit": 6,
+  "attack": 22,
+  "defence": 20,
+  "speed": 4,
+  "xp": 70,
+  "gold": [
+   22,
+   41
+  ],
+  "bonus": {
+   "itemId": 203,
+   "chance": 0.0008
+  },
+  "drop": 242
+ },
+ {
+  "id": 19,
+  "name": "Barrow hound",
+  "level": 26,
+  "hp": 51,
+  "maxHit": 7,
+  "attack": 26,
+  "defence": 24,
+  "speed": 4,
+  "xp": 91,
+  "gold": [
+   35,
+   65
+  ],
+  "bonus": {
+   "itemId": 203,
+   "chance": 0.0009
+  },
+  "drop": 242
+ },
+ {
+  "id": 20,
+  "name": "Chalk wight",
+  "level": 32,
+  "hp": 61,
+  "maxHit": 8,
+  "attack": 32,
+  "defence": 30,
+  "speed": 4,
+  "xp": 122,
+  "gold": [
+   62,
+   116
+  ],
+  "bonus": {
+   "itemId": 203,
+   "chance": 0.001
+  },
+  "drop": 242
+ }
+]

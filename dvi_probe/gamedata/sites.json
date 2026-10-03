@@ -1,0 +1,3536 @@
+[
+ {
+  "id": 1,
+  "x": 187,
+  "y": 78,
+  "kind": "rock",
+  "jobIds": [
+   1
+  ]
+ },
+ {
+  "id": 2,
+  "x": 194,
+  "y": 91,
+  "kind": "rock",
+  "jobIds": [
+   2
+  ]
+ },
+ {
+  "id": 3,
+  "x": 200,
+  "y": 60,
+  "kind": "rock",
+  "jobIds": [
+   1
+  ]
+ },
+ {
+  "id": 4,
+  "x": 196,
+  "y": 62,
+  "kind": "rock",
+  "jobIds": [
+   1
+  ]
+ },
+ {
+  "id": 5,
+  "x": 200,
+  "y": 56,
+  "kind": "rock",
+  "jobIds": [
+   2
+  ]
+ },
+ {
+  "id": 6,
+  "x": 192,
+  "y": 63,
+  "kind": "rock",
+  "jobIds": [
+   2
+  ]
+ },
+ {
+  "id": 7,
+  "x": 196,
+  "y": 57,
+  "kind": "rock",
+  "jobIds": [
+   3
+  ]
+ },
+ {
+  "id": 8,
+  "x": 200,
+  "y": 52,
+  "kind": "rock",
+  "jobIds": [
+   3
+  ]
+ },
+ {
+  "id": 9,
+  "x": 204,
+  "y": 55,
+  "kind": "rock",
+  "jobIds": [
+   3
+  ]
+ },
+ {
+  "id": 10,
+  "x": 200,
+  "y": 45,
+  "kind": "rock",
+  "jobIds": [
+   4
+  ]
+ },
+ {
+  "id": 11,
+  "x": 196,
+  "y": 49,
+  "kind": "rock",
+  "jobIds": [
+   4
+  ]
+ },
+ {
+  "id": 12,
+  "x": 204,
+  "y": 49,
+  "kind": "rock",
+  "jobIds": [
+   4
+  ]
+ },
+ {
+  "id": 13,
+  "x": 198,
+  "y": 37,
+  "kind": "rock",
+  "jobIds": [
+   5
+  ]
+ },
+ {
+  "id": 14,
+  "x": 202,
+  "y": 40,
+  "kind": "rock",
+  "jobIds": [
+   5
+  ]
+ },
+ {
+  "id": 15,
+  "x": 197,
+  "y": 41,
+  "kind": "rock",
+  "jobIds": [
+   5
+  ]
+ },
+ {
+  "id": 16,
+  "x": 194,
+  "y": 37,
+  "kind": "rock",
+  "jobIds": [
+   6
+  ]
+ },
+ {
+  "id": 17,
+  "x": 190,
+  "y": 41,
+  "kind": "rock",
+  "jobIds": [
+   6
+  ]
+ },
+ {
+  "id": 18,
+  "x": 186,
+  "y": 45,
+  "kind": "rock",
+  "jobIds": [
+   6
+  ]
+ },
+ {
+  "id": 19,
+  "x": 190,
+  "y": 33,
+  "kind": "rock",
+  "jobIds": [
+   7
+  ]
+ },
+ {
+  "id": 20,
+  "x": 186,
+  "y": 37,
+  "kind": "rock",
+  "jobIds": [
+   7
+  ]
+ },
+ {
+  "id": 21,
+  "x": 182,
+  "y": 41,
+  "kind": "rock",
+  "jobIds": [
+   7
+  ]
+ },
+ {
+  "id": 22,
+  "x": 181,
+  "y": 35,
+  "kind": "rock",
+  "jobIds": [
+   8
+  ]
+ },
+ {
+  "id": 23,
+  "x": 177,
+  "y": 39,
+  "kind": "rock",
+  "jobIds": [
+   8
+  ]
+ },
+ {
+  "id": 24,
+  "x": 185,
+  "y": 33,
+  "kind": "rock",
+  "jobIds": [
+   8
+  ]
+ },
+ {
+  "id": 25,
+  "x": 214,
+  "y": 83,
+  "kind": "fishing",
+  "jobIds": [
+   21
+  ]
+ },
+ {
+  "id": 26,
+  "x": 216,
+  "y": 79,
+  "kind": "fishing",
+  "jobIds": [
+   21
+  ]
+ },
+ {
+  "id": 27,
+  "x": 214,
+  "y": 89,
+  "kind": "fishing",
+  "jobIds": [
+   22
+  ]
+ },
+ {
+  "id": 28,
+  "x": 208,
+  "y": 65,
+  "kind": "fishing",
+  "jobIds": [
+   22
+  ]
+ },
+ {
+  "id": 29,
+  "x": 218,
+  "y": 75,
+  "kind": "fishing",
+  "jobIds": [
+   23
+  ]
+ },
+ {
+  "id": 30,
+  "x": 205,
+  "y": 60,
+  "kind": "fishing",
+  "jobIds": [
+   23
+  ]
+ },
+ {
+  "id": 31,
+  "x": 212,
+  "y": 67,
+  "kind": "fishing",
+  "jobIds": [
+   24
+  ]
+ },
+ {
+  "id": 32,
+  "x": 217,
+  "y": 93,
+  "kind": "fishing",
+  "jobIds": [
+   24
+  ]
+ },
+ {
+  "id": 33,
+  "x": 216,
+  "y": 69,
+  "kind": "fishing",
+  "jobIds": [
+   25
+  ]
+ },
+ {
+  "id": 34,
+  "x": 230,
+  "y": 82,
+  "kind": "fishing",
+  "jobIds": [
+   25
+  ]
+ },
+ {
+  "id": 35,
+  "x": 220,
+  "y": 71,
+  "kind": "fishing",
+  "jobIds": [
+   26
+  ]
+ },
+ {
+  "id": 36,
+  "x": 205,
+  "y": 54,
+  "kind": "fishing",
+  "jobIds": [
+   26
+  ]
+ },
+ {
+  "id": 37,
+  "x": 168,
+  "y": 80,
+  "kind": "fishing",
+  "jobIds": [
+   27
+  ]
+ },
+ {
+  "id": 38,
+  "x": 171,
+  "y": 87,
+  "kind": "fishing",
+  "jobIds": [
+   27
+  ]
+ },
+ {
+  "id": 39,
+  "x": 221,
+  "y": 95,
+  "kind": "fishing",
+  "jobIds": [
+   28
+  ]
+ },
+ {
+  "id": 40,
+  "x": 173,
+  "y": 91,
+  "kind": "fishing",
+  "jobIds": [
+   28
+  ]
+ },
+ {
+  "id": 41,
+  "x": 204,
+  "y": 77,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 42,
+  "x": 197,
+  "y": 85,
+  "kind": "furnace",
+  "jobIds": [
+   41,
+   42,
+   43,
+   44,
+   45
+  ]
+ },
+ {
+  "id": 43,
+  "x": 204,
+  "y": 86,
+  "kind": "anvil",
+  "jobIds": [
+   51,
+   52,
+   53,
+   54,
+   55,
+   56,
+   57,
+   58,
+   59,
+   60,
+   308,
+   309,
+   310,
+   311,
+   312,
+   313,
+   314,
+   315,
+   316,
+   317,
+   318,
+   319,
+   320,
+   321,
+   322,
+   323,
+   324,
+   325,
+   326,
+   327,
+   328,
+   329,
+   330,
+   331,
+   332,
+   333,
+   334,
+   335,
+   336,
+   337,
+   46,
+   47,
+   48,
+   49,
+   50,
+   110,
+   111,
+   112,
+   113,
+   114,
+   338,
+   339,
+   340,
+   341,
+   342,
+   343,
+   115,
+   116,
+   117,
+   118,
+   119,
+   120,
+   121,
+   122,
+   123,
+   124,
+   125,
+   126,
+   127,
+   128,
+   129,
+   130,
+   131,
+   132,
+   133,
+   134,
+   301,
+   302,
+   303,
+   304,
+   305,
+   140,
+   141,
+   142,
+   143,
+   144,
+   145,
+   146,
+   147,
+   148,
+   149,
+   150,
+   151,
+   200,
+   201,
+   202,
+   203,
+   204,
+   205,
+   230,
+   231,
+   232,
+   233,
+   307,
+   234,
+   235,
+   236,
+   306,
+   260,
+   261,
+   262,
+   263,
+   264,
+   265,
+   266,
+   267,
+   268,
+   269,
+   270,
+   271,
+   272,
+   273,
+   274,
+   289,
+   290,
+   291,
+   292,
+   293,
+   294,
+   248,
+   249,
+   250,
+   251,
+   252,
+   253,
+   254,
+   255,
+   256,
+   257,
+   258,
+   259,
+   295,
+   296,
+   297,
+   275,
+   276,
+   277,
+   278,
+   280,
+   281,
+   282,
+   283,
+   284,
+   298,
+   299,
+   285,
+   286,
+   287,
+   288,
+   300,
+   279
+  ]
+ },
+ {
+  "id": 44,
+  "x": 202,
+  "y": 83,
+  "kind": "fire",
+  "jobIds": [
+   61,
+   62,
+   63,
+   64,
+   65,
+   66,
+   67,
+   68,
+   220,
+   225,
+   226,
+   227,
+   221,
+   222,
+   223,
+   224
+  ]
+ },
+ {
+  "id": 45,
+  "x": 110,
+  "y": 181,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 46,
+  "x": 113,
+  "y": 177,
+  "kind": "furnace",
+  "jobIds": [
+   41,
+   42,
+   43,
+   44,
+   45
+  ]
+ },
+ {
+  "id": 47,
+  "x": 113,
+  "y": 180,
+  "kind": "anvil",
+  "jobIds": [
+   51,
+   52,
+   53,
+   54,
+   55,
+   56,
+   57,
+   58,
+   59,
+   60,
+   308,
+   309,
+   310,
+   311,
+   312,
+   313,
+   314,
+   315,
+   316,
+   317,
+   318,
+   319,
+   320,
+   321,
+   322,
+   323,
+   324,
+   325,
+   326,
+   327,
+   328,
+   329,
+   330,
+   331,
+   332,
+   333,
+   334,
+   335,
+   336,
+   337,
+   46,
+   47,
+   48,
+   49,
+   50,
+   110,
+   111,
+   112,
+   113,
+   114,
+   338,
+   339,
+   340,
+   341,
+   342,
+   343,
+   115,
+   116,
+   117,
+   118,
+   119,
+   120,
+   121,
+   122,
+   123,
+   124,
+   125,
+   126,
+   127,
+   128,
+   129,
+   130,
+   131,
+   132,
+   133,
+   134,
+   301,
+   302,
+   303,
+   304,
+   305,
+   140,
+   141,
+   142,
+   143,
+   144,
+   145,
+   146,
+   147,
+   148,
+   149,
+   150,
+   151,
+   200,
+   201,
+   202,
+   203,
+   204,
+   205,
+   230,
+   231,
+   232,
+   233,
+   307,
+   234,
+   235,
+   236,
+   306,
+   260,
+   261,
+   262,
+   263,
+   264,
+   265,
+   266,
+   267,
+   268,
+   269,
+   270,
+   271,
+   272,
+   273,
+   274,
+   289,
+   290,
+   291,
+   292,
+   293,
+   294,
+   248,
+   249,
+   250,
+   251,
+   252,
+   253,
+   254,
+   255,
+   256,
+   257,
+   258,
+   259,
+   295,
+   296,
+   297,
+   275,
+   276,
+   277,
+   278,
+   280,
+   281,
+   282,
+   283,
+   284,
+   298,
+   299,
+   285,
+   286,
+   287,
+   288,
+   300,
+   279
+  ]
+ },
+ {
+  "id": 48,
+  "x": 110,
+  "y": 179,
+  "kind": "fire",
+  "jobIds": [
+   61,
+   62,
+   63,
+   64,
+   65,
+   66,
+   67,
+   68,
+   220,
+   225,
+   226,
+   227,
+   221,
+   222,
+   223,
+   224
+  ]
+ },
+ {
+  "id": 49,
+  "x": 205,
+  "y": 126,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 50,
+  "x": 222,
+  "y": 144,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 51,
+  "x": 241,
+  "y": 77,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 52,
+  "x": 130,
+  "y": 181,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 53,
+  "x": 220,
+  "y": 169,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 54,
+  "x": 93,
+  "y": 41,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 55,
+  "x": 86,
+  "y": 7,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 56,
+  "x": 172,
+  "y": 39,
+  "kind": "tree",
+  "jobIds": [
+   30
+  ]
+ },
+ {
+  "id": 57,
+  "x": 167,
+  "y": 43,
+  "kind": "tree",
+  "jobIds": [
+   30
+  ]
+ },
+ {
+  "id": 58,
+  "x": 174,
+  "y": 34,
+  "kind": "tree",
+  "jobIds": [
+   30
+  ]
+ },
+ {
+  "id": 59,
+  "x": 174,
+  "y": 29,
+  "kind": "tree",
+  "jobIds": [
+   31
+  ]
+ },
+ {
+  "id": 60,
+  "x": 169,
+  "y": 34,
+  "kind": "tree",
+  "jobIds": [
+   31
+  ]
+ },
+ {
+  "id": 61,
+  "x": 162,
+  "y": 41,
+  "kind": "tree",
+  "jobIds": [
+   31
+  ]
+ },
+ {
+  "id": 62,
+  "x": 171,
+  "y": 23,
+  "kind": "tree",
+  "jobIds": [
+   32
+  ]
+ },
+ {
+  "id": 63,
+  "x": 166,
+  "y": 28,
+  "kind": "tree",
+  "jobIds": [
+   32
+  ]
+ },
+ {
+  "id": 64,
+  "x": 161,
+  "y": 33,
+  "kind": "tree",
+  "jobIds": [
+   32
+  ]
+ },
+ {
+  "id": 65,
+  "x": 168,
+  "y": 18,
+  "kind": "tree",
+  "jobIds": [
+   33
+  ]
+ },
+ {
+  "id": 66,
+  "x": 163,
+  "y": 23,
+  "kind": "tree",
+  "jobIds": [
+   33
+  ]
+ },
+ {
+  "id": 67,
+  "x": 158,
+  "y": 28,
+  "kind": "tree",
+  "jobIds": [
+   33
+  ]
+ },
+ {
+  "id": 68,
+  "x": 161,
+  "y": 16,
+  "kind": "tree",
+  "jobIds": [
+   34
+  ]
+ },
+ {
+  "id": 69,
+  "x": 156,
+  "y": 21,
+  "kind": "tree",
+  "jobIds": [
+   34
+  ]
+ },
+ {
+  "id": 70,
+  "x": 151,
+  "y": 26,
+  "kind": "tree",
+  "jobIds": [
+   34
+  ]
+ },
+ {
+  "id": 71,
+  "x": 151,
+  "y": 18,
+  "kind": "tree",
+  "jobIds": [
+   35
+  ]
+ },
+ {
+  "id": 72,
+  "x": 146,
+  "y": 25,
+  "kind": "tree",
+  "jobIds": [
+   35
+  ]
+ },
+ {
+  "id": 73,
+  "x": 156,
+  "y": 16,
+  "kind": "tree",
+  "jobIds": [
+   35
+  ]
+ },
+ {
+  "id": 74,
+  "x": 207,
+  "y": 93,
+  "kind": "field",
+  "jobIds": [
+   160,
+   161,
+   162,
+   163,
+   164,
+   165,
+   210,
+   211,
+   212
+  ]
+ },
+ {
+  "id": 75,
+  "x": 209,
+  "y": 93,
+  "kind": "field",
+  "jobIds": [
+   160,
+   161,
+   162,
+   163,
+   164,
+   165,
+   210,
+   211,
+   212
+  ]
+ },
+ {
+  "id": 76,
+  "x": 211,
+  "y": 93,
+  "kind": "field",
+  "jobIds": [
+   160,
+   161,
+   162,
+   163,
+   164,
+   165,
+   210,
+   211,
+   212
+  ]
+ },
+ {
+  "id": 77,
+  "x": 207,
+  "y": 97,
+  "kind": "field",
+  "jobIds": [
+   160,
+   161,
+   162,
+   163,
+   164,
+   165,
+   210,
+   211,
+   212
+  ]
+ },
+ {
+  "id": 78,
+  "x": 209,
+  "y": 97,
+  "kind": "field",
+  "jobIds": [
+   160,
+   161,
+   162,
+   163,
+   164,
+   165,
+   210,
+   211,
+   212
+  ]
+ },
+ {
+  "id": 79,
+  "x": 211,
+  "y": 97,
+  "kind": "field",
+  "jobIds": [
+   160,
+   161,
+   162,
+   163,
+   164,
+   165,
+   210,
+   211,
+   212
+  ]
+ },
+ {
+  "id": 80,
+  "x": 196,
+  "y": 77,
+  "kind": "stall",
+  "jobIds": [
+   240
+  ]
+ },
+ {
+  "id": 81,
+  "x": 198,
+  "y": 77,
+  "kind": "stall",
+  "jobIds": [
+   241
+  ]
+ },
+ {
+  "id": 82,
+  "x": 200,
+  "y": 77,
+  "kind": "stall",
+  "jobIds": [
+   242
+  ]
+ },
+ {
+  "id": 83,
+  "x": 202,
+  "y": 77,
+  "kind": "stall",
+  "jobIds": [
+   243
+  ]
+ },
+ {
+  "id": 84,
+  "x": 115,
+  "y": 179,
+  "kind": "stall",
+  "jobIds": [
+   240
+  ]
+ },
+ {
+  "id": 85,
+  "x": 115,
+  "y": 181,
+  "kind": "stall",
+  "jobIds": [
+   241
+  ]
+ },
+ {
+  "id": 86,
+  "x": 112,
+  "y": 182,
+  "kind": "stall",
+  "jobIds": [
+   242
+  ]
+ },
+ {
+  "id": 87,
+  "x": 116,
+  "y": 171,
+  "kind": "stall",
+  "jobIds": [
+   243
+  ]
+ },
+ {
+  "id": 88,
+  "x": 198,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 89,
+  "x": 199,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 90,
+  "x": 200,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 91,
+  "x": 201,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 92,
+  "x": 202,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 93,
+  "x": 198,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 94,
+  "x": 199,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 95,
+  "x": 200,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 96,
+  "x": 201,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 97,
+  "x": 202,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 98,
+  "x": 198,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 99,
+  "x": 199,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 100,
+  "x": 200,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 101,
+  "x": 201,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 102,
+  "x": 202,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "depot-wing"
+ },
+ {
+  "id": 103,
+  "x": 196,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "well"
+ },
+ {
+  "id": 104,
+  "x": 204,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "board"
+ },
+ {
+  "id": 105,
+  "x": 194,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "lantern"
+ },
+ {
+  "id": 106,
+  "x": 206,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "lantern"
+ },
+ {
+  "id": 107,
+  "x": 195,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "lantern"
+ },
+ {
+  "id": 108,
+  "x": 203,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "lantern"
+ },
+ {
+  "id": 109,
+  "x": 197,
+  "y": 83,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "bench"
+ },
+ {
+  "id": 110,
+  "x": 204,
+  "y": 82,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "bench"
+ },
+ {
+  "id": 111,
+  "x": 200,
+  "y": 84,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "crates"
+ },
+ {
+  "id": 112,
+  "x": 196,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "barrel"
+ },
+ {
+  "id": 113,
+  "x": 194,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "planter"
+ },
+ {
+  "id": 114,
+  "x": 206,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "planter"
+ },
+ {
+  "id": 115,
+  "x": 197,
+  "y": 87,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "town-tree"
+ },
+ {
+  "id": 116,
+  "x": 193,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-a"
+ },
+ {
+  "id": 117,
+  "x": 192,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 118,
+  "x": 193,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 119,
+  "x": 194,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 120,
+  "x": 192,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 121,
+  "x": 194,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 122,
+  "x": 198,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-b"
+ },
+ {
+  "id": 123,
+  "x": 198,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 124,
+  "x": 199,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 125,
+  "x": 199,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 126,
+  "x": 203,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-c"
+ },
+ {
+  "id": 127,
+  "x": 202,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 128,
+  "x": 203,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 129,
+  "x": 204,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 130,
+  "x": 205,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 131,
+  "x": 202,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 132,
+  "x": 204,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 133,
+  "x": 205,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 134,
+  "x": 208,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-g"
+ },
+ {
+  "id": 135,
+  "x": 208,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 136,
+  "x": 209,
+  "y": 71,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 137,
+  "x": 209,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 138,
+  "x": 192,
+  "y": 77,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-d"
+ },
+ {
+  "id": 139,
+  "x": 192,
+  "y": 75,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 140,
+  "x": 193,
+  "y": 75,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 141,
+  "x": 192,
+  "y": 76,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 142,
+  "x": 193,
+  "y": 76,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 143,
+  "x": 193,
+  "y": 77,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 144,
+  "x": 190,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-f"
+ },
+ {
+  "id": 145,
+  "x": 189,
+  "y": 85,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 146,
+  "x": 190,
+  "y": 85,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 147,
+  "x": 191,
+  "y": 85,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 148,
+  "x": 189,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 149,
+  "x": 191,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 150,
+  "x": 209,
+  "y": 87,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-h"
+ },
+ {
+  "id": 151,
+  "x": 208,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 152,
+  "x": 209,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 153,
+  "x": 210,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 154,
+  "x": 208,
+  "y": 87,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 155,
+  "x": 210,
+  "y": 87,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 156,
+  "x": 185,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-e"
+ },
+ {
+  "id": 157,
+  "x": 184,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 158,
+  "x": 185,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 159,
+  "x": 186,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 160,
+  "x": 184,
+  "y": 94,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 161,
+  "x": 185,
+  "y": 94,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 162,
+  "x": 186,
+  "y": 94,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 163,
+  "x": 184,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 164,
+  "x": 186,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 165,
+  "x": 192,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-i"
+ },
+ {
+  "id": 166,
+  "x": 192,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 167,
+  "x": 193,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 168,
+  "x": 192,
+  "y": 94,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 169,
+  "x": 193,
+  "y": 94,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 170,
+  "x": 193,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 171,
+  "x": 185,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-j"
+ },
+ {
+  "id": 172,
+  "x": 184,
+  "y": 100,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 173,
+  "x": 185,
+  "y": 100,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 174,
+  "x": 186,
+  "y": 100,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 175,
+  "x": 184,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 176,
+  "x": 185,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 177,
+  "x": 186,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 178,
+  "x": 184,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 179,
+  "x": 186,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 180,
+  "x": 192,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-b"
+ },
+ {
+  "id": 181,
+  "x": 192,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 182,
+  "x": 193,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 183,
+  "x": 193,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 184,
+  "x": 188,
+  "y": 98,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "well"
+ },
+ {
+  "id": 185,
+  "x": 190,
+  "y": 98,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "lantern"
+ },
+ {
+  "id": 186,
+  "x": 181,
+  "y": 98,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "town-tree"
+ },
+ {
+  "id": 187,
+  "x": 212,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-fisher"
+ },
+ {
+  "id": 188,
+  "x": 212,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 189,
+  "x": 213,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 190,
+  "x": 213,
+  "y": 81,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 191,
+  "x": 209,
+  "y": 69,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-fisher"
+ },
+ {
+  "id": 192,
+  "x": 209,
+  "y": 68,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 193,
+  "x": 210,
+  "y": 68,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 194,
+  "x": 210,
+  "y": 69,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 195,
+  "x": 214,
+  "y": 96,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-fisher"
+ },
+ {
+  "id": 196,
+  "x": 214,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 197,
+  "x": 215,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 198,
+  "x": 215,
+  "y": 96,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 199,
+  "x": 174,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-fisher"
+ },
+ {
+  "id": 200,
+  "x": 174,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 201,
+  "x": 175,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 202,
+  "x": 175,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 203,
+  "x": 208,
+  "y": 49,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-fisher"
+ },
+ {
+  "id": 204,
+  "x": 208,
+  "y": 48,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 205,
+  "x": 209,
+  "y": 48,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 206,
+  "x": 209,
+  "y": 49,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 207,
+  "x": 232,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-fisher"
+ },
+ {
+  "id": 208,
+  "x": 232,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 209,
+  "x": 233,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 210,
+  "x": 233,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 211,
+  "x": 170,
+  "y": 45,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-lumber"
+ },
+ {
+  "id": 212,
+  "x": 169,
+  "y": 44,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 213,
+  "x": 170,
+  "y": 44,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 214,
+  "x": 171,
+  "y": 44,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 215,
+  "x": 169,
+  "y": 45,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 216,
+  "x": 171,
+  "y": 45,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 217,
+  "x": 177,
+  "y": 25,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-lumber"
+ },
+ {
+  "id": 218,
+  "x": 176,
+  "y": 24,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 219,
+  "x": 177,
+  "y": 24,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 220,
+  "x": 178,
+  "y": 24,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 221,
+  "x": 176,
+  "y": 25,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 222,
+  "x": 178,
+  "y": 25,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 223,
+  "x": 202,
+  "y": 62,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut-miner"
+ },
+ {
+  "id": 224,
+  "x": 202,
+  "y": 61,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 225,
+  "x": 203,
+  "y": 61,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 226,
+  "x": 203,
+  "y": 62,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 227,
+  "x": 192,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:quarry"
+ },
+ {
+  "id": 228,
+  "x": 190,
+  "y": 83,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:forest"
+ },
+ {
+  "id": 229,
+  "x": 208,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:shore"
+ },
+ {
+  "id": 230,
+  "x": 200,
+  "y": 90,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:second depot"
+ },
+ {
+  "id": 231,
+  "x": 203,
+  "y": 90,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:The Warrens"
+ },
+ {
+  "id": 232,
+  "x": 210,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:Mirefen"
+ },
+ {
+  "id": 233,
+  "x": 207,
+  "y": 84,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:Dust Hollow"
+ },
+ {
+  "id": 234,
+  "x": 207,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "signpost:farm"
+ },
+ {
+  "id": 235,
+  "x": 179,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "ruin-wall"
+ },
+ {
+  "id": 236,
+  "x": 181,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "ruin-wall"
+ },
+ {
+  "id": 237,
+  "x": 181,
+  "y": 106,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "ruin-pillar"
+ },
+ {
+  "id": 238,
+  "x": 222,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "standing-stone"
+ },
+ {
+  "id": 239,
+  "x": 224,
+  "y": 104,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "standing-stone"
+ },
+ {
+  "id": 240,
+  "x": 222,
+  "y": 106,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "standing-stone"
+ },
+ {
+  "id": 241,
+  "x": 219,
+  "y": 103,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "standing-stone"
+ },
+ {
+  "id": 242,
+  "x": 224,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "standing-stone"
+ },
+ {
+  "id": 243,
+  "x": 219,
+  "y": 105,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "standing-stone"
+ },
+ {
+  "id": 244,
+  "x": 198,
+  "y": 54,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "cart"
+ },
+ {
+  "id": 245,
+  "x": 175,
+  "y": 37,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hut"
+ },
+ {
+  "id": 246,
+  "x": 209,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "windmill"
+ },
+ {
+  "id": 247,
+  "x": 215,
+  "y": 100,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "barn"
+ },
+ {
+  "id": 248,
+  "x": 207,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "haystack"
+ },
+ {
+  "id": 249,
+  "x": 211,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "scarecrow"
+ },
+ {
+  "id": 250,
+  "x": 205,
+  "y": 99,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "fence"
+ },
+ {
+  "id": 251,
+  "x": 213,
+  "y": 99,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "fence"
+ },
+ {
+  "id": 252,
+  "x": 209,
+  "y": 84,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "barrels"
+ },
+ {
+  "id": 253,
+  "x": 215,
+  "y": 77,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boat"
+ },
+ {
+  "id": 254,
+  "x": 212,
+  "y": 69,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "net-rack"
+ },
+ {
+  "id": 255,
+  "x": 206,
+  "y": 69,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "barrels"
+ },
+ {
+  "id": 256,
+  "x": 214,
+  "y": 67,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boat"
+ },
+ {
+  "id": 257,
+  "x": 217,
+  "y": 96,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "net-rack"
+ },
+ {
+  "id": 258,
+  "x": 210,
+  "y": 99,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "barrels"
+ },
+ {
+  "id": 259,
+  "x": 177,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "net-rack"
+ },
+ {
+  "id": 260,
+  "x": 176,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boat"
+ },
+ {
+  "id": 261,
+  "x": 178,
+  "y": 95,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "gull"
+ },
+ {
+  "id": 262,
+  "x": 211,
+  "y": 48,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "net-rack"
+ },
+ {
+  "id": 263,
+  "x": 211,
+  "y": 50,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boat"
+ },
+ {
+  "id": 264,
+  "x": 213,
+  "y": 50,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "gull"
+ },
+ {
+  "id": 265,
+  "x": 235,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "net-rack"
+ },
+ {
+  "id": 266,
+  "x": 232,
+  "y": 82,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "barrels"
+ },
+ {
+  "id": 267,
+  "x": 233,
+  "y": 77,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boat"
+ },
+ {
+  "id": 268,
+  "x": 235,
+  "y": 85,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "gull"
+ },
+ {
+  "id": 269,
+  "x": 173,
+  "y": 43,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "woodpile"
+ },
+ {
+  "id": 270,
+  "x": 167,
+  "y": 45,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "sawbuck"
+ },
+ {
+  "id": 271,
+  "x": 171,
+  "y": 47,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "stump-axe"
+ },
+ {
+  "id": 272,
+  "x": 180,
+  "y": 25,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "woodpile"
+ },
+ {
+  "id": 273,
+  "x": 177,
+  "y": 27,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "sawbuck"
+ },
+ {
+  "id": 274,
+  "x": 179,
+  "y": 27,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "stump-axe"
+ },
+ {
+  "id": 275,
+  "x": 205,
+  "y": 62,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "minecart"
+ },
+ {
+  "id": 276,
+  "x": 204,
+  "y": 84,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "forge-shed"
+ },
+ {
+  "id": 277,
+  "x": 202,
+  "y": 85,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "trade-wagon"
+ },
+ {
+  "id": 278,
+  "x": 189,
+  "y": 90,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-inn"
+ },
+ {
+  "id": 279,
+  "x": 188,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 280,
+  "x": 189,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 281,
+  "x": 190,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 282,
+  "x": 191,
+  "y": 88,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 283,
+  "x": 188,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 284,
+  "x": 189,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 285,
+  "x": 190,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 286,
+  "x": 191,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 287,
+  "x": 188,
+  "y": 90,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 288,
+  "x": 190,
+  "y": 90,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 289,
+  "x": 191,
+  "y": 90,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 290,
+  "x": 193,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "inn-sign"
+ },
+ {
+  "id": 291,
+  "x": 186,
+  "y": 91,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "table-bench"
+ },
+ {
+  "id": 292,
+  "x": 190,
+  "y": 92,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "table-bench"
+ },
+ {
+  "id": 293,
+  "x": 178,
+  "y": 99,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-herb"
+ },
+ {
+  "id": 294,
+  "x": 178,
+  "y": 98,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 295,
+  "x": 179,
+  "y": 98,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 296,
+  "x": 179,
+  "y": 99,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 297,
+  "x": 212,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "coop"
+ },
+ {
+  "id": 298,
+  "x": 213,
+  "y": 92,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hen"
+ },
+ {
+  "id": 299,
+  "x": 211,
+  "y": 91,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "hen"
+ },
+ {
+  "id": 300,
+  "x": 183,
+  "y": 104,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "cow"
+ },
+ {
+  "id": 301,
+  "x": 186,
+  "y": 106,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "cow"
+ },
+ {
+  "id": 302,
+  "x": 189,
+  "y": 105,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "cow"
+ },
+ {
+  "id": 303,
+  "x": 207,
+  "y": 78,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "tower"
+ },
+ {
+  "id": 304,
+  "x": 207,
+  "y": 76,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 305,
+  "x": 208,
+  "y": 76,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 306,
+  "x": 207,
+  "y": 77,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 307,
+  "x": 208,
+  "y": 77,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 308,
+  "x": 208,
+  "y": 78,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 309,
+  "x": 203,
+  "y": 94,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "tower"
+ },
+ {
+  "id": 310,
+  "x": 203,
+  "y": 92,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 311,
+  "x": 204,
+  "y": 92,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 312,
+  "x": 203,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 313,
+  "x": 204,
+  "y": 93,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 314,
+  "x": 204,
+  "y": 94,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-wing"
+ },
+ {
+  "id": 315,
+  "x": 189,
+  "y": 72,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 316,
+  "x": 181,
+  "y": 80,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "campfire"
+ },
+ {
+  "id": 317,
+  "x": 183,
+  "y": 79,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "tent"
+ },
+ {
+  "id": 318,
+  "x": 180,
+  "y": 83,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "pack"
+ },
+ {
+  "id": 319,
+  "x": 173,
+  "y": 70,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 320,
+  "x": 159,
+  "y": 62,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "wagon-wreck"
+ },
+ {
+  "id": 321,
+  "x": 162,
+  "y": 45,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 322,
+  "x": 200,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 323,
+  "x": 200,
+  "y": 121,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "campfire"
+ },
+ {
+  "id": 324,
+  "x": 203,
+  "y": 120,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "tent"
+ },
+ {
+  "id": 325,
+  "x": 200,
+  "y": 123,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "pack"
+ },
+ {
+  "id": 326,
+  "x": 189,
+  "y": 130,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 327,
+  "x": 169,
+  "y": 130,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "wagon-wreck"
+ },
+ {
+  "id": 328,
+  "x": 149,
+  "y": 130,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 329,
+  "x": 129,
+  "y": 130,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 330,
+  "x": 114,
+  "y": 135,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "campfire"
+ },
+ {
+  "id": 331,
+  "x": 117,
+  "y": 134,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "tent"
+ },
+ {
+  "id": 332,
+  "x": 114,
+  "y": 137,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "pack"
+ },
+ {
+  "id": 333,
+  "x": 114,
+  "y": 155,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 334,
+  "x": 115,
+  "y": 177,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "wagon-wreck"
+ },
+ {
+  "id": 335,
+  "x": 200,
+  "y": 103,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 336,
+  "x": 203,
+  "y": 122,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 337,
+  "x": 210,
+  "y": 89,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "campfire"
+ },
+ {
+  "id": 338,
+  "x": 209,
+  "y": 91,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "tent"
+ },
+ {
+  "id": 339,
+  "x": 218,
+  "y": 101,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 340,
+  "x": 221,
+  "y": 123,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "wagon-wreck"
+ },
+ {
+  "id": 341,
+  "x": 213,
+  "y": 136,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 342,
+  "x": 223,
+  "y": 100,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "campfire"
+ },
+ {
+  "id": 343,
+  "x": 222,
+  "y": 98,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "tent"
+ },
+ {
+  "id": 344,
+  "x": 226,
+  "y": 102,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "pack"
+ },
+ {
+  "id": 345,
+  "x": 241,
+  "y": 100,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "milestone"
+ },
+ {
+  "id": 346,
+  "x": 247,
+  "y": 86,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "wagon-wreck"
+ },
+ {
+  "id": 347,
+  "x": 158,
+  "y": 47,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "crossroads"
+ },
+ {
+  "id": 348,
+  "x": 180,
+  "y": 108,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "gravestone"
+ },
+ {
+  "id": 349,
+  "x": 183,
+  "y": 107,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "gravestone"
+ },
+ {
+  "id": 350,
+  "x": 182,
+  "y": 109,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "gravestone"
+ },
+ {
+  "id": 351,
+  "x": 183,
+  "y": 98,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "crow"
+ },
+ {
+  "id": 352,
+  "x": 150,
+  "y": 70,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boulder"
+ },
+ {
+  "id": 353,
+  "x": 230,
+  "y": 120,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boulder"
+ },
+ {
+  "id": 354,
+  "x": 120,
+  "y": 120,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boulder"
+ },
+ {
+  "id": 355,
+  "x": 170,
+  "y": 150,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boulder"
+ },
+ {
+  "id": 356,
+  "x": 137,
+  "y": 104,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "boulder"
+ },
+ {
+  "id": 357,
+  "x": 135,
+  "y": 140,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "dead-tree"
+ },
+ {
+  "id": 358,
+  "x": 239,
+  "y": 99,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "dead-tree"
+ },
+ {
+  "id": 359,
+  "x": 199,
+  "y": 86,
+  "kind": "stall",
+  "jobIds": [
+   244
+  ]
+ },
+ {
+  "id": 360,
+  "x": 195,
+  "y": 83,
+  "kind": "stall",
+  "jobIds": [
+   245
+  ]
+ },
+ {
+  "id": 361,
+  "x": 201,
+  "y": 87,
+  "kind": "stall",
+  "jobIds": [
+   246
+  ]
+ },
+ {
+  "id": 362,
+  "x": 195,
+  "y": 88,
+  "kind": "stall",
+  "jobIds": [
+   247
+  ]
+ },
+ {
+  "id": 363,
+  "x": 104,
+  "y": 180,
+  "kind": "stall",
+  "jobIds": [
+   244
+  ]
+ },
+ {
+  "id": 364,
+  "x": 114,
+  "y": 170,
+  "kind": "stall",
+  "jobIds": [
+   245
+  ]
+ },
+ {
+  "id": 365,
+  "x": 117,
+  "y": 173,
+  "kind": "stall",
+  "jobIds": [
+   246
+  ]
+ },
+ {
+  "id": 366,
+  "x": 117,
+  "y": 181,
+  "kind": "stall",
+  "jobIds": [
+   247
+  ]
+ },
+ {
+  "id": 367,
+  "x": 167,
+  "y": 218,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 368,
+  "x": 112,
+  "y": 54,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 369,
+  "x": 4,
+  "y": 137,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 370,
+  "x": 23,
+  "y": 92,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 371,
+  "x": 65,
+  "y": 35,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 372,
+  "x": 44,
+  "y": 27,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 373,
+  "x": 243,
+  "y": 116,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 374,
+  "x": 146,
+  "y": 190,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 375,
+  "x": 53,
+  "y": 157,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 376,
+  "x": 165,
+  "y": 178,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 377,
+  "x": 69,
+  "y": 196,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 378,
+  "x": 79,
+  "y": 107,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 379,
+  "x": 208,
+  "y": 17,
+  "kind": "fountain",
+  "jobIds": []
+ },
+ {
+  "id": 380,
+  "x": 272,
+  "y": 15,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "house-board"
+ },
+ {
+  "id": 381,
+  "x": 272,
+  "y": 17,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "portal-out"
+ },
+ {
+  "id": 382,
+  "x": 211,
+  "y": 76,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "portal:1"
+ },
+ {
+  "id": 383,
+  "x": 113,
+  "y": 178,
+  "kind": "scenery",
+  "jobIds": [],
+  "look": "portal:2"
+ }
+]
