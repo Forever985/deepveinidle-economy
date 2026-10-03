@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
-import { loadGameData, skillList, skillLabel } from './api/gamedata.ts'
+import { loadGameData, skillList } from './api/gamedata.ts'
+import { initI18n, langState, toggleLang, skillName, t } from './i18n.ts'
 import { PriceBook } from './calc/price.ts'
 import { StepCalc } from './calc/steps.ts'
 import { ChainCalc } from './calc/chain.ts'
@@ -39,6 +40,7 @@ onMounted(async () => {
   try {
     const d = await loadGameData()
     data.value = d
+    initI18n(d)
     const b = new PriceBook(d)
     b.loadManual(priceState.manual)
     // 行情来自本机文件 / 拖放 / 粘贴（见 stores/market），不经过任何服务端
@@ -116,6 +118,9 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
       <h1>DVI 利润网</h1>
       <span class="ver" v-if="data">数据 {{ data.meta.version }} · {{ data.actions.length }} 配方 · {{ data.monsters.length }} 怪物</span>
       <span class="spacer"></span>
+      <button class="langbtn" @click="toggleLang()" :title="'切换语言 / Switch language'">
+        {{ langState.lang === 'zh' ? '中文' : 'EN' }}
+      </button>
       <span class="ver" v-if="book">{{ book.marketCount() }} 个市场价</span>
       <span class="ver ok" v-if="!isPristine(player)">玩家配置已生效</span>
     </header>
@@ -155,7 +160,7 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
             <label>技能</label>
             <select v-model="settings.skill">
               <option value="__all">全部</option>
-              <option v-for="s in skills" :key="s" :value="s">{{ skillLabel(s) }}（{{ s }}）</option>
+              <option v-for="s in skills" :key="s" :value="s">{{ skillName(s) }}</option>
             </select>
           </div>
           <div class="grp">
@@ -209,8 +214,8 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
             </thead>
             <tbody>
               <tr v-for="r in rows" :key="r.actionId" :class="{sel: selected?.actionId === r.actionId}" @click="selected = r">
-                <td class="l">{{ r.name }}<span class="lv" :class="{hi: r.levelReq > (player.levels[r.skill] ?? 99)}">{{ r.levelReq }}</span></td>
-                <td class="l"><span class="skill">{{ skillLabel(r.skill) }}</span></td>
+                <td class="l">{{ t(r.name) }}<span class="lv" :class="{hi: r.levelReq > (player.levels[r.skill] ?? 99)}">{{ r.levelReq }}</span></td>
+                <td class="l"><span class="skill">{{ skillName(r.skill) }}</span></td>
                 <td class="num" :class="r.chainNetPerHour > 0 ? 'pos' : 'neg'">{{ fmt(r.chainNetPerHour) }}</td>
                 <td class="num" :class="r.step.netPerHour > 0 ? 'pos' : 'neg'">{{ fmt(r.step.netPerHour) }}</td>
                 <td class="num" :class="r.chainAdd > 0 ? 'pos' : 'neg'">{{ fmt(r.chainAdd) }}</td>
@@ -241,7 +246,7 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
           }">
             <option :value="0">请选择</option>
             <option v-for="r in rank?.rows ?? []" :key="r.actionId" :value="r.actionId">
-              {{ r.name }}（{{ r.skill }} · 深度 {{ r.chainDepth }}）
+              {{ t(r.name) }}（{{ skillName(r.skill) }} · 深度 {{ r.chainDepth }}）
             </option>
           </select>
         </div>
@@ -269,6 +274,7 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
 .nav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
 .nav .ic{font-size:11px;opacity:.55;margin-right:1px}
 .ver.ok{color:var(--up)}
+.langbtn{font-size:12px;padding:2px 9px}
 .vhead{margin-bottom:10px}
 .vhead h2{margin:0 0 3px;font-size:17px}
 .vhead p{margin:0;font-size:12.5px;color:var(--fg2)}

@@ -84,8 +84,13 @@ def main():
     sites = [pick(s, SITE_FIELDS) for s in g["sites"]]
     monsters = g.get("monsters", [])
 
+    # 官方中文对照表（游戏自带，不是机器翻译）
+    i18n_p = SRC / "i18n-zh.json"
+    i18n = json.loads(i18n_p.read_text(encoding="utf-8")) if i18n_p.exists() else {}
+
     payload = {
         "meta": g.get("meta", {}),
+        "i18nZh": i18n,
         "balance": g.get("balance", {}),
         "extra": {k: v for k, v in extra.items() if not k.startswith("_")},
         "items": items,
@@ -103,6 +108,7 @@ def main():
     print("✓ 产出 public/data/dvi-gamedata.json")
     print(f"  游戏数据 {ver} · commit {payload['meta'].get('commit', '?')}")
     print(f"  物品 {len(items)} · 配方 {len(actions)} · 站点 {len(sites)} · 怪物 {len(monsters)}")
+    print(f"  官方中文 {len(i18n)} 条")
     print(f"  体积 {kb:.0f} KB")
     print("  游戏改版后重跑本脚本即可，代码不用动。")
 

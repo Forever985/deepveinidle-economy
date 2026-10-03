@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '../i18n.ts'
 import { computed } from 'vue'
 import type { StepCalc } from '../calc/steps'
 import type { ChainCalc } from '../calc/chain'
@@ -47,7 +48,7 @@ function dur(sec: number): string {
         <span v-if="result.bottleneck === i" style="color:var(--warn)">（瓶颈）</span>
       </div>
       <div class="node" :class="{ sum: i === result.steps.length - 1 }">
-        <div class="t">{{ s.action.name }}</div>
+        <div class="t">{{ t(s.action.name) }}</div>
         <div class="d">
           产出 {{ s.expectedOut }} 个
           <template v-if="s.action.inputs.length">

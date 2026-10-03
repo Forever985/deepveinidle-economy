@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '../i18n.ts'
 import { computed, ref } from 'vue'
 import type { GameData, Options } from '../types'
 import type { PriceBook } from '../calc/price'
@@ -82,7 +83,7 @@ const fmt = (n: number, d = 0) =>
           <select v-model.number="itemId">
             <option :value="0">请选择</option>
             <option v-for="i in candidates" :key="i.id" :value="i.id">
-              {{ i.name }}（基础 {{ i.value }}）
+              {{ t(i.name) }}（基础 {{ i.value }}）
             </option>
           </select>
         </div>
@@ -105,7 +106,7 @@ const fmt = (n: number, d = 0) =>
         </div>
 
         <template v-if="detail">
-          <div class="kv"><span>装备</span><span>{{ detail.itemName }}</span></div>
+          <div class="kv"><span>装备</span><span>{{ t(detail.itemName) }}</span></div>
           <div class="kv"><span>强化前价值</span><span>{{ fmt(detail.baseValue) }}</span></div>
           <div class="kv"><span>强化后价值（+{{ detail.to }}）</span><span>{{ fmt(detail.finalValue) }}</span></div>
           <div class="kv"><span>价值增量</span><span>{{ fmt(detail.valueGain) }}</span></div>
@@ -153,7 +154,7 @@ const fmt = (n: number, d = 0) =>
             </thead>
             <tbody>
               <tr v-for="r in ranking" :key="r.itemId">
-                <td class="l">{{ r.name }}</td>
+                <td class="l">{{ t(r.name) }}</td>
                 <td class="num">{{ fmt(r.baseValue) }}</td>
                 <td class="num">{{ fmt(r.valueAtMax) }}</td>
                 <td class="num">{{ fmt(r.totalCost) }}</td>

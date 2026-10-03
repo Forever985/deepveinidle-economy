@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '../i18n.ts'
 import { computed } from 'vue'
 import type { GameData, Options } from '../types'
 import type { PriceBook } from '../calc/price'
@@ -82,7 +83,7 @@ const fmt = (n: number, d = 2) =>
         </thead>
         <tbody>
           <tr v-for="r in withRate" :key="r.id">
-            <td class="l">{{ r.name }}</td>
+            <td class="l">{{ t(r.name) }}</td>
             <td class="num">{{ r.heals }}</td>
             <td class="num">{{ r.baseValue }}</td>
             <td class="num">{{ fmt(r.price) }}</td>
