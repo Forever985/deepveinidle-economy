@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.8
+// @version      2026.10.03.9
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.8 · 2026-10-03 12:11 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.9 · 2026-10-03 13:30 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.8';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.9';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2309,6 +2309,10 @@
 
     let cssInjected = false;
     let fab = null, win = null, toastEl = null;
+    /* 插件在面板里占的「分区」，按 (插件id, 标题) 归并。
+     * 以前 panel() 是纯追加，插件每次渲染都调它 → 面板无限变长。
+     * 现在同一 key 只建一次并复用，且每次返回前清空内容。 */
+    const sections = new Map();
 
     /* 「无感」的关键：默认不往页面上放任何常驻元素。
      * quiet = 页面零痕迹，面板从油猴菜单叫出来（默认）
@@ -2384,6 +2388,25 @@
 
     function body() { makeWindow(); return win.querySelector('.dvi-bd'); }
 
+    /** 主干自用的幂等分区（与插件的 ctx.ui.panel 同一套机制） */
+    function ownSection(title, key) {
+      const b = body();
+      let box = sections.get(key);
+      if (!box || !box.parentNode || !sections.has(key)) {
+        const sec = document.createElement('div');
+        sec.className = 'dvi-sec';
+        sec.setAttribute('data-dvi-sec', key);
+        sec.textContent = title;
+        b.appendChild(sec);
+        box = document.createElement('div');
+        box.setAttribute('data-dvi-panel', key);
+        b.appendChild(box);
+        sections.set(key, box);
+      }
+      box.textContent = '';
+      return box;
+    }
+
     function toast(msg, ms) {
       ready(() => {
         ensureCSS();
@@ -2399,6 +2422,10 @@
     function renderSettings() {
       const b = body();
       b.innerHTML = '';
+      /* 面板被整体重绘，分区表必须一起作废。
+       * 以前靠「节点的 parentNode 是否还在」来间接判断失效 ——
+       * 那依赖 DOM 的隐式行为，不够显式，也更容易出错。 */
+      sections.clear();
 
       const sec0 = document.createElement('div');
       sec0.className = 'dvi-sec';
@@ -2754,7 +2781,7 @@
       } catch (e) { return false; }
     }
 
-    return { ensureCSS, ready, toast, toggle, body, renderSettings,
+    return { ensureCSS, ready, toast, toggle, body, renderSettings, ownSection,
              makeFab, makeWindow, removeFab, applyMode,
              mode, setMode, MODE_QUIET, MODE_FAB,
              inline, startInlineWatch, tip,
@@ -2872,16 +2899,16 @@
             if (text != null) e.textContent = text;
             return e;
           },
-          panel: (title) => {           // 在主干窗口里追加一个分区
-            const b = ui.body();
-            const sec = document.createElement('div');
-            sec.className = 'dvi-sec';
-            sec.textContent = title;
-            b.appendChild(sec);
-            const box = document.createElement('div');
-            b.appendChild(box);
-            return box;
-          },
+          /* 在主干窗口里取一个分区（**幂等**）。
+           *
+           * 约定：同一个插件的同一个标题永远只占一个分区，
+           * 每次调用会**先清空**再返回，调用方只管 appendChild 即可。
+           *
+           * 以前这里是纯追加，而插件把它挂在定时器上（每 1.5 秒调一次），
+           * 于是面板每 tick 多一个分区、越拉越长 —— 这就是用户报的
+           * 「窗口无限向下延伸」。API 不该设这种陷阱，所以从主干这边改。
+           * 委托给 ui.ownSection，让分区机制只有一份实现。 */
+          panel: (title, id) => ui.ownSection(title, `${rec.id}::${id || title}`),
         },
         log: (...a) => console.info(`[DVI:${rec.id}]`, ...a),
       };
@@ -3735,17 +3762,14 @@
     console.info('[DVI] 自检', st.summary);
     console.table(st.checks.map(c => ({ 项目: c.name, 结果: c.pass ? '✓' : '✗', 说明: c.detail || '' })));
     if (document.body) {
-      const b = ui.body();
       ui.toggle(true);
-      const sec = document.createElement('div');
-      sec.className = 'dvi-sec';
-      sec.textContent = `环境自检 — ${st.summary}`;
-      b.appendChild(sec);
+      // 先开面板（它会重绘并清空），再取分区 —— 顺序反了会被清掉
+      const box = ui.ownSection(`环境自检 — ${st.summary}`, 'trunk:selftest');
       for (const c of st.checks) {
         const row = document.createElement('div');
         row.className = 'dvi-row' + (c.pass ? '' : ' dvi-err');
         row.textContent = `${c.pass ? '✓' : '✗'} ${c.name}${c.detail ? ' — ' + c.detail : ''}`;
-        b.appendChild(row);
+        box.appendChild(row);
       }
     }
     ui.toast(st.summary);

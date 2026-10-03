@@ -103,7 +103,17 @@ function makeEl(tag) {
     onclick: null, onchange: null,
   };
   Object.defineProperty(el, 'textContent', {
-    get() { return this._text; }, set(v) { this._text = String(v); },
+    get() { return this._text; },
+    /* 真实 DOM 里 textContent = '' 会**移除所有子节点**。
+     * 桩以前只改文本变量、不删子节点，导致依赖「清空后重建」的逻辑
+     * 在测试里全都验不出来（面板分区幂等那次就是）。 */
+    set(v) {
+      this._text = String(v);
+      if (this._text === '') {
+        for (const c of this.children) c.parentNode = null;
+        this.children = [];
+      }
+    },
   });
   Object.defineProperty(el, 'firstElementChild', {
     get() { return this.children[0] || null; },
@@ -1562,6 +1572,73 @@ section('㉝ 目标等级：可以升到指定级，而不只是下一级');
 
   setT(0);
   def.cache.clear();
+}
+
+/* ══════════ 面板分区必须幂等 ══════════ */
+section('㉞ 面板分区幂等：重复渲染不累积');
+{
+  // 由来：用户报「右下角按钮打开的面板无限向下延伸」。
+  // 根因是 ui.panel() 原本是**纯追加**，而插件把它挂在定时器上
+  // （每 1.5 秒调一次）→ 每 tick 多一个分区，窗口越拉越长。
+  // 从主干改成幂等：同一 (插件, 标题) 只建一次，复用并清空。
+  const rec = DVI.plugin.get('example-networth-hourly') || DVI.plugin.get('10-example-job-yield');
+  const rec2 = DVI.plugin.get('job-level-estimate');
+  ok('能取到插件上下文', !!(rec && rec.ctx && rec2 && rec2.ctx));
+
+  if (rec && rec.ctx) {
+    DVI.ui.toggle(true);
+    const b = () => DVI.ui.body();
+
+    // 连着取 50 次同一个分区
+    for (let i = 0; i < 50; i++) rec.ctx.ui.panel('幂等测试分区');
+
+    const secs = () => b().querySelectorAll('[data-dvi-sec]')
+      .filter(s => s.textContent === '幂等测试分区');
+    const boxes = () => b().querySelectorAll('[data-dvi-panel]');
+
+    ok('50 次调用后标题分区仍然只有 1 个', secs().length === 1,
+       `实得 ${secs().length} 个`);
+
+    // 每次返回前应清空，所以箱内不该累积
+    const box = rec.ctx.ui.panel('幂等测试分区');
+    for (let i = 0; i < 20; i++) {
+      const bx = rec.ctx.ui.panel('幂等测试分区');
+      bx.appendChild(rec.ctx.ui.el('div', { class: 'dvi-row' }, `第 ${i} 次`));
+    }
+    ok('箱内不累积（每次返回前已清空）',
+       box.children.length === 1,
+       `实得 ${box.children.length} 个子节点`);
+
+    // 不同插件用同标题也应各自独立
+    if (rec2) {
+      rec.ctx.ui.panel('同名分区');
+      rec2.ctx.ui.panel('同名分区');
+      const all = b().querySelectorAll('[data-dvi-sec]')
+        .filter(s => s.textContent === '同名分区');
+      ok('不同插件的同名分区互不干扰', all.length === 2,
+         `实得 ${all.length} 个`);
+    }
+
+    // 面板整体重绘后仍能正常重建
+    DVI.ui.renderSettings();
+    const again = rec.ctx.ui.panel('幂等测试分区');
+    ok('面板重绘后分区可重建', !!again && !!again.parentNode);
+    again.appendChild(rec.ctx.ui.el('div', { class: 'dvi-row' }, 'x'));
+    ok('重建后仍只有一个分区', secs().length === 1, `实得 ${secs().length} 个`);
+
+    DVI.ui.toggle(false);
+  }
+
+  // 主干自用分区同样幂等
+  ok('主干自用分区可用', typeof DVI.ui.ownSection === 'function');
+  if (typeof DVI.ui.ownSection === 'function') {
+    DVI.ui.toggle(true);
+    for (let i = 0; i < 30; i++) DVI.ui.ownSection('自检', 'trunk:test');
+    const n = DVI.ui.body().querySelectorAll('[data-dvi-panel]')
+      .filter(x => x.getAttribute('data-dvi-panel') === 'trunk:test').length;
+    ok('主干分区 30 次调用仍只有 1 个', n === 1, `实得 ${n} 个`);
+    DVI.ui.toggle(false);
+  }
 }
 
 /* ══════════ 导出（只做下载） ══════════ */
