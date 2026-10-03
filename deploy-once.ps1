@@ -32,6 +32,66 @@ $Site   = 'https://forever985.github.io/deepveinidle-economy/'
 $PLog   = Join-Path $env:TEMP 'dvi-profit-proxy.log'
 $WebDir = Join-Path $PSScriptRoot 'web'
 
+# ── gh-pages 发布（原生实现，不依赖 bash / node）─────────────────
+function Invoke-Git {
+    param([string[]]$GitArgs, [string]$Cwd = $PSScriptRoot)
+    $out = & git @GitArgs 2>&1
+    $code = $LASTEXITCODE
+    return @{ Code = $code; Out = ($out | Out-String).Trim() }
+}
+
+function Publish-GhPages {
+    param([string]$Repo, [string]$Dist, [int]$Tries = 2)
+
+    $global:LASTEXITCODE = 1
+    if (-not (Test-Path (Join-Path $Dist 'index.html'))) {
+        Write-Host "      [X] 构建产物缺少 index.html：$Dist"
+        return
+    }
+
+    $tmp = Join-Path $env:TEMP ("dvi-gh-" + [guid]::NewGuid().ToString('N').Substring(0, 8))
+    try {
+        New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+
+        $probe = Invoke-Git @('ls-remote', '--heads', $Repo, 'gh-pages')
+        if ($probe.Code -eq 0 -and $probe.Out -match 'refs/heads/gh-pages') {
+            Write-Host "      [i] 克隆已有 gh-pages 分支 ..."
+            $r = Invoke-Git @('clone', '--branch', 'gh-pages', '--single-branch', '--depth', '1', $Repo, $tmp) $PSScriptRoot
+            if ($r.Code -ne 0) { Write-Host "      [X] 克隆失败：$($r.Out)"; return }
+            Invoke-Git @('rm', '-rq', '--cached', '.') $tmp | Out-Null
+            Invoke-Git @('rm', '-rfq', '--ignore-unmatch', '.') $tmp | Out-Null
+        } else {
+            Write-Host "      [i] gh-pages 不存在，新建 ..."
+            Invoke-Git @('init', '-q') $tmp | Out-Null
+            Invoke-Git @('config', 'core.autocrlf', 'false') $tmp | Out-Null
+            Invoke-Git @('remote', 'add', 'origin', $Repo) $tmp | Out-Null
+            Invoke-Git @('checkout', '-q', '--orphan', 'gh-pages') $tmp | Out-Null
+            # 新建分支时仓库还没有任何提交，**不能**跑 git rm ——
+            # 会报 "pathspec '.' did not match any files" 并返回非零。
+        }
+
+        Write-Host "      [i] 拷入构建产物 ..."
+        Copy-Item -Path (Join-Path $Dist '*') -Destination $tmp -Recurse -Force
+
+        Invoke-Git @('add', '-A') $tmp | Out-Null
+        $stamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+        Invoke-Git @('commit', '-q', '-m', "deploy: $stamp") $tmp | Out-Null
+
+        Write-Host "      [i] 推送到 gh-pages ..."
+        $ok = $false
+        for ($i = 1; $i -le $Tries; $i++) {
+            $r = Invoke-Git @('push', 'origin', 'gh-pages') $tmp
+            if ($r.Code -eq 0) { $ok = $true; break }
+            Write-Host "      [!] 第 $i 次推送失败，3 秒后重试" -ForegroundColor DarkGray
+            Start-Sleep -Seconds 3
+        }
+        if (-not $ok) { Write-Host "      [X] 推送失败：$($r.Out)"; return }
+        $global:LASTEXITCODE = 0
+    } finally {
+        if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue }
+    }
+}
+
 $proxyProc  = $null
 $proxyOwned = $false
 $tmpCfg     = $null
@@ -255,20 +315,11 @@ try {
     $attempt = 0
     while ($true) {
         $attempt++
-        # 优先用 bash 版发布器：它不依赖 Node 派发外部进程，
-        # 在受限环境里更稳。找不到 bash 才退回 .mjs。
-        $bash = Get-Command bash -ErrorAction SilentlyContinue
+        Info "第 $attempt 次尝试 ..."
         $prevEap = $ErrorActionPreference
         $ErrorActionPreference = 'Continue'
-        if ($bash) {
-            Info "bash scripts\publish-gh-pages.sh（第 $attempt 次）..."
-            & bash (Join-Path $PSScriptRoot 'scripts\publish-gh-pages.sh') $Remote (Join-Path $WebDir 'dist')
-            $pagesExit = $LASTEXITCODE
-        } else {
-            Info "node scripts\publish-gh-pages.mjs（第 $attempt 次）..."
-            & node (Join-Path $PSScriptRoot 'scripts\publish-gh-pages.mjs') --dir (Join-Path $WebDir 'dist') --repo $Remote
-            $pagesExit = $LASTEXITCODE
-        }
+        Publish-GhPages -Repo $Remote -Dist (Join-Path $WebDir 'dist')
+        $pagesExit = $LASTEXITCODE
         $ErrorActionPreference = $prevEap
 
         if ($pagesExit -eq 0) { Ok "gh-pages 推送完成"; break }

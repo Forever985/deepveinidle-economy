@@ -1,0 +1,38 @@
+修两个部署阻塞：.bat 编码 + bash 不可用
+
+用户双击部署失败，暴露两个问题。
+
+## ① .bat 编码错了
+
+现象：`锘緻echo off` / `'涔嬪墠璇诲埌鍨冨溇瀛楃' 不是内部或外部命令`
+
+根因：**cmd.exe 用系统 ANSI 代码页（本机 GBK）解码 .bat**，
+而我把它存成了 UTF-8 + BOM —— BOM 被当成正文，@ 被吃掉，第一条命令直接失效。
+报错完全看不出是编码问题。
+
+修法：
+- 入口改名 **`deploy.bat`**（原「超级一键部署.bat」）
+- **内容全部改为纯 ASCII、零 BOM**，中文提示只留在 deploy-once.ps1
+  （那是 UTF-8+BOM，由 PowerShell 而非 cmd 读取，没这个问题）
+- 新增 `scripts/fix-bat.py` 做校验：非 ASCII 或带 BOM 直接报出来
+
+> 规则固化：**.bat 里一个非 ASCII 字符都不能有。**
+> 我自己写的注释里用了 ⚠ 和 —，自己踩了自己的坑。
+
+## ② bash 不可用
+
+现象：gh-pages 连推 3 次都失败，每次打印 `Linux ? Windows` 的 WSL 提示
+
+根因：本机的 `bash` 是 **WSL 占位程序**（未装 WSL，打印提示后退出），
+而脚本用 `Get-Command bash` 探测，把它误认成真 bash。
+
+修法：**放弃 bash 方案，改为原生实现**。`Publish-GhPages` + `Invoke-Git`
+直接调 git，不经过任何中间层：
+- 之前的两条路都有坑：bash 是 WSL 空壳，node 靠 spawnSync（受限环境 EBUSY）
+- 原生实现一条依赖都不引入
+- 顺带修了一个隐藏 bug：新建孤儿分支时**不能**跑 `git rm`，
+  此前会报 "pathspec did not match any files" 并返回非零，脚本静默退出
+
+校验：BOM=1 · 语法解析 OK（1970 tokens）· 函数已就位
+
+未推送 —— 等用户自己双击。
