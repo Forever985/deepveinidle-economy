@@ -1801,6 +1801,14 @@
   api.selfTest = selfTest;
 
   /* ═══════════════════════════════════════════════════════════════
+   * 价格桥注入点
+   *
+   * 必须放在 api 发布**之后** —— 它要用 api.bus / api.EVT / api.state。
+   * build.py 会把 src/price-bridge.js 整段塞到这里（仍在主干 IIFE 内部）。
+   * ═══════════════════════════════════════════════════════════════ */
+  /*@DVI_PRICE_BRIDGE@*/
+
+  /* ═══════════════════════════════════════════════════════════════
    * 插件注入点
    *
    * build.py 会把插件的代码直接放进这里 —— **在主干内部**，
@@ -1900,6 +1908,9 @@
       }
     }, 4000);
   });
+
+  /* 价格桥常驻：市场消息一来就防抖落盘（途径①）；另有每小时兜底（途径②） */
+  if (typeof DVI.attachPriceBridge === 'function') DVI.attachPriceBridge();
 
   GM_registerMenuCommand('打开 DVI Tools 面板', () => ui.toggle(true));
   GM_registerMenuCommand('关闭面板', () => ui.toggle(false));
@@ -2014,44 +2025,59 @@
   });
 
   /* --- 运行日志：出问题时直接导出，不用翻控制台 --- */
-  /* --- 价格快照：直接喂给利润网站 ---
+  /* --- 价格桥：把游戏内行情落到本机文件，供 dvi-economy 读取 ---
    *
-   * 为什么需要：DVI 没有公开的价格接口（bundle 里一个外部 URL 都没有），
-   * 价格只存在于游戏内的 WebSocket。所以**必须有人开着游戏抓一次**。
-   * 抓完之后导出成 JSON，静态站就能用它算 —— 之后不登录也能用，
-   * 只是数据停留在快照那一刻。
+   * 两条更新途径（用户要求）：
+   *   ① 每次刷新页面 —— 市场消息一到就防抖落盘（见 price-bridge 的 attach）
+   *   ② 每小时一次 —— 即使没有新消息也刷新一次「快照时间」
    *
-   * 抓取频率待实测：客户端没有任何 market 相关的轮询，
-   * 说明是服务端推送，但间隔没暴露在代码里。用下面那条「测推送频率」统计。
+   * 之所以要落成本机文件：游戏域名与利润网站域名不同，
+   * localStorage / cookie **不跨源**，没有共同的本地存储可用。
+   * 而走 GitHub 提交部署又太绕。File System Access API 让两边
+   * 各选一次同一个文件即可，闭环全在本机。
    */
-  GM_registerMenuCommand('💰 导出价格快照（给利润网站）', () => {
-    const mk = s.market;
-    const out = {};
-    for (const [id, m] of mk) {
-      const row = {};
-      if (m.ask != null) row.a = { p: m.ask, q: m.askQty };
-      if (m.bid != null) row.b = { p: m.bid, q: m.bidQty };
-      if (m.ask != null || m.bid != null) out[id] = row;
-    }
-    const n = Object.keys(out).length;
-    if (!n) {
-      ui.toast('还没有任何市场数据 —— 打开游戏里的市场页面等几秒再试');
-      return;
-    }
-    const payload = {
-      _note: 'DVI 价格快照。由 dvi-tools 从游戏内 WebSocket 抓取。',
-      toolVersion: VERSION,
-      at: new Date().toISOString(),
-      count: n,
-      market: out,
-    };
-    const name = `dvi-prices-${new Date().toISOString().slice(0, 10)}.json`;
-    if (ui.downloadText(JSON.stringify(payload, null, 1), name, 'application/json')) {
-      ui.toast(`已导出 ${n} 个物品的价格，放到 web/public/data/ 后重新部署即可`);
-    } else {
-      console.info('[DVI] 价格快照', payload);
-      ui.toast('导出失败，已打到控制台');
-    }
+  GM_registerMenuCommand('💰 立即抓一次价格', () => {
+    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
+    DVI.price.flushNow('手动');
+    ui.toast(`已抓取 ${DVI.price.lastCount} 个物品（1 秒内落盘）`);
+  });
+
+  GM_registerMenuCommand('🔗 连接价格文件（给利润网站用）', () => {
+    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
+    DVI.price.connect().then((r) => {
+      if (r.ok) {
+        ui.toast(`已连接 ${r.name} —— 之后每次抓价都会自动写入，网站读同一个文件即可`);
+      } else if (r.why === 'unsupported') {
+        ui.toast('这个浏览器不支持自动写入，已改为下载方式');
+        DVI.price.download();
+      } else if (r.why === 'cancelled') {
+        ui.toast('已取消');
+      } else {
+        ui.toast('连接失败：' + r.why);
+      }
+    });
+  });
+
+  GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {
+    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
+    const n = DVI.price.download();
+    ui.toast(`已下载 ${DVI.price.fileName}（${n} 个物品），拖到利润网站页面即可`);
+  });
+
+  GM_registerMenuCommand('📈 价格桥状态', () => {
+    if (!DVI.price) { ui.toast('价格桥未就绪'); return; }
+    const st = DVI.price.status();
+    const when = st.snapshotAt ? new Date(st.snapshotAt).toLocaleString('zh-CN') : '从未';
+    const lines = [
+      `自动写入：${st.connected ? '已连接 ' + st.fileName : '未连接（菜单里点「连接价格文件」）'}`,
+      `浏览器支持：${st.supported ? '是' : '否（只能下载）'}`,
+      `上次快照：${when}`,
+      `快照物品数：${st.snapshotCount}`,
+      `是否过期（>70 分钟）：${st.stale ? '是' : '否'}`,
+      '',
+      '利润网站读法：网站里点「连接本地价格文件」，选同一个 ' + st.fileName,
+    ];
+    alert(lines.join('\n'));
   });
 
   GM_registerMenuCommand('⏱ 测市场推送频率（跑 1 分钟）', () => {

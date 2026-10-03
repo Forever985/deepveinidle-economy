@@ -7,6 +7,12 @@ import { ChainCalc } from './calc/chain.ts'
 import { Rank, SORTS, type Row, type SortKey } from './calc/rank.ts'
 import { settings, calcOptions, resetSettings } from './stores/settings.ts'
 import { loadPrices, priceState } from './stores/prices.ts'
+import { priceState as marketState, loadCache as loadMarketCache } from './stores/market.ts'
+
+function loadMarket(): Record<string, any> {
+  loadMarketCache()
+  return marketState.market as Record<string, any>
+}
 import { player } from './stores/player.ts'
 import { isPristine } from './calc/player.ts'
 import type { GameData } from './types.ts'
@@ -17,7 +23,7 @@ import CombatView from './views/CombatView.vue'
 import ConsumableView from './views/ConsumableView.vue'
 import DocsView from './views/DocsView.vue'
 import ChainPanel from './components/ChainView.vue'
-import PriceManager from './components/PriceManager.vue'
+import PriceView from './views/PriceView.vue'
 
 const data = shallowRef<GameData | null>(null)
 const err = ref('')
@@ -35,8 +41,10 @@ onMounted(async () => {
     data.value = d
     const b = new PriceBook(d)
     b.loadManual(priceState.manual)
-    if (Object.keys(priceState.market).length) {
-      b.setMarket(new Map(Object.entries(priceState.market).map(([k, v]) => [Number(k), v])))
+    // 行情来自本机文件 / 拖放 / 粘贴（见 stores/market），不经过任何服务端
+    const mkt = loadMarket()
+    if (Object.keys(mkt).length) {
+      b.setMarket(new Map(Object.entries(mkt).map(([k, v]) => [Number(k), v])))
     }
     book.value = b
     rebuild()
@@ -65,8 +73,8 @@ const skills = computed(() => (data.value ? skillList(data.value) : []))
 watch(() => ({ ...settings }), () => { if (book.value) { book.value.loadManual(priceState.manual); rebuild() } }, { deep: true })
 watch(() => ({ ...player }), () => rebuild(), { deep: true })
 watch(() => priceState.manual, () => { if (book.value) { book.value.loadManual(priceState.manual); rebuild() } }, { deep: true })
-watch(() => priceState.market, () => {
-  if (book.value) book.value.setMarket(new Map(Object.entries(priceState.market).map(([k, v]) => [Number(k), v])))
+watch(() => marketState.market, () => {
+  if (book.value) book.value.setMarket(new Map(Object.entries(marketState.market).map(([k, v]) => [Number(k), v])))
   rebuild()
 }, { deep: true })
 
@@ -245,20 +253,7 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
       <CombatView v-else-if="current === 'combat'" :data="data" :book="book" :opts="opts" />
       <ConsumableView v-else-if="current === 'consumable'" :data="data" :book="book" :opts="opts" />
 
-      <div v-else-if="current === 'market'" class="view">
-        <div class="vhead">
-          <h2>价格</h2>
-          <p>没有市场数据时全部用兜底价。想看真实利润，导入快照或手动填价。</p>
-        </div>
-        <div class="card">
-          <h3>当前数据来源分布</h3>
-          <p style="font-size:12.5px;color:var(--fg2);margin:0">
-            市场价 {{ book.marketCount() }} 个 · 手动价 {{ Object.keys(priceState.manual).length }} 个 ·
-            其余 {{ data.items.length - book.marketCount() - Object.keys(priceState.manual).length }} 个用兜底价
-          </p>
-        </div>
-        <PriceManager :book="book" @close="go('market')" />
-      </div>
+      <PriceView v-else-if="current === 'market'" :data="data" :book="book" />
 
       <DocsView v-else-if="current === 'docs'" :data="data" />
     </template>

@@ -209,6 +209,16 @@ def main():
              f" · 怪物 {len(data['monsters'])} · 站点 {len(data['sites'])}\n")
     out = out.replace("(function () {\n  'use strict';", stamp + "(function () {\n  'use strict';", 1)
 
+    # ── 价格桥（主干级模块，必须在 api 发布之后）──
+    PB = "/*@DVI_PRICE_BRIDGE@*/"
+    pb_path = SRC.parent / "price-bridge.js"
+    if pb_path.exists():
+        if PB not in out:
+            sys.exit(f"✗ 主干里找不到注入点 {PB} —— 价格桥将无处安放，已中止。")
+        out = out.replace(PB, pb_path.read_text(encoding="utf-8").strip(), 1)
+    if PB in out:
+        sys.exit(f"✗ 注入点 {PB} 未被替换，构建结果不可信，已中止。")
+
     # ── 拼接插件 ──
     # 关键：插件注入到主干**内部**的 /*@DVI_PLUGINS@*/ 位置，
     # 而不是追加在文件末尾。放在末尾时插件只靠「文件顺序」与主干维系，
