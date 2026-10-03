@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '../i18n'
 import { computed, ref } from 'vue'
 import type { GameData, Options } from '../types'
 import type { PriceBook } from '../calc/price'
@@ -103,7 +104,7 @@ const fmt = (n: number, d = 0) =>
             <tbody>
               <tr v-for="r in rows" :key="r.monster.id"
                   :class="{ sel: selected === r.monster.id }" @click="selected = r.monster.id">
-                <td class="l">{{ r.name }}</td>
+                <td class="l">{{ t(r.name) }}</td>
                 <td class="num">{{ r.level }}</td>
                 <td class="num">{{ fmt(r.goldPerHour) }}</td>
                 <td class="num">{{ fmt(r.dropPerHour) }}</td>
@@ -118,7 +119,7 @@ const fmt = (n: number, d = 0) =>
       <div class="card">
         <h3>明细</h3>
         <template v-if="detail">
-          <div class="kv"><span>怪物</span><span>{{ detail.name }}（Lv{{ detail.level }}）</span></div>
+          <div class="kv"><span>怪物</span><span>{{ t(detail.name) }}（Lv{{ detail.level }}）</span></div>
           <div class="kv"><span>击杀频率</span><span>{{ detail.killsPerHour.toFixed(0) }} 只/时</span></div>
           <div class="kv sum"><span>合计收益 / 小时</span>
             <span style="color:var(--up)">{{ fmt(detail.totalPerHour) }}</span></div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { t } from '../i18n.ts'
+import { t } from '../i18n'
 import { computed } from 'vue'
 import type { StepCalc } from '../calc/steps'
 import type { ChainCalc } from '../calc/chain'
@@ -14,7 +14,8 @@ const emit = defineEmits<{ close: [] }>()
 const result = computed(() => props.ctx.chain.runAuto(props.ctx.id, props.opts))
 
 function name(id: number): string {
-  return props.ctx.step.action(id)?.name || `#${id}`
+  // 名称走官方译文；查不到时回退英文原文，不显示空白
+  return t(props.ctx.step.action(id)?.name || `#${id}`)
 }
 function fmt(n: number, d = 0): string {
   if (!Number.isFinite(n)) return '—'
@@ -32,7 +33,7 @@ function dur(sec: number): string {
 
 <template>
   <div v-if="result" class="chain">
-    <h3>{{ result.steps[result.steps.length - 1]?.action.name }} · 完整产业链</h3>
+    <h3>{{ t(result.steps[result.steps.length - 1]?.action.name) }} · 完整产业链</h3>
     <div class="meta">
       {{ result.steps.length }} 步 · 瓶颈在第 {{ (result.bottleneck ?? 0) + 1 }} 步 ·
       整链耗时 {{ dur(result.steps.reduce((s, r) => s + r.seconds, 0)) }}

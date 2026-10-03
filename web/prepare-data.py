@@ -95,6 +95,9 @@ def main():
     for a in actions:
         need.add(a["name"]); need.add(a["skill"]); need.add(a["group"])
     for m in monsters: need.add(m["name"])
+    # 特权名也要留 —— 玩家配置页会显示（官方有译文：XP gain → 经验获取）
+    for pk in extra.get("perks", []):
+        need.add(pk["name"])
     i18n = {k: v for k, v in i18n_all.items() if k in need}
     missing = sorted(need - set(i18n))
 

@@ -100,6 +100,23 @@ export function ui(key: string): string {
   return t(row.zh) || row.zh
 }
 
+/**
+ * 特权所属 lane 的中文标签。
+ *
+ * ⚠ lane（efficiency / power）是**游戏内部的分类 ID**，玩家在游戏里
+ * 根本看不到它，官方也没有译文。是我们自己在玩家配置页上显示的，
+ * 所以标签由这里定义 —— 不写清楚就等于自己往界面上塞英文。
+ */
+const LANE: Record<string, { zh: string; en: string }> = {
+  efficiency: { zh: '效率', en: 'Efficiency' },
+  power: { zh: '战力', en: 'Power' },
+}
+
+export function laneLabel(lane: string): string {
+  if (langState.lang === 'en') return LANE[lane]?.en ?? lane
+  return LANE[lane]?.zh ?? lane
+}
+
 /** 技能显示名：官方译文优先 */
 export function skillName(skill: string): string {
   if (langState.lang === 'en') return skill

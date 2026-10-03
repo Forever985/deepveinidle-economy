@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { t } from '../i18n.ts'
+import { t } from '../i18n'
 import { computed } from 'vue'
 import type { GameData, Options } from '../types'
 import type { PriceBook } from '../calc/price'

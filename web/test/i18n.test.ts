@@ -6,9 +6,9 @@
  *   如果新名字没被提取到，界面上会静默显示英文（或空白），用户却不知道是数据缺了。
  *   所以把「覆盖率必须 100%」钉死成断言 —— 掉下来立刻能发现。
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
+import { dirname, resolve, join } from 'node:path'
 
 import type { GameData } from '../src/types.ts'
 
@@ -66,6 +66,47 @@ section('③ 退回行为')
   ok('数据里的名字都不为空', data.items.every(i => i.name && i.name.length))
   ok('数据里的名字无重复', new Set(data.items.map(i => i.name)).size === data.items.length,
      `${data.items.length} vs ${new Set(data.items.map(i => i.name)).size}`)
+}
+
+section('④ 源码扫描：模板里不该有裸的英文名')
+{
+  // 这一节是**防回归**的。
+  // 之前就是因为模板里直接写了 {{ r.name }} 而没包 t()，
+  // 玩家看到的是英文；而数据覆盖率测试是全绿的 —— 两边都"没问题"，
+  // 但用户就是看到英文。测试必须覆盖到「界面实际显示什么」这一层。
+  const SRC = resolve(HERE, '../src')
+  const files: string[] = []
+  const walk = (dir: string) => {
+    for (const n of readdirSync(dir)) {
+      const p = join(dir, n)
+      if (statSync(p).isDirectory()) walk(p)
+      else if (n.endsWith('.vue')) files.push(p)
+    }
+  }
+  walk(SRC)
+
+  // 模板里出现 {{ xxx.name }} / {{ a.b.name }} 之类，且**没有**紧邻的 t( 或 laneLabel(
+  const BARE = /\{\{[^}]*?(?<![\w.])([a-zA-Z_][\w$]*)\.name\b[^}]*\}\}/g
+  const offenders: string[] = []
+  for (const f of files) {
+    const src = readFileSync(f, 'utf-8')
+    const tpl = src.split('<template>')[1] ?? ''
+    for (const m of tpl.matchAll(BARE)) {
+      const frag = m[0]
+      if (/\bt\(/.test(frag) || /\blaneLabel\(/.test(frag)) continue
+      offenders.push(`${f.split('/').pop()}: ${frag.trim()}`)
+    }
+  }
+  ok('模板里没有裸的 .name 输出', offenders.length === 0,
+     offenders.length ? offenders.slice(0, 5).join(' | ') : '')
+
+  // 每个 .vue 用了 i18n 就必须真的导入
+  for (const f of files) {
+    const src = readFileSync(f, 'utf-8')
+    const uses = /\{\{[^}]*\bt\(/s.test(src.split('<template>')[1] ?? '')
+    if (!uses) continue
+    ok(`${f.split('/').pop()} 导入了 t`, /import \{[^}]*\bt\b[^}]*\} from '\.\.?\/i18n/.test(src))
+  }
 }
 
 console.log('\n' + '─'.repeat(52))

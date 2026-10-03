@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t, laneLabel } from '../i18n'
 import { computed } from 'vue'
 import { player, resetPlayer } from '../stores/player'
 import { PriceBook } from '../calc/price'
@@ -97,7 +98,7 @@ const isGather = (s: string) => GATHER_SKILLS.includes(s)
         <h3>特权</h3>
         <p class="hint">每级 <code>perRank</code> 加成，累乘。</p>
         <div v-for="p in perks" :key="p.id" class="row">
-          <label>{{ p.name }}<span class="tag">{{ p.lane }}</span></label>
+          <label>{{ t(p.name) }}<span class="tag">{{ laneLabel(p.lane) }}</span></label>
           <input type="number" v-model.number="player.perkRanks[p.id]" min="0" max="999" step="1">
           <span class="mult">×{{ (1 + p.perRank * (player.perkRanks[p.id] ?? 0)).toFixed(3) }}</span>
         </div>

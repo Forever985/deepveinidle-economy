@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { t } from '../i18n.ts'
+import { t } from '../i18n'
 import { computed, ref } from 'vue'
 import type { GameData, Options } from '../types'
 import type { PriceBook } from '../calc/price'
@@ -100,7 +100,7 @@ const fmt = (n: number, d = 0) =>
           <select v-model.number="shardId">
             <option :value="0">未选择（成本只算金币）</option>
             <option v-for="i in shardCandidates" :key="i.id" :value="i.id">
-              {{ i.name }}（{{ i.value }}）
+              {{ t(i.name) }}（{{ i.value }}）
             </option>
           </select>
         </div>

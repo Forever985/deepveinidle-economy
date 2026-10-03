@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '../i18n'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { GameData } from '../types'
 import type { PriceBook } from '../calc/price'
@@ -225,7 +226,7 @@ const spreads = computed(() => {
           </thead>
           <tbody>
             <tr v-for="s in spreads" :key="s.id">
-              <td class="l">{{ s.name }}</td>
+              <td class="l">{{ t(s.name) }}</td>
               <td class="num">{{ s.ask }}</td>
               <td class="num">{{ s.bid }}</td>
               <td class="num pos">{{ s.pct.toFixed(1) }}%</td>
