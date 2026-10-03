@@ -17,7 +17,7 @@ import { PriceBook } from '../src/calc/price.ts'
 import { StepCalc } from '../src/calc/steps.ts'
 import { ChainCalc } from '../src/calc/chain.ts'
 import { Rank } from '../src/calc/rank.ts'
-import { TICK_SECONDS, HOUR_TICKS, failChance, workTicks, effectiveTicks } from '../src/calc/expected.ts'
+import { TICK_SECONDS, HOUR_TICKS, failChance, workTicks } from '../src/calc/expected.ts'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const data: GameData = JSON.parse(
@@ -65,11 +65,12 @@ section('② 失败率')
 section('③ 生长时间的两��口径')
 {
   const farm = data.actions.find(a => a.grow != null)!
-  ok('种子里有 grow 字段', typeof farm.grow === 'number' && farm.grow > 0, String(farm.grow))
+  const farmGrow = farm.grow ?? 0
+  ok('种子里有 grow 字段', farmGrow > 0, String(farmGrow))
   const par = workTicks(farm, baseOpts({ parallelGrow: true }))
   const ser = workTicks(farm, baseOpts({ parallelGrow: false }))
   ok('并行口径只算动手时间', par === farm.baseTicks, `${par} vs ${farm.baseTicks}`)
-  ok('单线程口径含生长时间', ser === farm.baseTicks + farm.grow, `${ser} vs ${farm.baseTicks + farm.grow}`)
+  ok('单线程口径含生长时间', ser === farm.baseTicks + farmGrow, `${ser} vs ${farm.baseTicks + farmGrow}`)
   ok('两者差异显著（这正是要暴露给用户的原因）', ser > par * 10, `${ser} vs ${par}`)
 
   const noGrow = data.actions.find(a => a.grow == null)!
@@ -219,7 +220,6 @@ section('⑥ 整链核算 · 中间品不得重复计价')
     const up = steps.producersOf(mid.inputs[0].itemId)[0]
     if (up) {
       const r2 = chain.run([{ actionId: up.id }, { actionId: mid.id }], opts)!
-      const upOut = up.output!.itemId
       // 上游那一步的产物被下游消耗 → 它的收入必须是 0
       ok('两段链：上游产出被下游消耗时收入计 0', r2.steps[0].income === 0,
          String(r2.steps[0].income))

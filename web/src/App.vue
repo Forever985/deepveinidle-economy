@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
-import { loadGameData, skillList, skillLabel, type } from '../api/gamedata'
-import { PriceBook } from '../calc/price'
-import { StepCalc } from '../calc/steps'
-import { ChainCalc } from '../calc/chain'
-import { Rank, SORTS, type Row, type SortKey } from '../calc/rank'
-import { settings, calcOptions, resetSettings } from '../stores/settings'
-import { loadPrices, priceState } from '../stores/prices'
-import type { GameData } from '../types'
+import { loadGameData, skillList, skillLabel } from './api/gamedata.ts'
+import { PriceBook } from './calc/price.ts'
+import { StepCalc } from './calc/steps.ts'
+import { ChainCalc } from './calc/chain.ts'
+import { Rank, SORTS, type Row, type SortKey } from './calc/rank.ts'
+import { settings, calcOptions, resetSettings } from './stores/settings.ts'
+import { loadPrices, priceState } from './stores/prices.ts'
+import type { GameData } from './types.ts'
 import ChainView from './components/ChainView.vue'
 import PriceManager from './components/PriceManager.vue'
 
@@ -51,7 +51,7 @@ function rebuild() {
   r.build(calcOptions())
   rank.value = r
   if (selected.value) {
-    selected.value = r.rows.find(x => x.actionId === selected.value!.actionId) || null
+    selected.value = r.rows.find((x: Row) => x.actionId === selected.value!.actionId) || null
   }
 }
 
@@ -68,7 +68,7 @@ watch(() => priceState.market, () => {
 
 const rows = computed<Row[]>(() => {
   if (!rank.value) return []
-  const f = rank.value.filter({
+  const f: Row[] = rank.value.filter({
     skill: settings.skill,
     maxLevel: settings.maxLevel,
     onlyMarket: settings.onlyMarket,

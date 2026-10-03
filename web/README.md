@@ -13,11 +13,14 @@
 
 ```bash
 cd web
-npm install
-npm run dev        # 开发
-npm test           # 计算层测试（零依赖，68 项）
-npm run build      # 产出 dist/
+npm install          # 依赖装在 web/node_modules（局部，不污染全局）
+npm run dev          # 开发
+npm test             # 计算层测试（零依赖，68 项）
+npm run build        # 产出 dist/
 ```
+
+> **`.npmrc` 已配国内镜像**（`registry.npmmirror.com`），与 milkonomy 一致。
+> 不配的话 `registry.npmjs.org` 会非常慢。这个文件也会被 GitHub Actions 读取。
 
 **游戏改版后**重跑数据提取即可，代码一行不用改：
 

@@ -18,11 +18,9 @@ import { bonusQty, effectiveTicks, failRate, ticksToSeconds } from './expected.t
 export class StepCalc {
   private readonly byId = new Map<number, Action>()
 
-  private readonly data: GameData
   private readonly book: PriceBook
 
   constructor(data: GameData, book: PriceBook) {
-    this.data = data
     this.book = book
     for (const a of data.actions) this.byId.set(a.id, a)
   }

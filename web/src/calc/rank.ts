@@ -62,15 +62,12 @@ export const SORTS: { key: SortKey; label: string }[] = [
 
 export class Rank {
   private _rows: Row[] = []
-  private _built = false
 
-  private readonly data: GameData
   private readonly book: PriceBook
   private readonly steps: StepCalc
   private readonly chain: ChainCalc
 
-  constructor(data: GameData, book: PriceBook, steps: StepCalc, chain: ChainCalc) {
-    this.data = data
+  constructor(_data: GameData, book: PriceBook, steps: StepCalc, chain: ChainCalc) {
     this.book = book
     this.steps = steps
     this.chain = chain
@@ -106,7 +103,6 @@ export class Rank {
       })
     }
     this._rows = rows
-    this._built = true
     return rows
   }
 

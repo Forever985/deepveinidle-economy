@@ -57,7 +57,7 @@ export function calcOptions(): Options {
     parallelGrow: settings.parallelGrow,
     revenueSide: settings.revenueSide,
     taxBp: settings.taxBp,
-    playerLevel: settings.playerLevel > 0 ? settings.playerLevel : undefined,
+    playerLevel: (settings.playerLevel ?? 0) > 0 ? settings.playerLevel : undefined,
     parallelSlots: settings.parallelSlots,
   }
 }

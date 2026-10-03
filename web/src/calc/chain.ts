@@ -1,7 +1,6 @@
 import type { ChainResult, ChainStep, GameData, Options, StepResult } from '../types.ts'
 import type { PriceBook } from './price.ts'
 import type { StepCalc } from './steps.ts'
-import { ticksToSeconds } from './expected.ts'
 
 /**
  * 整链核算。
@@ -17,13 +16,9 @@ import { ticksToSeconds } from './expected.ts'
  * 这是自研利润工具最常见的错误来源。
  */
 export class ChainCalc {
-  private readonly data: GameData
-  private readonly book: PriceBook
   private readonly steps: StepCalc
 
-  constructor(data: GameData, book: PriceBook, steps: StepCalc) {
-    this.data = data
-    this.book = book
+  constructor(_data: GameData, _book: PriceBook, steps: StepCalc) {
     this.steps = steps
   }
 

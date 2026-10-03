@@ -13,8 +13,9 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": []
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/**/*.vue", "test/**/*.ts"],
   "exclude": ["node_modules", "dist"]

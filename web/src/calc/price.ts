@@ -22,7 +22,6 @@ export class PriceBook {
   // 注：这里刻意用「显式字段 + 构造函数赋值」而不是构造函数参数属性
   // （constructor(private x: T)）。因为本层要能被 Node 直接跑测试，
   // 而 Node 的类型剥离模式不支持参数属性语法。
-  private readonly data: GameData
   private readonly items = new Map<number, Item>()
   /** 市场快照：itemId → { ask, bid }。可随时灌入新数据 */
   private market = new Map<number, MarketSnapshot>()
@@ -30,7 +29,6 @@ export class PriceBook {
   private manual = new Map<number, number>()
 
   constructor(data: GameData) {
-    this.data = data
     for (const it of data.items) this.items.set(it.id, it)
   }
 

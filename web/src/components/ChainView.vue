@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PriceBook } from '../calc/price'
 import type { StepCalc } from '../calc/steps'
 import type { ChainCalc } from '../calc/chain'
 import type { Options } from '../types'
