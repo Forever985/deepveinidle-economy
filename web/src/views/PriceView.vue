@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { t } from '../i18n'
+import { diagnoseHandle } from '../lib/handleStore'
+import type { HandleDiag } from '../lib/handleStore'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { GameData } from '../types'
 import type { PriceBook } from '../calc/price'
 import {
   priceState, supportsFileApi, connectPriceFile, readPriceFile, handleFiles,
   applyPasted, clearAll, loadCache, autoReconnect, isFileConnected,
-  grantAndRead, disconnect,
+  grantAndRead, disconnect, pullFromLocalServer, localServerUp,
 } from '../stores/market'
 
 const props = defineProps<{ data: GameData; book: PriceBook }>()
@@ -14,11 +16,17 @@ const props = defineProps<{ data: GameData; book: PriceBook }>()
 const msg = ref('')
 const pasteText = ref('')
 const showPaste = ref(false)
+const diag = ref<HandleDiag | null>(null)
+const diagBusy = ref(false)
 const dragOver = ref(false)
 
-onMounted(() => {
-  if (!Object.keys(priceState.market).length) loadCache()
-  void autoReconnect()
+onMounted(async () => {
+  // 首选本机服务：不需要任何授权，也不碰文件系统
+  const got = await pullFromLocalServer()
+  if (!got) {
+    if (!Object.keys(priceState.market).length) loadCache()
+    void autoReconnect()
+  }
   window.addEventListener('dragover', onDragOver)
   window.addEventListener('drop', onDrop)
 })
@@ -49,6 +57,34 @@ async function doRead() {
   const r = await readPriceFile()
   msg.value = r.msg
 }
+/** 诊断结果的可读文案（放 script 里算，模板保持干净） */
+const PERM_LABEL: Record<string, string> = {
+  granted: '已授权', denied: '被拒绝', prompt: '需点一下确认',
+}
+const permLabel = computed(() => {
+  const p = diag.value?.permission
+  return p ? (PERM_LABEL[p] || p) : '—'
+})
+const readLabel = computed(() => {
+  const d = diag.value
+  if (!d) return '—'
+  if (!d.stored) return '—'
+  if (d.canRead) return `是（${d.count} 个物品）`
+  return '否'
+})
+
+async function runDiag() {
+  diagBusy.value = true
+  diag.value = await diagnoseHandle()
+  diagBusy.value = false
+}
+
+async function retryLocal() {
+  msg.value = '正在连接本机价格服务…'
+  const ok = await pullFromLocalServer()
+  msg.value = ok ? `已连上，${Object.keys(priceState.market).length} 个物品` : '连不上，请确认「启动价格服务.bat」已在运行'
+}
+
 async function doGrant() {
   const r = await grantAndRead()
   msg.value = r.msg
@@ -114,6 +150,21 @@ const spreads = computed(() => {
         这里用<b>本机文件</b>做桥：dvi-tools 写 <code>dvi-prices.json</code>，
         本站读<b>同一个文件</b> —— 数据闭环全在你自己的电脑上，不经过 GitHub。
       </p>
+    </div>
+
+    <!-- 本机服务：首选通路 -->
+    <div v-if="localServerUp.checked && localServerUp.up" class="note ok-note">
+      ✓ 已连上<b>本机价格服务</b>（{{ localServerUp.count }} 个物品）——
+      dvi-tools 每次打开市场页面都会自动推过来，这里每次打开自动读取。
+      <b>不需要选文件、不需要拖拽、不需要部署。</b>
+    </div>
+    <div v-else-if="localServerUp.checked && !localServerUp.up" class="note warn">
+      <b>本机价格服务没在运行</b>，当前{{ stats.n ? '用的是上次缓存' : '全部使用兜底价' }}。
+      <div style="margin-top:4px;font-size:12px">
+        双击 <code>D://dvitools//启动价格服务.bat</code> 启动它（可加入开机自启，一次配置永久生效）。
+        启动后本页面会自动读到，无需再做任何操作。
+      </div>
+      <div style="margin-top:6px"><button @click="retryLocal">重试连接</button></div>
     </div>
 
     <!-- 状态 -->
@@ -207,8 +258,32 @@ const spreads = computed(() => {
       <div v-if="msg" class="msg">{{ msg }}</div>
       <div v-if="priceState.error" class="msg err">{{ priceState.error }}</div>
 
-      <div style="margin-top:10px">
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button @click="runDiag" :disabled="diagBusy">{{ diagBusy ? '诊断中…' : '🔍 连接诊断' }}</button>
         <button @click="doClear">清空本机价格数据</button>
+      </div>
+
+      <!-- 诊断：把「为什么没连上」摆到台面上 -->
+      <div v-if="diag" class="diag">
+        <div class="diag-t">连接诊断</div>
+        <div class="kv"><span>浏览器支持文件选择器</span>
+          <span :class="diag.apiSupported ? 'ok' : 'bad'">{{ diag.apiSupported ? '是' : '否' }}</span></div>
+        <div class="kv"><span>已记住文件句柄</span>
+          <span :class="diag.stored ? 'ok' : 'no'">{{ diag.stored ? '是' : '否' }}</span></div>
+        <div class="kv"><span>句柄方法完好</span>
+          <span :class="diag.methodsOk ? 'ok' : (diag.stored ? 'bad' : 'no')">
+            {{ diag.stored ? (diag.methodsOk ? '是' : '否') : '—' }}</span></div>
+        <div class="kv"><span>读取权限</span>
+          <span :class="diag.permission === 'granted' ? 'ok' : (diag.permission ? 'bad' : 'no')">
+            {{ permLabel }}</span></div>
+        <div class="kv"><span>能读到文件</span>
+          <span :class="diag.canRead ? 'ok' : (diag.stored ? 'bad' : 'no')">{{ readLabel }}</span></div>
+        <div class="kv"><span>本机缓存（localStorage）</span>
+          <span :class="stats.n ? 'ok' : 'no'">{{ stats.n }} 个物品{{ priceState.at ? ' · ' + new Date(priceState.at).toLocaleString('zh-CN') : '' }}</span></div>
+        <div v-if="diag.error" class="kv"><span>错误</span><span class="bad">{{ diag.error }}</span></div>
+        <p v-if="!diag.stored" class="hint" style="margin:6px 0 0">
+          说明还没绑定过 —— 点上面的「连接本机文件」选一次 dvi-prices.json 即可。
+        </p>
       </div>
     </div>
 
@@ -252,6 +327,12 @@ code{font-family:var(--mono);background:#eceff3;padding:1px 4px;border-radius:3p
 .msg{margin-top:8px;font-size:12.5px;color:var(--up)}
 .msg.err{color:var(--warn)}
 .tw{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:7px}
+.diag{margin-top:10px;border:1px solid var(--line);border-radius:7px;padding:9px 11px;background:#fbfcfd}
+.diag-t{font-size:12.5px;font-weight:600;margin-bottom:5px}
+.diag .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:1px 0}
+.diag .ok{color:var(--up)}
+.diag .bad{color:var(--warn)}
+.diag .no{color:var(--fg3)}
 .ok-note{border-left-color:var(--up);background:#f0f8f2}
 .bar-fix{display:flex;flex-direction:column;gap:6px}
 .view.dragging{outline:3px dashed var(--accent);outline-offset:-6px;background:var(--accent-soft)}

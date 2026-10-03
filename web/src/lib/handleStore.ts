@@ -118,3 +118,70 @@ export async function requestPermission(h: FileSystemFileHandle): Promise<PermSt
     return 'denied'
   }
 }
+
+/**
+ * 连接诊断 —— 把「为什么没连上」变成可读的事实。
+ *
+ * 这段是被连续四次盲猜逼出来的：
+ *   Illegal invocation → 修完变成 getFile is not a function
+ *   → 修完变成 Must be handling a user gesture → 还是不知道句柄能不能持久
+ * 每一轮都在猜。**把每一步的真实结果打出来，下一轮就不用猜了。**
+ */
+export interface HandleDiag {
+  /** 浏览器是否提供文件选择器 */
+  apiSupported: boolean
+  /** IndexedDB 里是否存过句柄 */
+  stored: boolean
+  /** 取回的句柄是否还带必需的方法 */
+  methodsOk: boolean
+  /** 当前权限状态（null = 还没法查） */
+  permission: 'granted' | 'denied' | 'prompt' | null
+  /** 实际读文件是否成功 */
+  canRead: boolean
+  /** 最后一次读到的物品数 */
+  count: number
+  /** 快照时间 */
+  at: string | null
+  /** 诊断过程中的原始错误 */
+  error: string
+}
+
+export async function diagnoseHandle(): Promise<HandleDiag> {
+  const d: HandleDiag = {
+    apiSupported: typeof (window as unknown as {
+      showOpenFilePicker?: unknown
+    }).showOpenFilePicker === 'function',
+    stored: false, methodsOk: false, permission: null,
+    canRead: false, count: 0, at: null, error: '',
+  }
+  try {
+    const h = await loadHandle()
+    d.stored = !!h
+    if (!h) return d
+
+    d.methodsOk = isUsableHandle(h)
+    if (!d.methodsOk) {
+      // 具体缺哪个方法，写清楚，别只说「不可用」
+      const c = h as unknown as Record<string, unknown>
+      const missing = ['getFile', 'queryPermission', 'name']
+        .filter((k) => typeof c[k] !== 'function' && typeof c[k] !== 'string')
+      d.error = '句柄缺少：' + (missing.join('、') || '（对象结构异常）')
+      return d
+    }
+
+    d.permission = await checkPermission(h as FileSystemFileHandle)
+    if (d.permission === 'granted') {
+      const f = await (h as FileSystemFileHandle).getFile()
+      const txt = await f.text()
+      const o = JSON.parse(txt) as { market?: Record<string, unknown> }
+      d.canRead = true
+      d.count = Object.keys(o.market || {}).length
+      d.at = (o as { at?: string }).at ?? null
+    } else {
+      d.error = d.permission === 'prompt' ? '需要你点一下授权' : '授权已被拒绝'
+    }
+  } catch (e) {
+    d.error = (e as Error)?.message || String(e)
+  }
+  return d
+}

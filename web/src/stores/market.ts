@@ -60,6 +60,52 @@ const fsa = () => window as unknown as FSAWindow
 
 export const supportsFileApi = typeof window !== 'undefined' && typeof fsa().showOpenFilePicker === 'function'
 
+/**
+ * 本机价格服务地址（scripts/price-server.js）。
+ *
+ * ## 这是首选通路
+ *   dvi-tools 每次拿到行情就 POST 到 127.0.0.1:8791，网站直接 GET。
+ *   **全程 localhost**：不经过文件、不经过拖拽、不经过 GitHub部署，
+ *   也就绕开了那一整类「沙箱 + 文件句柄」的坑
+ *   （Illegal invocation / getFile is not a function /
+ *    Must be handling a user gesture / instanceof 恒 false）。
+ *
+ * ## 为什么 https 页面能读 http://127.0.0.1
+ *   Chrome / Edge 把 127.0.0.1 与 localhost 视为「可能可信来源」，
+ *   所以不算混合内容，不会被拦。
+ */
+export const LOCAL_SERVER = 'http://127.0.0.1:8791'
+
+/** 本机服务是否可用（页面加载时探一次） */
+export const localServerUp = reactive<{ up: boolean; checked: boolean; count: number }>({
+  up: false, checked: false, count: 0,
+})
+
+/**
+ * 从本机服务拉价格。**不需要任何用户授权**，也不碰文件系统。
+ * 服务没开就返回 false，调用方退回缓存 / 兜底价。
+ */
+export async function pullFromLocalServer(timeoutMs = 2500): Promise<boolean> {
+  const ac = new AbortController()
+  const timer = setTimeout(() => ac.abort(), timeoutMs)
+  try {
+    const r = await fetch(LOCAL_SERVER + '/prices.json', { signal: ac.signal, cache: 'no-store' })
+    if (!r.ok) throw new Error('HTTP ' + r.status)
+    const txt = await r.text()
+    if (!applySnapshot(txt, 'file')) return false
+    localServerUp.up = true
+    localServerUp.checked = true
+    localServerUp.count = Object.keys(priceState.market).length
+    return true
+  } catch {
+    localServerUp.up = false
+    localServerUp.checked = true
+    return false
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 /* ─────────────── 解析与入库 ─────────────── */
 
 interface Snapshot {
