@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.2
+// @version      2026.10.03.3
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.2 · 2026-10-03 09:33 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.3 · 2026-10-03 09:34 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.2';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.3';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2302,17 +2302,14 @@
       .dvi-inline-note[data-tone="warn"]{color:#d8a657}
       .dvi-inline-note[data-tone="done"]{color:#6fbf8b}
       .dvi-inline-row{display:block;margin-top:2px;color:#8b96a3;font-size:11px}
-      /* 就地重算入口：放在列表下方，做得尽量小。
-       * 它是「需要时才用」的东西，常驻显眼按钮只会干扰视线。 */
-      .dvi-refresh{display:flex;align-items:center;gap:6px;width:fit-content;
-        margin:6px 0 0 2px;padding:2px 8px;border:0;border-radius:4px;
+      /* 就地重算入口：放在列表下方，保持极简。
+       * 不提示数据新旧、不做状态变色 —— 需要时点一下就好。 */
+      .dvi-refresh{display:flex;align-items:center;gap:5px;width:fit-content;
+        margin:6px 0 0 2px;padding:2px 9px;border:0;border-radius:4px;
         background:rgba(255,255,255,.05);color:#7f8b98;
-        font:inherit;font-size:11px;cursor:pointer;opacity:.75;
+        font:inherit;font-size:11px;cursor:pointer;opacity:.8;
         transition:opacity .15s,color .15s,background .15s}
       .dvi-refresh:hover{opacity:1;color:#c8d2dc;background:rgba(255,255,255,.10)}
-      .dvi-refresh[data-stale="1"]{color:#d8a657;opacity:.95}
-      .dvi-refresh-age{color:#5f6b78;font-size:10.5px}
-      .dvi-refresh[data-stale="1"] .dvi-refresh-age{color:#a5843f}
     `;
 
     let cssInjected = false;
@@ -3356,31 +3353,20 @@
     },
 
     /**
-     * 就地刷新入口。
-     * 做得尽量小、尽量不显眼：它是个「需要时才用」的东西，
-     * 常驻一个显眼按钮只会干扰视线。
-     * 文案自带「数据多旧」，所以一眼就知道它有什么用。
+     * 就地重算入口。
+     * 保持极简：不提示数据新旧、不做状态变色 ——
+     * 用户本来就知道「要用的时候点一下」。
      */
     renderRefreshButton(ctx) {
       const me = ctx.state.me;
       if (!me) return null;                       // 还没登录就不显示
 
-      let age = '刚刚';
-      let stale = false;
-      if (this.lastCalc) {
-        const s = Math.round((Date.now() - this.lastCalc) / 1000);
-        if (s >= 60) { age = `${Math.round(s / 60)} 分钟前`; stale = s >= 120; }
-        else age = `${s} 秒前`;
-      }
-
       return `<button class="dvi-refresh" type="button"
-        data-stale="${stale ? '1' : '0'}"
         ${ctx.ui.tip('重算升级预估', [
-          '用当前等级、装备、增益重新算一遍',
-          `数据时间：${age}${stale ? '（已过期）' : ''}`,
-          this.isAuto(ctx) ? '当前是自动模式，状态变化后最多 30 秒自动重算一次'
-                           : '当前是按需模式，只会在这里点击或刷新页面时重算',
-        ])}>↻ 重算<span class="dvi-refresh-age">${age}</span></button>`;
+          '按当前等级、装备与增益重新算一遍',
+          this.isAuto(ctx) ? '当前为自动模式，状态变化后会自动重算'
+                           : '当前为按需模式，点这里或刷新页面即可',
+        ])}>↻ 重算</button>`;
     },
 
     enable(ctx) {

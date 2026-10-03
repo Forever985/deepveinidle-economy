@@ -182,31 +182,20 @@
     },
 
     /**
-     * 就地刷新入口。
-     * 做得尽量小、尽量不显眼：它是个「需要时才用」的东西，
-     * 常驻一个显眼按钮只会干扰视线。
-     * 文案自带「数据多旧」，所以一眼就知道它有什么用。
+     * 就地重算入口。
+     * 保持极简：不提示数据新旧、不做状态变色 ——
+     * 用户本来就知道「要用的时候点一下」。
      */
     renderRefreshButton(ctx) {
       const me = ctx.state.me;
       if (!me) return null;                       // 还没登录就不显示
 
-      let age = '刚刚';
-      let stale = false;
-      if (this.lastCalc) {
-        const s = Math.round((Date.now() - this.lastCalc) / 1000);
-        if (s >= 60) { age = `${Math.round(s / 60)} 分钟前`; stale = s >= 120; }
-        else age = `${s} 秒前`;
-      }
-
       return `<button class="dvi-refresh" type="button"
-        data-stale="${stale ? '1' : '0'}"
         ${ctx.ui.tip('重算升级预估', [
-          '用当前等级、装备、增益重新算一遍',
-          `数据时间：${age}${stale ? '（已过期）' : ''}`,
-          this.isAuto(ctx) ? '当前是自动模式，状态变化后最多 30 秒自动重算一次'
-                           : '当前是按需模式，只会在这里点击或刷新页面时重算',
-        ])}>↻ 重算<span class="dvi-refresh-age">${age}</span></button>`;
+          '按当前等级、装备与增益重新算一遍',
+          this.isAuto(ctx) ? '当前为自动模式，状态变化后会自动重算'
+                           : '当前为按需模式，点这里或刷新页面即可',
+        ])}>↻ 重算</button>`;
     },
 
     enable(ctx) {
