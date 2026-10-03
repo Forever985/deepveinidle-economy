@@ -34,16 +34,44 @@ $WebDir = Join-Path $PSScriptRoot 'web'
 
 # ── gh-pages 发布（原生实现，不依赖 bash / node）─────────────────
 function Invoke-Git {
-    param([string[]]$GitArgs, [string]$Cwd = $PSScriptRoot)
-    $out = & git @GitArgs 2>&1
-    $code = $LASTEXITCODE
+    <#
+      在指定目录里跑 git。
+
+      ⚠ 之前这个函数收了 $Cwd 却**从不使用** —— git 一直在调用方的当前目录
+      （也就是主仓库）里执行，于是 rm/add/commit/push 全打在主仓库上。
+      现在真的切目录，并且切完切回。
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string[]]$GitArgs,
+        [string]$Cwd = $PSScriptRoot,
+        [switch]$MustSucceed
+    )
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        Push-Location $Cwd
+        try {
+            $out = & git @GitArgs 2>&1
+            $code = $LASTEXITCODE
+        } finally {
+            Pop-Location
+        }
+    } finally {
+        $ErrorActionPreference = $prev
+    }
+
     $txt = ($out | Out-String).Trim()
-    if ($code -ne 0) { $script:LastGitOut = "git $($GitArgs -join ' ')`n$txt" }
+    if ($code -ne 0) {
+        $script:LastGitOut = "git $($GitArgs -join ' ')   (cwd=$Cwd)`n$txt"
+        if ($MustSucceed) {
+            throw "git $($GitArgs -join ' ') 失败（cwd=$Cwd）：`n$txt"
+        }
+    }
     return @{ Code = $code; Out = $txt }
 }
 
 function Publish-GhPages {
-    param([string]$Repo, [string]$Dist, [int]$Tries = 2)
+    param([string]$Repo, [string]$Dist, [int]$Tries = 3)
 
     $global:LASTEXITCODE = 1
     if (-not (Test-Path (Join-Path $Dist 'index.html'))) {
@@ -55,58 +83,79 @@ function Publish-GhPages {
     try {
         New-Item -ItemType Directory -Path $tmp -Force | Out-Null
 
-        $probe = Invoke-Git @('ls-remote', '--heads', $Repo, 'gh-pages')
-        if ($probe.Code -eq 0 -and $probe.Out -match 'refs/heads/gh-pages') {
-            Write-Host "      [i] 克隆已有 gh-pages 分支 ..."
-            $r = Invoke-Git @('clone', '--branch', 'gh-pages', '--single-branch', '--depth', '1', $Repo, $tmp) $PSScriptRoot
-            if ($r.Code -ne 0) { Write-Host "      [X] 克隆失败：$($r.Out)"; return }
-            Invoke-Git @('rm', '-rq', '--cached', '.') $tmp | Out-Null
-            Invoke-Git @('rm', '-rfq', '--ignore-unmatch', '.') $tmp | Out-Null
-        } else {
-            Write-Host "      [i] gh-pages 不存在，新建 ..."
-            Invoke-Git @('init', '-q') $tmp | Out-Null
-            Invoke-Git @('config', 'core.autocrlf', 'false') $tmp | Out-Null
-            Invoke-Git @('remote', 'add', 'origin', $Repo) $tmp | Out-Null
-            Invoke-Git @('checkout', '-q', '--orphan', 'gh-pages') $tmp | Out-Null
-            # 新建分支时仓库还没有任何提交，**不能**跑 git rm ——
-            # 会报 "pathspec '.' did not match any files" 并返回非零。
+        # ── clone：代理偶尔 502，必须重试，不能当成成功 ──
+        $cloned = $false
+        for ($i = 1; $i -le $Tries; $i++) {
+            $probe = Invoke-Git @('ls-remote', '--heads', $Repo, 'gh-pages')
+            if ($probe.Code -eq 0 -and $probe.Out -match 'refs/heads/gh-pages') {
+                Write-Host "      [i] 克隆已有 gh-pages 分支（第 $i 次）..."
+                $r = Invoke-Git @('clone', '--branch', 'gh-pages', '--single-branch', '--depth', '1', $Repo, $tmp) $PSScriptRoot
+                if ($r.Code -eq 0) { $cloned = $true; break }
+                Write-Host "      [!] 克隆失败：$($r.Out)" -ForegroundColor DarkGray
+                Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
+                New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+            } else {
+                Write-Host "      [i] gh-pages 不存在，新建（第 $i 次）..."
+                Invoke-Git @('init', '-q') $tmp -MustSucceed | Out-Null
+                Invoke-Git @('config', 'core.autocrlf', 'false') $tmp -MustSucceed | Out-Null
+                Invoke-Git @('remote', 'add', 'origin', $Repo) $tmp -MustSucceed | Out-Null
+                # 新建分支时仓库还没有任何提交，**不能**跑 git rm ——
+                # 会报 "pathspec '.' did not match any files" 并返回非零。
+                Invoke-Git @('checkout', '-q', '--orphan', 'gh-pages') $tmp -MustSucceed | Out-Null
+                $cloned = $true
+                break
+            }
+            Write-Host "      [i] 3 秒后重试 ..." -ForegroundColor DarkGray
+            Start-Sleep -Seconds 3
+        }
+        if (-not $cloned) { Write-Host "      [X] gh-pages 分支准备失败" -ForegroundColor Red; return }
+
+        # ── 清空（仅克隆已有分支时需要）──
+        if ((Invoke-Git @('rev-parse', '--verify', 'HEAD') $tmp).Code -eq 0) {
+            Invoke-Git @('rm', '-rq', '--cached', '.') $tmp -MustSucceed | Out-Null
+            Invoke-Git @('rm', '-rfq', '--ignore-unmatch', '.') $tmp -MustSucceed | Out-Null
         }
 
         Write-Host "      [i] 拷入构建产物 ..."
         Copy-Item -Path (Join-Path $Dist '*') -Destination $tmp -Recurse -Force
 
-        Invoke-Git @('add', '-A') $tmp | Out-Null
+        # ── 提交：这两步**必须检查**，之前被 Out-Null 吞掉，
+        #    结果 commit 失败了还继续 push，报错指向 push，排查方向全错 ──
+        Invoke-Git @('add', '-A') $tmp -MustSucceed | Out-Null
         $stamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-        Invoke-Git @('commit', '-q', '-m', "deploy: $stamp") $tmp | Out-Null
+        $c = Invoke-Git @('commit', '-q', '-m', "deploy: $stamp") $tmp
+        if ($c.Code -ne 0) {
+            # 没有变更时 commit 会返回 1，不是错误
+            if ($c.Out -match 'nothing to commit|working directory clean|无文件要提交') {
+                Write-Host "      [i] 构建产物与线上完全一致，无需更新"
+                $global:LASTEXITCODE = 0
+                return
+            }
+            Write-Host "      [X] 提交失败：$($c.Out)" -ForegroundColor Red
+            $global:LASTEXITCODE = 1
+            return
+        }
+
+        # 提交后确认分支真的存在 —— 少了这步，报错会推迟到 push 才暴露
+        $br = Invoke-Git @('rev-parse', '--verify', 'refs/heads/gh-pages') $tmp
+        if ($br.Code -ne 0) { Write-Host "      [X] 提交后仍无 gh-pages 分支" -ForegroundColor Red; return }
 
         Write-Host "      [i] 推送到 gh-pages ..."
         $ok = $false
         for ($i = 1; $i -le $Tries; $i++) {
             $r = Invoke-Git @('push', 'origin', 'gh-pages') $tmp
             if ($r.Code -eq 0) { $ok = $true; break }
-            Write-Host "      [!] 第 $i 次推送失败，3 秒后重试" -ForegroundColor DarkGray
+            Write-Host "      [!] 第 $i 次推送失败：$($r.Out)" -ForegroundColor DarkGray
             Start-Sleep -Seconds 3
         }
-        if (-not $ok) { Write-Host "      [X] 推送失败：$($r.Out)"; return }
+        if (-not $ok) { Write-Host "      [X] 推送失败（已重试 $Tries 次）" -ForegroundColor Red; return }
         $global:LASTEXITCODE = 0
+    } catch {
+        Write-Host "      [X] $($_.Exception.Message)" -ForegroundColor Red
+        $global:LASTEXITCODE = 1
     } finally {
         if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue }
     }
-}
-
-# ── 运行日志 ──────────────────────────────────────────────────
-# 每��都落一份：deploy-latest.log（固定名，永远指向最近一次）
-#              deploy-<时间戳>.log（留档，可对照历史）
-# 用户只需说「看日志」，不需要再复制控制台输出。
-$LogDir = Join-Path $PSScriptRoot 'logs'
-$LogLatest = Join-Path $LogDir 'deploy-latest.log'
-try {
-    New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
-    # 清掉上一次的，避免新旧混在一起
-    if (Test-Path $LogLatest) { Remove-Item $LogLatest -Force -ErrorAction SilentlyContinue }
-    Start-Transcript -Path $LogLatest -Force | Out-Null
-} catch {
-    $LogLatest = $null       # 日志是辅助功能，起不来不该挡住部署
 }
 
 $proxyProc  = $null
