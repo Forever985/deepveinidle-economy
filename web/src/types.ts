@@ -62,7 +62,7 @@ export interface Site {
   jobIds: number[]
 }
 
-/** 怪物（战斗收益是独立利润来源，暂未纳入） */
+/** 怪物（战斗收益是独立利润来源） */
 export interface Monster {
   id: number
   name: string
@@ -73,9 +73,12 @@ export interface Monster {
   defence: number
   speed: number
   xp: number
-  gold: number
-  bonus: number
-  drop: unknown
+  /** 金币区间 [min, max]，计算时取期望 */
+  gold: number[]
+  /** 概率额外掉落 */
+  bonus?: { itemId: number; chance: number }
+  /** 固定掉落的物品 id */
+  drop: number
 }
 
 export interface Balance {
