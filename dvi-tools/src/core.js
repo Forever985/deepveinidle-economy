@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.6
+// @version      2026.10.03.7
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.6';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.7';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -1110,10 +1110,9 @@
      *   })
      * ═══════════════════════════════════════════════════════════ */
     const anchors = new Map();
-    let observer = null;
     let rafPending = false;
     let lastRun = 0;
-    const MIN_INTERVAL = 120;   // ms，节流：游戏重绘很频繁
+    const MIN_INTERVAL = 120;   // ms，节流：显式 refresh 时合并高频调用
 
     const MARK = 'data-dvi-inline';
 
@@ -1204,6 +1203,7 @@
     }
 
     let lastLoggedTotal = -1;   // 只在注入总数变化时记日志，避免每帧刷屏
+    let lastLoggedAt = 0;       // 日志时间节流，console 输出本身也是开销
 
     let applying = false;        // 重入保护：我们自己插节点会再触发观察器
 
@@ -1262,93 +1262,78 @@
         total += a.count;
       }
 
-      // 只在「注入总数」变化时记一条，避免每帧刷屏
-      if (total !== lastLoggedTotal) {
-        const first = total > 0 && lastLoggedTotal <= 0;   // 首次成功注入
-        lastLoggedTotal = total;
-        const detail = [...anchors.values()]
-          .map(a => `${a.id}:宿主${a.hostsFound}/注入${a.count}${a.lastError ? ' ⚠' + a.lastError : ''}`)
-          .join(' · ');
-        if (total > 0) DIAG.info('内联', `已注入 ${total} 处 · ${detail}`);
-        else DIAG.warn('内联', `未注入任何内容 · ${detail || '（无锚点）'}`);
+      lastInjectedTotal = total;   // 供每秒的存在性检查比对
 
-        // 首次注入时把「落点周围的 DOM 结构」也记下来。
-        // 出过的问题：注入的元素把游戏面板排版撑坏，但日志里只有数量，
-        // 看不出它到底被放进了什么样的容器。这里把父链和容器子元素数记清楚。
-        if (first) {
-          try {
-            const host = document.querySelector([...anchors.values()][0].selector);
-            if (host) {
-              const chain = [];
-              let el = host, depth = 0;
-              while (el && el.tagName && depth < 4) {
-                chain.push(el.tagName.toLowerCase() +
-                  (el.className ? '.' + String(el.className).trim().split(/\s+/).slice(0, 2).join('.') : ''));
-                el = el.parentElement; depth++;
+      // 只在「注入总数」变化、且距上次记录超过 1 秒时才写日志。
+      // console 输出本身就有成本，若游戏每帧重建列表、总数在 8/0 之间反复跳，
+      // 不加时间节流会把控制台刷爆、也白白吃掉帧率。
+      if (total !== lastLoggedTotal) {
+        const first = total > 0 && lastLoggedTotal <= 0;
+        const now = Date.now();
+        const bigChange = Math.abs(total - lastLoggedTotal) > 0;
+        lastLoggedTotal = total;
+
+        if (first || bigChange && now - lastLoggedAt > 1000) {
+          lastLoggedAt = now;
+          const detail = [...anchors.values()]
+            .map(a => `${a.id}:宿主${a.hostsFound}/注入${a.count}${a.lastError ? ' ⚠' + a.lastError : ''}`)
+            .join(' · ');
+          if (total > 0) DIAG.info('内联', `已注入 ${total} 处 · ${detail}`);
+          else DIAG.warn('内联', `未注入任何内容 · ${detail || '（无锚点）'}`);
+
+          // 首次注入时把「落点周围的 DOM 结构」也记下来。
+          // 出过的问题：注入的元素把游戏面板排版撑坏，但日志里只有数量，
+          // 看不出它到底被放进了什么样的容器。这里把父链和容器子元素数记清楚。
+          if (first) {
+            try {
+              const a0 = [...anchors.values()][0];
+              const host = a0 && document.querySelector(a0.selector);
+              if (host) {
+                const chain = [];
+                let el = host, depth = 0;
+                while (el && el.tagName && depth < 4) {
+                  chain.push(el.tagName.toLowerCase() +
+                    (el.className ? '.' + String(el.className).trim().split(/\s+/).slice(0, 2).join('.') : ''));
+                  el = el.parentElement; depth++;
+                }
+                DIAG.info('结构', `注入落点：<${chain.join(' < ')}> · ` +
+                  `父容器子元素 ${host.parentElement ? host.parentElement.children.length : '?'} 个`);
               }
-              DIAG.info('结构', `注入落点：<${chain.join(' < ')}> · ` +
-                `父容器子元素 ${host.parentElement ? host.parentElement.children.length : '?'} 个 · ` +
-                `列表子元素 ${(() => {
-                  const list = document.querySelector('[data-routes]');
-                  return list ? list.children.length : '无';
-                })()} 个`);
-            }
-          } catch (e) { /* 诊断失败不影响功能 */ }
+            } catch (e) { /* 诊断失败不影响功能 */ }
+          }
         }
       }
     }
 
-    /** 判断一条变动记录是不是「我们自己造成的」。
-     *  自激循环会让注入每帧重跑，必须排除干净。
-     *  **判不准时一律当作外部变动** —— 宁多重跑一次 applyAll（很便宜），
-     *  也不能把游戏的真实更新误判成自己的而漏掉。 */
-    function isOurMutation(rec) {
-      try {
-        // 变动发生在我们注入的节点内部 → 是我们的
-        const t = rec.target;
-        if (t && typeof t.closest === 'function' && t.closest(`[${MARK}]`)) return true;
+    /* ── 注入的自愈：只做「极廉价的存在性检查」 ──
+     *
+     * 这里走过一段弯路：为了让标注在游戏重绘后立刻补回，
+     * 我挂了 MutationObserver，并在**每一次** DOM 变动上同步重注入，
+     * 后来又加了一层「相关性过滤」。结果是**掉帧严重**。
+     *
+     * 其实没必要。这份预估只需要「及时、相对准确」：
+     * 它不随 tick 变化，玩家要的是点一下能拿到当下的数。
+     * 所以：**不监听 DOM 变动**，只每秒做一次存在性检查，
+     * 发现标注被游戏打扫掉了就补一次。
+     *
+     * 代价是每秒一次 querySelectorAll（可忽略），
+     * 相比「挂在所有变动上」，负担小了两个数量级。
+     */
+    let watchTimer = null;
+    let lastInjectedTotal = -1;
 
-        let examined = 0;
-        for (const list of [rec.addedNodes, rec.removedNodes]) {
-          if (!list) continue;
-          for (const n of list) {
-            examined++;
-            const ours = (n && typeof n.hasAttribute === 'function' && n.hasAttribute(MARK)) ||
-                         (n && typeof n.closest === 'function' && n.closest(`[${MARK}]`));
-            if (!ours) return false;      // 发现一个不属于我们的 → 外部变动
-          }
-        }
-        // 一个节点都没能判定（如只有文本节点）→ 保守当作外部变动
-        return examined > 0;
-      } catch (e) { return false; }
-    }
+    function startInlineWatch() {
+      if (watchTimer) return;
+      applyAll();                        // 先注入一次
 
-    /** 观察游戏 DOM 变化，变化后自动重注入 */
-    function startObserver() {
-      if (observer || typeof MutationObserver !== 'function') return;
-
-      /* 关键：**同步**注入，不要延到下一帧。
-       *
-       * 游戏的作业列表是整体重建的（this.list.innerHTML = …），
-       * 所以每次重绘我们的标注都会被抹掉、需要立刻补回。
-       * MutationObserver 的回调跑在**渲染之前的微任务**里 ——
-       * 在这里同步注入，标注就能赶上同一帧的绘制，
-       * 玩家看到的是「一直在」而不是「一直在闪」。
-       *
-       * 曾经用 requestAnimationFrame 延后一帧补注，结果每帧都缺一次，
-       * 表现为技能列表持续闪烁。 */
-      observer = new MutationObserver((records) => {
-        for (const rec of records) {
-          if (!isOurMutation(rec)) { applyAll(); return; }
-        }
-      });
-      // 观察 documentElement 而不是 #app —— 游戏换掉 #app 时观察器不能跟着死
-      observer.observe(document.documentElement, { childList: true, subtree: true });
-      applyAll();
-
-      // 保险丝：万一观察器漏了（或 #app 被整体重建），兜底重扫一次。
-      // 观察器本身已经覆盖绝大多数情况，所以这里间隔可以放长。
-      setInterval(() => schedule(), 5000);
+      watchTimer = setInterval(() => {
+        if (!anchors.size) return;       // 没有锚点就什么都不做
+        let live = 0;
+        try { live = document.querySelectorAll(`[${MARK}]`).length; } catch (e) { return; }
+        // 数量对得上就立刻返回 —— 这是绝大多数情况，成本极低
+        if (live === lastInjectedTotal) return;
+        applyAll();                      // 被游戏重绘抹掉了，补一次
+      }, 1000);
     }
 
     /** 诊断：报告每个锚点当前匹配到多少宿主 */
@@ -1413,7 +1398,7 @@
     return { ensureCSS, ready, toast, toggle, body, renderSettings,
              makeFab, makeWindow, removeFab, applyMode,
              mode, setMode, MODE_QUIET, MODE_FAB,
-             inline, startObserver, tip,
+             inline, startInlineWatch, tip,
              downloadText };
   })();
 
@@ -1783,7 +1768,7 @@
   ui.ready(() => {
     ui.makeWindow();          // 面板先建好但保持隐藏
     ui.applyMode();           // 按当前模式决定要不要放悬浮按钮（默认不放）
-    ui.startObserver();       // 开始观察游戏 DOM，供内联注入使用
+    ui.startInlineWatch();    // 注入一次，之后每秒做一次廉价的存在性检查
 
     // 启动日志：一次把定位问题需要的环境信息记全
     DIAG.info('启动', `v${VERSION} · ${location.host} · ` +
