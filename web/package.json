@@ -1,0 +1,23 @@
+{
+  "name": "dvi-profit-net",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deep Vein Idle 利润网 —— 配方利润与产业链分析（纯静态、只读）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "data": "python prepare-data.py",
+    "test": "node --experimental-strip-types --no-warnings test/calc.test.ts"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vue-tsc": "^2.2.0"
+  }
+}

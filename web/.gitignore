@@ -1,0 +1,19 @@
+# 依赖与构建产物
+node_modules/
+dist/
+*.local
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+
+# 本地价格数据（含玩家自己填的价，不该进仓库）
+*.prices.json
+dvi-prices-*.json
