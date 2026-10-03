@@ -1164,7 +1164,10 @@
       schedule();
     }
 
-    /** 节流调度：一帧内只跑一次，且不低于最小间隔 */
+    /** 节流调度：一帧内只跑一次，且不低于最小间隔。
+     *  **只用于「非游戏重绘驱动」的场合**（显式 refresh、兜底重扫）。
+     *  游戏重绘驱动的补注走观察器里的**同步** applyAll，
+     *  否则会延后一帧、表现为闪烁。 */
     function schedule() {
       if (rafPending) return;
       rafPending = true;
