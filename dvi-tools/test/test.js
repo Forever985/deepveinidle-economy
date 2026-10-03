@@ -157,6 +157,18 @@ const gmStore = new Map();
  * 否则测不出「跨脚本能否共享」这个关键点。 */
 const pageWindow = {};                 // 页面窗口（unsafeWindow）
 
+/* MutationObserver 桩。
+ * 真实环境里它回调跑在「渲染之前的微任务」中 —— 主干正是靠这一点
+ * 把注入赶在同一帧完成，从而不闪。所以必须能手动触发回调来验证。 */
+const observerInstances = [];
+class MutationObserverStub {
+  constructor(cb) { this.cb = cb; this.targets = []; observerInstances.push(this); }
+  observe(target, opts) { this.targets.push({ target, opts }); }
+  disconnect() { this.targets = []; }
+  /** 测试用：手动投递一批变动记录 */
+  fire(records) { this.cb(records, this); }
+}
+
 const sandbox = {
   console,
   setTimeout, clearTimeout, setInterval, clearInterval,
@@ -164,6 +176,7 @@ const sandbox = {
   isFinite, parseInt, parseFloat, Promise,
   MessageEvent: MessageEventStub,
   WebSocket: WebSocketStub,
+  MutationObserver: MutationObserverStub,
   document: documentStub,
   location: { href: 'https://deepveinidle.com/', host: 'deepveinidle.com', hostname: 'deepveinidle.com', protocol: 'https:' },
   navigator: { userAgent: 'node-test-stub' },
@@ -1380,6 +1393,71 @@ section('㉛ 原生 tooltip 必须克制');
                      })()));
 
   rec.def.cache.clear();
+}
+
+/* ══════════ 不闪：注入必须与游戏重绘同帧 ══════════ */
+section('㉜ 不闪烁：观察器回调里同步注入');
+{
+  // 由来：游戏的作业列表是整体重建的（this.list.innerHTML = …），
+  // 每次重绘都会抹掉我们的标注。
+  // 曾经用 requestAnimationFrame 延后一帧补注 → 每帧缺一次 → 列表持续闪烁。
+  // MutationObserver 的回调跑在渲染之前的微任务里，在这里**同步**注入即可同帧。
+
+  ok('观察器桩已加载', typeof MutationObserverStub === 'function');
+
+  // 正式触发一次观察器安装（ui.ready 里会调，这里显式确保）
+  if (typeof DVI.ui.startObserver === 'function') DVI.ui.startObserver();
+  ok('已创建 MutationObserver', observerInstances.length > 0,
+     `实得 ${observerInstances.length} 个`);
+
+  const obs = observerInstances[0];
+  ok('观察的是 documentElement（不是 #app）',
+     obs && obs.targets.some(t => t.opts && t.opts.subtree === true),
+     JSON.stringify(obs ? obs.targets.map(t => t.opts) : null));
+
+  // 准备一个宿主，模拟「游戏重建了这一行」
+  // 必须真的挂进文档树 —— 否则 querySelectorAll 找不到它，
+  // remove() 之类的清理逻辑就没法验证（桩要像真的一样）。
+  const host = makeEl('button');
+  host.dataset.job = '1';
+  documentStub.body.appendChild(host);
+  selectorResults.set('[data-routes] [data-job]', [host]);
+  DVI.ui.inline.add({ id: 'flicker-anchor', selector: '[data-routes] [data-job]',
+                      where: 'beforeend', render: () => '<span class="dvi-inline-note">x</span>' });
+  DVI.ui.inline.applyAll();
+  const countNotes = () => Array.from(host.children)
+    .filter(c => c.getAttribute('data-dvi-inline') === 'flicker-anchor').length;
+  ok('注入生效', countNotes() === 1, `实得 ${countNotes()}`);
+
+  // 模拟游戏重绘：把行内容清空，然后投递一条「外部变动」记录
+  host.children.forEach(c => { if (c.getAttribute('data-dvi-inline')) c.remove(); });
+  ok('重绘后标注确实没了', countNotes() === 0);
+
+  const fakeRow = makeEl('span');            // 游戏新插入的节点（不是我们的）
+  obs.fire([{ target: documentStub.body, addedNodes: [fakeRow], removedNodes: [] }]);
+  ok('观察器回调后标注已同步补回（无需等待下一帧）', countNotes() === 1,
+     `实得 ${countNotes()}`);
+
+  // 自激防护：我们自己插入的节点不能反过来再触发一轮
+  const ours = makeEl('span');
+  ours.setAttribute('data-dvi-inline', 'flicker-anchor');
+  const before = countNotes();
+  obs.fire([{ target: host, addedNodes: [ours], removedNodes: [] }]);
+  ok('自身的变动不会造成重复注入（不进入自激循环）', countNotes() === before,
+     `实得 ${countNotes()}，期望 ${before}`);
+
+  // 反复「重建 → 补注」不应堆积节点（用户担心的「垃圾数据冗余堆砌」）
+  for (let i = 0; i < 60; i++) {
+    host.children.forEach(c => { if (c.getAttribute('data-dvi-inline')) c.remove(); });
+    obs.fire([{ target: documentStub.body, addedNodes: [makeEl('span')], removedNodes: [] }]);
+  }
+  ok('60 轮重建之后标注仍只有一份（不堆积）', countNotes() === 1,
+     `实得 ${countNotes()}`);
+
+  ok('清理锚点后不留残留', (() => {
+    DVI.ui.inline.remove('flicker-anchor');
+    return countNotes() === 0;
+  })());
 }
 
 /* ══════════ 导出（只做下载） ══════════ */

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.4
+// @version      2026.10.03.5
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.4';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.5';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -1202,8 +1202,20 @@
 
     let lastLoggedTotal = -1;   // 只在注入总数变化时记日志，避免每帧刷屏
 
+    let applying = false;        // 重入保护：我们自己插节点会再触发观察器
+
     function applyAll() {
+      if (applying) return;      // 已经在一轮里了，直接退出（观察器会过滤自身变动）
       if (!document.body) return;
+      applying = true;
+      try {
+        applyAllInner();
+      } finally {
+        applying = false;
+      }
+    }
+
+    function applyAllInner() {
       let total = 0;
       for (const a of anchors.values()) {
         a.count = 0;
@@ -1283,16 +1295,57 @@
       }
     }
 
+    /** 判断一条变动记录是不是「我们自己造成的」。
+     *  自激循环会让注入每帧重跑，必须排除干净。
+     *  **判不准时一律当作外部变动** —— 宁多重跑一次 applyAll（很便宜），
+     *  也不能把游戏的真实更新误判成自己的而漏掉。 */
+    function isOurMutation(rec) {
+      try {
+        // 变动发生在我们注入的节点内部 → 是我们的
+        const t = rec.target;
+        if (t && typeof t.closest === 'function' && t.closest(`[${MARK}]`)) return true;
+
+        let examined = 0;
+        for (const list of [rec.addedNodes, rec.removedNodes]) {
+          if (!list) continue;
+          for (const n of list) {
+            examined++;
+            const ours = (n && typeof n.hasAttribute === 'function' && n.hasAttribute(MARK)) ||
+                         (n && typeof n.closest === 'function' && n.closest(`[${MARK}]`));
+            if (!ours) return false;      // 发现一个不属于我们的 → 外部变动
+          }
+        }
+        // 一个节点都没能判定（如只有文本节点）→ 保守当作外部变动
+        return examined > 0;
+      } catch (e) { return false; }
+    }
+
     /** 观察游戏 DOM 变化，变化后自动重注入 */
     function startObserver() {
       if (observer || typeof MutationObserver !== 'function') return;
-      observer = new MutationObserver(() => schedule());
+
+      /* 关键：**同步**注入，不要延到下一帧。
+       *
+       * 游戏的作业列表是整体重建的（this.list.innerHTML = …），
+       * 所以每次重绘我们的标注都会被抹掉、需要立刻补回。
+       * MutationObserver 的回调跑在**渲染之前的微任务**里 ——
+       * 在这里同步注入，标注就能赶上同一帧的绘制，
+       * 玩家看到的是「一直在」而不是「一直在闪」。
+       *
+       * 曾经用 requestAnimationFrame 延后一帧补注，结果每帧都缺一次，
+       * 表现为技能列表持续闪烁。 */
+      observer = new MutationObserver((records) => {
+        for (const rec of records) {
+          if (!isOurMutation(rec)) { applyAll(); return; }
+        }
+      });
       // 观察 documentElement 而不是 #app —— 游戏换掉 #app 时观察器不能跟着死
       observer.observe(document.documentElement, { childList: true, subtree: true });
-      schedule();
-      // 保险丝：万一观察器漏了（或 #app 被整体重建），每 2.5 秒兜底重扫一次。
-      // 代价很低（只做 querySelectorAll + 已存在就跳过），换来的是「不会静默失效」。
-      setInterval(() => schedule(), 2500);
+      applyAll();
+
+      // 保险丝：万一观察器漏了（或 #app 被整体重建），兜底重扫一次。
+      // 观察器本身已经覆盖绝大多数情况，所以这里间隔可以放长。
+      setInterval(() => schedule(), 5000);
     }
 
     /** 诊断：报告每个锚点当前匹配到多少宿主 */
