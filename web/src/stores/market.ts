@@ -185,9 +185,22 @@ export async function readPriceFile(): Promise<{ ok: boolean; msg: string }> {
     if (perm !== 'granted') return { ok: false, msg: '没有读取权限，请在浏览器里重新授权' }
 
     const file = await fileHandle.getFile()
+    // 选错文件、或文件还是空的（游戏侧还没跑过一次）——这两种情况要分开说，
+    // 否则用户只看到「解析失败」，根本不知道下一步该做什么。
+    if (file.size === 0) {
+      return {
+        ok: false,
+        msg: `这个文件是空的（${file.name}）。请先在游戏里用 dvi-tools 打开一次市场页面，`
+            + '油猴菜单 →「💰 立即抓一次价格」或「🔗 连接价格文件」，让它先写出内容。',
+      }
+    }
     const text = await file.text()
     if (!applySnapshot(text, 'file')) {
-      return { ok: false, msg: priceState.error || '解析失败' }
+      return {
+        ok: false,
+        msg: (priceState.error || '解析失败')
+            + '　—— 请确认选的是 dvi-tools 导出的那个 dvi-prices.json，而不是别的 json。',
+      }
     }
     priceState.fileName = fileHandle.name
     priceState.fileConnected = true
