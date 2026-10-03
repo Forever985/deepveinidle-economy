@@ -72,6 +72,24 @@ export async function forgetHandle(): Promise<void> {
 
 type PermState = 'granted' | 'denied' | 'prompt'
 
+/**
+ * 判断取回的句柄**是不是还能用**。
+ *
+ * 为什么需要：句柄从 IndexedDB 反序列化回来后，**有时会丢失原型方法** ——
+ * 实测报 `Se.getFile is not a function`（`Se` 是浏览器内部的压缩类名）。
+ * 也就是说：对象还在、能 structured-clone，但 getFile / queryPermission
+ * 已经不在了。这时候直接调 getFile() 就会抛。
+ *
+ * 所以取回后必须先验一遍，失效就丢掉，让用户重连一次。
+ */
+export function isUsableHandle(h: unknown): h is FileSystemFileHandle {
+  if (!h || typeof h !== 'object') return false
+  const c = h as Record<string, unknown>
+  return typeof c.getFile === 'function'
+      && typeof c.queryPermission === 'function'
+      && typeof c.name === 'string'
+}
+
 function permApi(h: FileSystemFileHandle) {
   return h as FileSystemFileHandle & {
     queryPermission?: (d: { mode: string }) => Promise<PermState>

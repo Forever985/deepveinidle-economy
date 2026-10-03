@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import type { MarketSnapshot } from '../types'
 import {
-  saveHandle, loadHandle, forgetHandle, checkPermission, requestPermission,
+  saveHandle, loadHandle, forgetHandle, checkPermission, requestPermission, isUsableHandle,
 } from '../lib/handleStore.ts'
 
 /**
@@ -173,6 +173,14 @@ export async function connectPriceFile(): Promise<{ ok: boolean; msg: string }> 
 /** 从已连接的文件读取；会先检查/申请权限 */
 export async function readPriceFile(): Promise<{ ok: boolean; msg: string }> {
   if (!fileHandle) return { ok: false, msg: '尚未连接文件' }
+  if (!isUsableHandle(fileHandle)) {
+    // 句柄还在但已失效（丢原型方法 / 被浏览器回收）——丢掉，让用户重连
+    fileHandle = null
+    priceState.fileConnected = false
+    priceState.fileRemembered = false
+    await forgetHandle()
+    return { ok: false, msg: '上次记住的文件句柄已失效，请重新点一次「连接价格文件」' }
+  }
   try {
     const h = fileHandle as FileSystemFileHandle & {
       queryPermission?: (d: { mode: string }) => Promise<string>
@@ -224,6 +232,12 @@ export async function autoReconnect(): Promise<void> {
 
   const h = await loadHandle()
   if (!h) return                       // 首次使用，或用户主动断开过
+  if (!isUsableHandle(h)) {
+    // 反序列化后丢了原型方法，留着只会每次都抛 getFile is not a function
+    await forgetHandle()
+    priceState.fileRemembered = false
+    return
+  }
 
   const perm = await checkPermission(h)
   if (perm === 'granted') {
@@ -244,6 +258,11 @@ export async function autoReconnect(): Promise<void> {
 /** 用户点击「继续」后调用（申请权限必须有手势） */
 export async function grantAndRead(): Promise<{ ok: boolean; msg: string }> {
   if (!fileHandle) return { ok: false, msg: '没有可用的文件句柄' }
+  if (!isUsableHandle(fileHandle)) {
+    fileHandle = null
+    await forgetHandle()
+    return { ok: false, msg: '文件句柄已失效，请重新点「连接价格文件」' }
+  }
   const perm = await requestPermission(fileHandle)
   if (perm !== 'granted') {
     return { ok: false, msg: perm === 'denied' ? '授权被拒绝' : '未获得授权' }

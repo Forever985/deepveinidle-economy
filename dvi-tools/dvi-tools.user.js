@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.14
+// @version      2026.10.03.15
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.14 · 2026-10-03 17:51 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.15 · 2026-10-03 17:58 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.14';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.15';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -3244,8 +3244,23 @@
   async function saveHandle(h) {
     try { await idb('readwrite', (s) => s.put(h, HKEY)); } catch (e) { log('句柄未能持久化', e); }
   }
+  /**
+   * 判断句柄**是不是还能用**。
+   *
+   * 句柄从 IndexedDB 反序列化回来后，有时会**丢失原型方法** ——
+   * 表现为 createWritable / getFile 「is not a function」（类名是浏览器
+   * 内部压缩后的，看不懂是谁）。所以取回后必须先验，失效就丢弃。
+   */
+  function usable(h) {
+    if (!h || typeof h !== 'object') return false;
+    return typeof h.createWritable === 'function' && typeof h.name === 'string';
+  }
   async function loadHandle() {
-    try { return (await idb('readonly', (s) => s.get(HKEY))) || null; } catch { return null; }
+    try {
+      const h = (await idb('readonly', (st) => st.get(HKEY))) || null;
+      if (!usable(h)) { if (h) await forgetHandle(); return null; }
+      return h;
+    } catch { return null; }
   }
   async function forgetHandle() {
     try { await idb('readwrite', (s) => s.delete(HKEY)); } catch { /* 忽略 */ }
@@ -3304,6 +3319,12 @@
 
     if (!fileHandle) {
       notify(snap, '已存入脚本存储（未连接文件）');
+      return;
+    }
+    if (!usable(fileHandle)) {
+      // 句柄在页面存活期间也可能被浏览器回收 —— 别去调 createWritable
+      fileHandle = null;
+      notify(snap, '文件句柄已失效，需要重新连接（面板里点「选择价格文件」）');
       return;
     }
     fileHandle.createWritable()
@@ -3430,7 +3451,7 @@
    */
   async function restore() {
     const h = await loadHandle();
-    if (!h) return;
+    if (!h) return;                     // loadHandle 内部已验过
     fileHandle = h;
     const perm = await checkPerm(h);
     if (perm === 'granted') {

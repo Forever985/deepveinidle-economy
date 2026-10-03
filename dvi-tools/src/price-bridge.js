@@ -85,8 +85,23 @@
   async function saveHandle(h) {
     try { await idb('readwrite', (s) => s.put(h, HKEY)); } catch (e) { log('句柄未能持久化', e); }
   }
+  /**
+   * 判断句柄**是不是还能用**。
+   *
+   * 句柄从 IndexedDB 反序列化回来后，有时会**丢失原型方法** ——
+   * 表现为 createWritable / getFile 「is not a function」（类名是浏览器
+   * 内部压缩后的，看不懂是谁）。所以取回后必须先验，失效就丢弃。
+   */
+  function usable(h) {
+    if (!h || typeof h !== 'object') return false;
+    return typeof h.createWritable === 'function' && typeof h.name === 'string';
+  }
   async function loadHandle() {
-    try { return (await idb('readonly', (s) => s.get(HKEY))) || null; } catch { return null; }
+    try {
+      const h = (await idb('readonly', (st) => st.get(HKEY))) || null;
+      if (!usable(h)) { if (h) await forgetHandle(); return null; }
+      return h;
+    } catch { return null; }
   }
   async function forgetHandle() {
     try { await idb('readwrite', (s) => s.delete(HKEY)); } catch { /* 忽略 */ }
@@ -145,6 +160,12 @@
 
     if (!fileHandle) {
       notify(snap, '已存入脚本存储（未连接文件）');
+      return;
+    }
+    if (!usable(fileHandle)) {
+      // 句柄在页面存活期间也可能被浏览器回收 —— 别去调 createWritable
+      fileHandle = null;
+      notify(snap, '文件句柄已失效，需要重新连接（面板里点「选择价格文件」）');
       return;
     }
     fileHandle.createWritable()
@@ -271,7 +292,7 @@
    */
   async function restore() {
     const h = await loadHandle();
-    if (!h) return;
+    if (!h) return;                     // loadHandle 内部已验过
     fileHandle = h;
     const perm = await checkPerm(h);
     if (perm === 'granted') {
