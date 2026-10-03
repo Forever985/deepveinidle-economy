@@ -18,7 +18,7 @@ const dragOver = ref(false)
 
 onMounted(() => {
   if (!Object.keys(priceState.market).length) loadCache()
-  autoReconnect()
+  void autoReconnect()
   window.addEventListener('dragover', onDragOver)
   window.addEventListener('drop', onDrop)
 })

@@ -172,6 +172,15 @@ export async function connectPriceFile(): Promise<{ ok: boolean; msg: string }> 
 
 /** 从已连接的文件读取；会先检查/申请权限 */
 export async function readPriceFile(): Promise<{ ok: boolean; msg: string }> {
+  try {
+    return await _readPriceFile()
+  } catch (e) {
+    console.warn('[dvi] 读取价格文件失败', e)
+    return { ok: false, msg: '读取失败：' + ((e as Error)?.message ?? e) }
+  }
+}
+
+async function _readPriceFile(): Promise<{ ok: boolean; msg: string }> {
   if (!fileHandle) return { ok: false, msg: '尚未连接文件' }
   if (!isUsableHandle(fileHandle)) {
     // 句柄还在但已失效（丢原型方法 / 被浏览器回收）——丢掉，让用户重连
@@ -228,7 +237,20 @@ export async function readPriceFile(): Promise<{ ok: boolean; msg: string }> {
  *   ③ 句柄没了/文件被删     → 静默退回 localStorage 缓存，界面标明数据是缓存
  */
 export async function autoReconnect(): Promise<void> {
-  if (fileHandle) { void readPriceFile(); return }
+  // 整体兜底：自动恢复失败只意味着「这次没连上文件」，
+  // 绝不能抛出去 —— 它是无 await 调用，抛了就是未捕获拒绝，
+  // 会让整页报错（用户看到的 Se.getFile is not a function 就是这么来的）。
+  try {
+    await _autoReconnect()
+  } catch (e) {
+    console.warn('[dvi] 自动恢复价格文件失败（不影响使用）', e)
+    priceState.fileConnected = false
+    priceState.needsGesture = false
+  }
+}
+
+async function _autoReconnect(): Promise<void> {
+  if (fileHandle) { await readPriceFile(); return }
 
   const h = await loadHandle()
   if (!h) return                       // 首次使用，或用户主动断开过
