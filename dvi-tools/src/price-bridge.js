@@ -40,6 +40,22 @@
 
   function log(...a) { console.info('[DVI:价格桥]', ...a); }
 
+  /**
+   * 拿到「真正的」Window 上的文件选择器。
+   *
+   * ⚠ 为什么不能直接 window.showSaveFilePicker(...)：
+   *   油猴的沙箱把 window 包成了一层 Proxy。用它调用原生方法时，
+   *   浏览器做 brand check 会发现 this 不是真正的 Window，抛
+   *   **Illegal invocation**（实测踩过，报错还看不出跟沙箱有关）。
+   *
+   *   所以要拿 unsafeWindow（真实页面窗口）当接收者，用 .call() 显式绑定。
+   *   拿不到 unsafeWindow 时退回 window。
+   */
+  function filePicker() {
+    const target = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
+    return { target, fn: target.showSaveFilePicker };
+  }
+
   /* ── 句柄持久化 ──────────────────────────────────────────────
    * FileSystemFileHandle 是可结构化克隆的，能存进 IndexedDB 并在
    * 下次打开时取回。**不存的话，句柄只活在当前会话**，
@@ -177,11 +193,13 @@
 
     /** 让玩家选一个文件，之后就能自动写入 */
     async connect() {
-      if (!window.showSaveFilePicker) {
+      const { target, fn } = filePicker();
+      if (typeof fn !== 'function') {
         return { ok: false, why: 'unsupported' };
       }
       try {
-        fileHandle = await window.showSaveFilePicker({
+        // ★ 必须 .call(target) —— 见 filePicker() 的注释
+        fileHandle = await fn.call(target, {
           suggestedName: FILE_NAME,
           types: [{ description: 'DVI 价格快照', accept: { 'application/json': ['.json'] } }],
         });
@@ -222,11 +240,13 @@
       const snap = buildSnapshot();
       const text = JSON.stringify(snap, null, 1);
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+      // createObjectURL/Blob 在沙箱里也可能需要真实 window，显式取一次
+      const W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
+      a.href = W.URL.createObjectURL(new W.Blob([text], { type: 'application/json' }));
       a.download = FILE_NAME;
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      setTimeout(() => { W.URL.revokeObjectURL(a.href); a.remove(); }, 1000);
       return snap.count;
     },
 
@@ -235,7 +255,7 @@
       return {
         connected: !!fileHandle,
         fileName: FILE_NAME,
-        supported: !!window.showSaveFilePicker,
+        supported: typeof filePicker().fn === 'function',
         count: lastCount,
         snapshotAt: stored ? stored.at : null,
         snapshotCount: stored ? stored.count : 0,

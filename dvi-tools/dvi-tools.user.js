@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.10
+// @version      2026.10.03.11
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.10 · 2026-10-03 16:43 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.11 · 2026-10-03 17:34 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.10';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.11';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -3191,6 +3191,22 @@
 
   function log(...a) { console.info('[DVI:价格桥]', ...a); }
 
+  /**
+   * 拿到「真正的」Window 上的文件选择器。
+   *
+   * ⚠ 为什么不能直接 window.showSaveFilePicker(...)：
+   *   油猴的沙箱把 window 包成了一层 Proxy。用它调用原生方法时，
+   *   浏览器做 brand check 会发现 this 不是真正的 Window，抛
+   *   **Illegal invocation**（实测踩过，报错还看不出跟沙箱有关）。
+   *
+   *   所以要拿 unsafeWindow（真实页面窗口）当接收者，用 .call() 显式绑定。
+   *   拿不到 unsafeWindow 时退回 window。
+   */
+  function filePicker() {
+    const target = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
+    return { target, fn: target.showSaveFilePicker };
+  }
+
   /* ── 句柄持久化 ──────────────────────────────────────────────
    * FileSystemFileHandle 是可结构化克隆的，能存进 IndexedDB 并在
    * 下次打开时取回。**不存的话，句柄只活在当前会话**，
@@ -3328,11 +3344,13 @@
 
     /** 让玩家选一个文件，之后就能自动写入 */
     async connect() {
-      if (!window.showSaveFilePicker) {
+      const { target, fn } = filePicker();
+      if (typeof fn !== 'function') {
         return { ok: false, why: 'unsupported' };
       }
       try {
-        fileHandle = await window.showSaveFilePicker({
+        // ★ 必须 .call(target) —— 见 filePicker() 的注释
+        fileHandle = await fn.call(target, {
           suggestedName: FILE_NAME,
           types: [{ description: 'DVI 价格快照', accept: { 'application/json': ['.json'] } }],
         });
@@ -3373,11 +3391,13 @@
       const snap = buildSnapshot();
       const text = JSON.stringify(snap, null, 1);
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+      // createObjectURL/Blob 在沙箱里也可能需要真实 window，显式取一次
+      const W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
+      a.href = W.URL.createObjectURL(new W.Blob([text], { type: 'application/json' }));
       a.download = FILE_NAME;
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      setTimeout(() => { W.URL.revokeObjectURL(a.href); a.remove(); }, 1000);
       return snap.count;
     },
 
@@ -3386,7 +3406,7 @@
       return {
         connected: !!fileHandle,
         fileName: FILE_NAME,
-        supported: !!window.showSaveFilePicker,
+        supported: typeof filePicker().fn === 'function',
         count: lastCount,
         snapshotAt: stored ? stored.at : null,
         snapshotCount: stored ? stored.count : 0,
@@ -4172,12 +4192,12 @@
       if (r.ok) {
         ui.toast(`已连接 ${r.name} —— 之后每次抓价都会自动写入，网站读同一个文件即可`);
       } else if (r.why === 'unsupported') {
-        ui.toast('这个浏览器不支持自动写入，已改为下载方式');
+        ui.toast('这个浏览器不支持自动写入，已改为下载方式（把文件拖到利润网站即可）');
         DVI.price.download();
       } else if (r.why === 'cancelled') {
         ui.toast('已取消');
       } else {
-        ui.toast('连接失败：' + r.why);
+        ui.toast('连接失败：' + r.why + '（可改用「💾 下载价格文件」，再把文件拖到利润网站）');
       }
     });
   });

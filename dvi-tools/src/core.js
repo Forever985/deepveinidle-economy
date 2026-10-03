@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.10
+// @version      2026.10.03.11
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.10';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.11';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2048,12 +2048,12 @@
       if (r.ok) {
         ui.toast(`已连接 ${r.name} —— 之后每次抓价都会自动写入，网站读同一个文件即可`);
       } else if (r.why === 'unsupported') {
-        ui.toast('这个浏览器不支持自动写入，已改为下载方式');
+        ui.toast('这个浏览器不支持自动写入，已改为下载方式（把文件拖到利润网站即可）');
         DVI.price.download();
       } else if (r.why === 'cancelled') {
         ui.toast('已取消');
       } else {
-        ui.toast('连接失败：' + r.why);
+        ui.toast('连接失败：' + r.why + '（可改用「💾 下载价格文件」，再把文件拖到利润网站）');
       }
     });
   });
