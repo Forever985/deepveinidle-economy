@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.7
+// @version      2026.10.03.8
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.7 · 2026-10-03 10:06 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.8 · 2026-10-03 12:11 · 游戏数据 0.0.1164 / 1db7eb7 · 物品 290 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.7';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.8';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2596,16 +2596,16 @@
 
       lastInjectedTotal = total;   // 供每秒的存在性检查比对
 
-      // 只在「注入总数」变化、且距上次记录超过 1 秒时才写日志。
-      // console 输出本身就有成本，若游戏每帧重建列表、总数在 8/0 之间反复跳，
-      // 不加时间节流会把控制台刷爆、也白白吃掉帧率。
+      // 只在「注入总数」变化、且距上次记录超过 30 秒时才写日志。
+      // 这个窗口刻意放得很宽：console 输出本身有成本，
+      // 若游戏每帧重建列表、总数在 8/0 之间反复跳，1 秒一条会把控制台刷爆，
+      // 开着 DevTools 时越跑越卡（日志条目会一直堆在控制台里）。
       if (total !== lastLoggedTotal) {
         const first = total > 0 && lastLoggedTotal <= 0;
         const now = Date.now();
-        const bigChange = Math.abs(total - lastLoggedTotal) > 0;
         lastLoggedTotal = total;
 
-        if (first || bigChange && now - lastLoggedAt > 1000) {
+        if (first || now - lastLoggedAt > 30000) {
           lastLoggedAt = now;
           const detail = [...anchors.values()]
             .map(a => `${a.id}:宿主${a.hostsFound}/注入${a.count}${a.lastError ? ' ⚠' + a.lastError : ''}`)
@@ -2653,19 +2653,44 @@
      */
     let watchTimer = null;
     let lastInjectedTotal = -1;
+    let reinjectCount = 0;      // 启动以来补注过多少次（诊断用，不刷日志）
 
     function startInlineWatch() {
       if (watchTimer) return;
       applyAll();                        // 先注入一次
 
-      watchTimer = setInterval(() => {
+      const tick = () => {
         if (!anchors.size) return;       // 没有锚点就什么都不做
         let live = 0;
         try { live = document.querySelectorAll(`[${MARK}]`).length; } catch (e) { return; }
         // 数量对得上就立刻返回 —— 这是绝大多数情况，成本极低
         if (live === lastInjectedTotal) return;
+        reinjectCount++;
         applyAll();                      // 被游戏重绘抹掉了，补一次
-      }, 1000);
+      };
+
+      const start = () => {
+        if (watchTimer) return;
+        watchTimer = setInterval(tick, 1000);
+      };
+      const stop = () => {
+        if (!watchTimer) return;
+        clearInterval(watchTimer);
+        watchTimer = null;
+      };
+
+      start();
+
+      /* 页面不可见时**完全停掉**。
+       * 用户反馈过：「放在后台一段时间回来好像还在持续运行」——
+       * 一个静态的小东西不该在后台消耗任何东西。
+       * 切回来时立刻补一次，所以体感上没有任何延迟。 */
+      try {
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) stop();
+          else { tick(); start(); }
+        });
+      } catch (e) { /* 不支持就退化成一直跑 */ }
     }
 
     /** 诊断：报告每个锚点当前匹配到多少宿主 */
@@ -2703,6 +2728,8 @@
 
     const inline = { add: addAnchor, remove: removeAnchor, refresh: schedule,
                      report: inlineReport, applyAll,
+                     /** 运行统计：补注过多少次 —— 用来判断是否在跟游戏「较劲」 */
+                     stats: () => ({ reinjects: reinjectCount, watching: !!watchTimer }),
                      get size() { return anchors.size; } };
 
     /* ═══════════════════════════════════════════════════════════
@@ -3871,6 +3898,10 @@
       `页面元素探测：\n${probes.join('\n')}\n` +
       `────────────────\n` +
       `已注册插件：${pluginLine}` +
+      `\n运行统计：补注 ${inline.stats().reinjects} 次 · 每秒巡检 ${inline.stats().watching ? '进行中' : '已停（页面不可见）'}` +
+      (inline.stats().reinjects > 200
+        ? `\n⚠ 补注次数偏高，说明游戏在频繁重建列表，我们一直在补 —— 这不影响正确性，但可以反馈。`
+        : '') +
       (broken.length
         ? `\n\n⚠ 插件初始化失败（功能不会出现）：\n` +
           broken.map(p => `  ${p.id}：${p.setupError}`).join('\n')

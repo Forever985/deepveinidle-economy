@@ -145,8 +145,18 @@ const selectorResults = new Map();
 const documentStub = {
   body: makeEl('body'),
   head: makeEl('head'),
-  addEventListener() {},
-  removeEventListener() {},
+  hidden: false,                       // 真实 DOM 属性，暂停逻辑靠它判断
+  _handlers: {},
+  addEventListener(type, fn) {
+    (this._handlers[type] || (this._handlers[type] = [])).push(fn);
+  },
+  removeEventListener(type, fn) {
+    this._handlers[type] = (this._handlers[type] || []).filter(f => f !== fn);
+  },
+  /** 测试用：派发一个事件（只有这样才验得了「切后台要停」） */
+  dispatch(type) {
+    for (const fn of (this._handlers[type] || [])) fn({ type, target: this });
+  },
   createElement: makeEl,
   querySelector(sel) { return (selectorResults.get(sel) || [])[0] || null; },
   querySelectorAll(sel) {
@@ -1461,6 +1471,27 @@ section('㉜ 注入保持轻量：不按 DOM 变动重跑');
     DVI.ui.inline.remove('lite-anchor');
     return countNotes() === 0;
   })());
+
+  // ── 页面不可见时必须完全停掉 ──
+  // 用户反馈：「放在后台一段时间回来好像还在持续运行」——
+  // 一个静态的小东西不该在后台消耗任何东西。
+  DVI.ui.startInlineWatch();
+  ok('提供运行统计', typeof DVI.ui.inline.stats === 'function');
+  ok('可见时巡检进行中', DVI.ui.inline.stats().watching === true,
+     JSON.stringify(DVI.ui.inline.stats()));
+
+  documentStub.hidden = true;
+  documentStub.dispatch('visibilitychange');
+  ok('切到后台后巡检停止', DVI.ui.inline.stats().watching === false,
+     JSON.stringify(DVI.ui.inline.stats()));
+
+  documentStub.hidden = false;
+  documentStub.dispatch('visibilitychange');
+  ok('切回前台后巡检恢复', DVI.ui.inline.stats().watching === true,
+     JSON.stringify(DVI.ui.inline.stats()));
+
+  ok('统计里带补注次数', typeof DVI.ui.inline.stats().reinjects === 'number',
+     `实得 ${DVI.ui.inline.stats().reinjects}`);
 }
 
 /* ══════════ 目标等级 ══════════ */
