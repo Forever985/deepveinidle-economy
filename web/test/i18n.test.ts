@@ -29,7 +29,10 @@ const zh = (data as unknown as { i18nZh?: Record<string, string> }).i18nZh ?? {}
 
 section('① 官方中文表已随数据打包')
 {
-  ok('i18nZh 存在且非空', Object.keys(zh).length > 500, `${Object.keys(zh).length} 条`)
+  // prepare-data.py 会把中文表裁剪到「网站真正显示的名字」，
+  // 所以这里不能用「全量 2518」当门槛，否则裁剪会被误判成数据丢失。
+  const n = Object.keys(zh).length
+  ok('i18nZh 存在且非空', n >= 300, `${n} 条（裁剪后；全量 2518）`)
   ok('meta 标注了来源是官方中文',
      String((data.meta as Record<string, unknown>)?.i18n ?? '').includes('官方'),
      String((data.meta as Record<string, unknown>)?.i18n))

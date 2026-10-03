@@ -98,7 +98,8 @@ export interface GameData {
   extra: Record<string, unknown>
   items: Item[]
   actions: Action[]
-  sites: Site[]
+  /** 站点数量（坐标数据网站用不上，不随包分发，需要时从 dvi_probe 现取） */
+  siteCount: number
   monsters: Monster[]
 }
 

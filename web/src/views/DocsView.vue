@@ -22,7 +22,7 @@ const m = props.data.meta
         全程只读，<b>不调用任何服务端接口，不发送任何游戏指令</b>。
       </p>
       <p class="dim">
-        物品 {{ data.items.length }} · 配方 {{ data.actions.length }} · 站点 {{ data.sites.length }} · 怪物 {{ data.monsters.length }}
+        物品 {{ data.items.length }} · 配方 {{ data.actions.length }} · 站点 {{ data.siteCount }} · 怪物 {{ data.monsters.length }}
       </p>
     </div>
 

@@ -27,3 +27,11 @@ node_modules/
 __pycache__/
 *.pyc
 .venv/
+
+# ── 派生数据（不入库）──
+# 这两个文件都是「由 dvi_probe/gamedata/ 下的小文件拼出来」的产物，
+# 每次部署都会重新生成。提交它们只会让仓库凭空多出 300+ KB，
+# 而游戏数据没变时内容是完全一样的 —— 纯浪费。
+# 改为：构建时现生成（deploy-once.ps1 会自动跑 prepare-data.py）。
+web/public/data/dvi-gamedata.json
+dvi_probe/gamedata/dvi-gamedata.json
