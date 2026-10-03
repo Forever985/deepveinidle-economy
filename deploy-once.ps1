@@ -80,40 +80,70 @@ try {
     Ok "环境就绪"
 
     # ---------------------------------------------------------- [1/6] 通道
-    Step "[1/6] 启动加速通道并自检"
-    if (Test-PortOpen $ProxyPort) {
-        Info "端口 $ProxyPort 已在监听，复用已有反代"
+    Step "[1/6] 准备网络通道"
+
+    # 两条路，优先用系统代理 —— 那通常更稳、也更省事：
+    #   A. 系统代理（Windows「设置 → 网络和 Internet → 代理」里配的那个）
+    #   B. Watt Toolkit 的 hosts 劫持：需要自己起 CONNECT 反代把流量转给它
+    $sysProxy = $null
+    try {
+        $ip = Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -ErrorAction Stop
+        if ($ip.ProxyEnable -eq 1 -and $ip.ProxyServer) {
+            $raw = [string]$ip.ProxyServer
+            # 可能是 "host:port" 或 "http=host:port;https=host:port"
+            if ($raw -match '^\d+\.\d+\.\d+\.\d+:\d+$') { $sysProxy = $raw }
+            elseif ($raw -match 'https?=([^;]+)')          { $sysProxy = $Matches[1] }
+        }
+    } catch { }
+
+    if ($sysProxy) {
+        Ok "检测到系统代理：$sysProxy —— 直接使用"
+        $env:http_proxy  = "http://$sysProxy"
+        $env:https_proxy = "http://$sysProxy"
+        Info "若推送失败，可改用 Watt Toolkit 通道（-ProxyPort 参数）"
     } else {
-        Info "启动本地反代 ..."
-        if (Test-Path $PLog) { Remove-Item $PLog -Force -ErrorAction SilentlyContinue }
-        $proxyProc = Start-Process -FilePath 'node' -ArgumentList @($proxyScript, "$ProxyPort") `
-            -WindowStyle Hidden -PassThru `
-            -RedirectStandardOutput $PLog -RedirectStandardError "$PLog.err"
-        $proxyOwned = $true
-        $waited = 0
-        while ($waited -lt 15 -and -not (Test-PortOpen $ProxyPort)) {
-            Start-Sleep -Seconds 1
-            $waited++
-        }
-        if (-not (Test-PortOpen $ProxyPort)) {
-            if (Test-Path $PLog) { Get-Content $PLog -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "      $_" } }
-            throw "反代启动超时（15 秒）"
-        }
-        Ok "反代已监听 127.0.0.1:$ProxyPort（等待 ${waited}s）"
+        Info "未检测到系统代理，改走 Watt Toolkit 加速通道 ..."
     }
 
-    if (Test-Path $PLog) {
-        $logText = (Get-Content $PLog -Raw -ErrorAction SilentlyContinue)
-        if ($logText -match 'SELFTEST_OK') { Ok "加速通道自检通过" }
-        elseif ($logText -match 'SELFTEST_FAIL') {
-            Warn "通道自检未通过 —— 请确认 Watt Toolkit 已开启且「GitHub 加速」已勾选"
+    $useProxy = $env:https_proxy
+
+    if (-not $useProxy) {
+        if (Test-PortOpen $ProxyPort) {
+            Info "端口 $ProxyPort 已在监听，复用已有反代"
+        } else {
+            Info "启动本地反代 ..."
+            if (Test-Path $PLog) { Remove-Item $PLog -Force -ErrorAction SilentlyContinue }
+            $proxyProc = Start-Process -FilePath 'node' -ArgumentList @($proxyScript, "$ProxyPort") `
+                -WindowStyle Hidden -PassThru `
+                -RedirectStandardOutput $PLog -RedirectStandardError "$PLog.err"
+            $proxyOwned = $true
+            $waited = 0
+            while ($waited -lt 15 -and -not (Test-PortOpen $ProxyPort)) {
+                Start-Sleep -Seconds 1
+                $waited++
+            }
+            if (-not (Test-PortOpen $ProxyPort)) {
+                if (Test-Path $PLog) { Get-Content $PLog -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "      $_" } }
+                throw "反代启动超时（15 秒）"
+            }
+            Ok "反代已监听 127.0.0.1:$ProxyPort（等待 ${waited}s）"
         }
+
+        if (Test-Path $PLog) {
+            $logText = (Get-Content $PLog -Raw -ErrorAction SilentlyContinue)
+            if ($logText -match 'SELFTEST_OK') { Ok "加速通道自检通过" }
+            elseif ($logText -match 'SELFTEST_FAIL') {
+                Warn "通道自检未通过 —— 请确认 Watt Toolkit 已开启且「GitHub 加速」已勾选"
+            }
+        }
+        $env:http_proxy  = "http://127.0.0.1:$ProxyPort"
+        $env:https_proxy = "http://127.0.0.1:$ProxyPort"
     }
 
     # 临时 git 配置：走本地反代 + 放行 Watt 自签证书 + 凭据 wincred + 大仓库 postBuffer
     $tmpCfg = Join-Path $env:TEMP ("dvi-deploy-" + [guid]::NewGuid().ToString('N') + ".cfg")
-    & git config --file $tmpCfg http.proxy  "http://127.0.0.1:$ProxyPort"
-    & git config --file $tmpCfg https.proxy "http://127.0.0.1:$ProxyPort"
+    & git config --file $tmpCfg http.proxy  $env:http_proxy
+    & git config --file $tmpCfg https.proxy $env:https_proxy
     & git config --file $tmpCfg http.sslVerify  false
     & git config --file $tmpCfg https.sslVerify false
     & git config --file $tmpCfg credential.helper wincred
@@ -200,11 +230,20 @@ try {
     $attempt = 0
     while ($true) {
         $attempt++
-        Info "node scripts\publish-gh-pages.mjs（第 $attempt 次）..."
+        # 优先用 bash 版发布器：它不依赖 Node 派发外部进程，
+        # 在受限环境里更稳。找不到 bash 才退回 .mjs。
+        $bash = Get-Command bash -ErrorAction SilentlyContinue
         $prevEap = $ErrorActionPreference
         $ErrorActionPreference = 'Continue'
-        & node (Join-Path $PSScriptRoot 'scripts\publish-gh-pages.mjs') --dir (Join-Path $WebDir 'dist') --repo $Remote
-        $pagesExit = $LASTEXITCODE
+        if ($bash) {
+            Info "bash scripts\publish-gh-pages.sh（第 $attempt 次）..."
+            & bash (Join-Path $PSScriptRoot 'scripts\publish-gh-pages.sh') $Remote (Join-Path $WebDir 'dist')
+            $pagesExit = $LASTEXITCODE
+        } else {
+            Info "node scripts\publish-gh-pages.mjs（第 $attempt 次）..."
+            & node (Join-Path $PSScriptRoot 'scripts\publish-gh-pages.mjs') --dir (Join-Path $WebDir 'dist') --repo $Remote
+            $pagesExit = $LASTEXITCODE
+        }
         $ErrorActionPreference = $prevEap
 
         if ($pagesExit -eq 0) { Ok "gh-pages 推送完成"; break }

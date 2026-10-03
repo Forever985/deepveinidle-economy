@@ -1,0 +1,11 @@
+﻿ProxyEnable = 1
+ProxyServer = 127.0.0.1:10808
+AutoConfigURL = 
+port 7890 : False
+port 7897 : False
+port 10809 : False
+port 1080 : False
+port 10808 : True
+port 20171 : False
+npm http-proxy  = 
+npm https-proxy = 

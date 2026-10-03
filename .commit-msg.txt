@@ -1,27 +1,32 @@
-利润网：修完类型检查，构建通过
+部署脚本：优先用系统代理 + 新增 bash 版发布器
 
-首次真实执行 npm install + vue-tsc + vite build，暴露并修掉 22 处类型问题。
+实机部署过程中发现并修掉的问题：
 
-关键修复
-- **App.vue 的相对导入写错了**：它在 src/ 下，我写成 '../api/...'，
-  实际解析到 web/api（不存在）。这会让构建直接失败。
-- 我把 `type` 当成具名导入了 —— 它是 TS 内建关键字，不是模块导出。
-  GameData 类型改从 './types' 用 import type 取。
-- tsconfig 开 allowImportingTsExtensions：
-  calc/ 里的导入带 .ts 后缀是为了让 Node 的类型剥离模式能跑，
-  这是刻意为之，所以开这个开关而不是改导入写法。
-- 装 @types/node 并加进 types（测试要用 node:fs / process）。
-- 清掉一批未使用的私有字段（构造函数参数属性改成显式字段后残留的）。
+1. **系统代理才是主力通道**
+   之前只认 Watt Toolkit 的 hosts 劫持路线，但实测那东西没开时整条链路不通。
+   而 Windows 的系统代理（本机 127.0.0.1:10808）一直是通的，git 只是没用上。
+   现在优先读注册表里的 ProxyEnable/ProxyServer，没有才退回反代路线。
+   —— 这也是为什么我一开始推不上去：脚本里没这条路。
 
-环境相关的两个坑
-- **npm 默认 registry 是 npmjs.org，国内极慢** → web/.npmrc 配 npmmirror，
-  与 milkonomy 一致；这个文件也会被 GitHub Actions 读取。
-- **esbuild 的 postinstall 被 npm 11+ 拦截**（install-scripts 未批准），
-  但实测不影响构建，esbuild 的 wasm 兜底可用。
+2. **Node 派生子进程在这个环境会 EBUSY**
+   publish-gh-pages.mjs 原本用 shell:true（要经过 cmd.exe），
+   在受限环境里直接 EBUSY 失败。改为直接 spawn git.exe，并加了安装路径兜底。
+   同时消掉了 shell 带来的参数转义告警（DEP0190）。
 
-构建结果
-dist/ 共 4 个文件，约 100 KB（JS gzip 后 37 KB）。
-**资源路径是相对的（./assets/...）** —— GitHub Pages 挂在子路径下，
-用绝对路径会全 404，这是 base:'./' 的目的。
+3. **新建分支时不能跑 git rm**
+   orphan 分支建出来时仓库还没有任何提交，
+   `git rm --cached .` 必然报 "pathspec did not match any files" 并返回非零，
+   脚本把它当致命错误退出了（而且是静默退出，连错都没打）。
+   现在只在克隆已有分支时才清理，失败时打印是哪条命令。
 
-测试 68/68 通过。
+4. **bash 版发布器**（新增 scripts/publish-gh-pages.sh）
+   不依赖 Node 派发外部进程，更稳。deploy-once.ps1 优先用它，找不到 bash 才退回 .mjs。
+   顺带修了自己引入的 bug：cd 到临时目录后相对路径失效，
+   现在进目录前就把产物路径解析成绝对路径。
+
+本次已实际完成首次上线推送：
+- main     bbcea92
+- gh-pages 8b0ad8a（4 个文件，资源路径为相对，适配 Pages 子路径）
+
+遗留：.github/workflows/ci.yml 因当前 PAT 缺 workflow 权限被 GitHub 拒绝，
+已从索引移出（本地文件保留），待补权限后放回。
