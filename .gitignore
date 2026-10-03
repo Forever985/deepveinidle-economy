@@ -43,3 +43,6 @@ dvi_probe/gamedata/dvi-gamedata.json
 # 留文件在本地（万一以后换了带 workflow 权限的 token 就能用），
 # 但不入库 —— 免得每次部署都被它卡住。
 .github/workflows/
+
+# 部署日志（每次运行生成，不需要入库）
+logs/

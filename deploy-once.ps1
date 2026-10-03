@@ -37,7 +37,9 @@ function Invoke-Git {
     param([string[]]$GitArgs, [string]$Cwd = $PSScriptRoot)
     $out = & git @GitArgs 2>&1
     $code = $LASTEXITCODE
-    return @{ Code = $code; Out = ($out | Out-String).Trim() }
+    $txt = ($out | Out-String).Trim()
+    if ($code -ne 0) { $script:LastGitOut = "git $($GitArgs -join ' ')`n$txt" }
+    return @{ Code = $code; Out = $txt }
 }
 
 function Publish-GhPages {
@@ -92,11 +94,30 @@ function Publish-GhPages {
     }
 }
 
+# ── 运行日志 ──────────────────────────────────────────────────
+# 每��都落一份：deploy-latest.log（固定名，永远指向最近一次）
+#              deploy-<时间戳>.log（留档，可对照历史）
+# 用户只需说「看日志」，不需要再复制控制台输出。
+$LogDir = Join-Path $PSScriptRoot 'logs'
+$LogLatest = Join-Path $LogDir 'deploy-latest.log'
+try {
+    New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
+    # 清掉上一次的，避免新旧混在一起
+    if (Test-Path $LogLatest) { Remove-Item $LogLatest -Force -ErrorAction SilentlyContinue }
+    Start-Transcript -Path $LogLatest -Force | Out-Null
+} catch {
+    $LogLatest = $null       # 日志是辅助功能，起不来不该挡住部署
+}
+
 $proxyProc  = $null
 $proxyOwned = $false
 $tmpCfg     = $null
 
+$script:Stage = ''
+$script:LastGitOut = ''
+
 function Step([string]$t) {
+    $script:Stage = $t
     Write-Host ""
     Write-Host "==========================================================" -ForegroundColor DarkCyan
     Write-Host " $t" -ForegroundColor Cyan
@@ -123,6 +144,7 @@ try {
     Write-Host "  DVI 利润网 · 一键部署" -ForegroundColor White
     Write-Host "  仓库 : $Remote"
     Write-Host "  站点 : $Site"
+    if ($LogLatest) { Write-Host "  日志 : $LogLatest" -ForegroundColor DarkGray }
 
     # ---------------------------------------------------------- [0/6] 环境
     Step "[0/6] 环境检查"
@@ -351,10 +373,36 @@ catch {
     Write-Host ""
     Write-Host "  本脚本不会产生半成品状态：测试/构建失败则完全没推送；" -ForegroundColor DarkGray
     Write-Host "  main 成功但 gh-pages 失败时，直接重跑即可补推。" -ForegroundColor DarkGray
+    # 日志里写清「失败在第几步、当时 git 看到的原文」，省去翻整份日志
+    Write-Host ""
+    Write-Host "──────── 失败摘要 ────────" -ForegroundColor DarkGray
+    Write-Host "  时间    : $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor DarkGray
+    Write-Host "  阶段    : $script:Stage" -ForegroundColor DarkGray
+    Write-Host "  信息    : $($_.Exception.Message)" -ForegroundColor DarkGray
+    if ($script:LastGitOut) {
+        Write-Host "  git 输出 :" -ForegroundColor DarkGray
+        ($script:LastGitOut -split "`n" | Select-Object -Last 8) |
+            ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
+    }
+    if ($LogLatest) { Write-Host "  完整日志: $LogLatest" -ForegroundColor DarkGray }
     Write-Host "==========================================================" -ForegroundColor Red
     $exitCode = 1
 }
 finally {
+    if ($LogLatest) {
+        Write-Host ""
+        Write-Host "  [i]  日志已保存：$LogLatest" -ForegroundColor DarkGray
+        try {
+            Stop-Transcript | Out-Null
+            $archive = Join-Path $LogDir ("deploy-{0}.log" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
+            Copy-Item $LogLatest $archive -Force -ErrorAction SilentlyContinue
+            # 只留最近 30 份，避免日志目录无限膨胀
+            $old = Get-ChildItem $LogDir -Filter 'deploy-????????-??????.log' -ErrorAction SilentlyContinue |
+                   Sort-Object LastWriteTime -Descending | Select-Object -Skip 30
+            if ($old) { $old | Remove-Item -Force -ErrorAction SilentlyContinue }
+        } catch { }
+    }
+
     # 只关掉本脚本自己启动的反代，复用的不动
     if ($proxyOwned -and $proxyProc -and -not $proxyProc.HasExited) {
         Stop-Process -Id $proxyProc.Id -Force -ErrorAction SilentlyContinue
