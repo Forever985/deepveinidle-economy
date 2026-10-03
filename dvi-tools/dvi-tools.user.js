@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.16
+// @version      2026.10.03.17
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.16 · 2026-10-03 18:21 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.17 · 2026-10-03 18:47 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.16';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.17';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -3467,6 +3467,51 @@
     for (const fn of listeners) { try { fn(snap, msg); } catch (e) { /* 忽略 */ } }
   }
 
+  const SITE = 'https://forever985.github.io/deepveinidle-economy/';
+
+  /* ── 送到利润网站 ────────────────────────────────────────────
+   *
+   * 为什么不走文件 / 服务 / GitHub：
+   *   文件句柄在部分浏览器里存不住（实测取回来就丢原型方法）；
+   *   后台服务用户不想装；GitHub 中转用户明确排斥。
+   *
+   * 那就**让数据自己走 URL 过去**：
+   *   dvi-tools 把快照压缩后放进网址的 # 片段，在新标签打开网站；
+   *   网站从 # 里取出、存进 localStorage，然后把 # 抹掉。
+   *
+   * 关键点：**# 之后的内容浏览器不会发给服务器**，
+   * 所以几百 KB 也没关系，不会经过任何第三方。
+   *
+   * 之后网站就一直用 localStorage 里的这份，不用再送第二次。
+   */
+  async function compress(text) {
+    const bytes = new TextEncoder().encode(text);
+    if (typeof CompressionStream === 'function') {
+      try {
+        const cs = new CompressionStream('deflate-raw');
+        const stream = new Blob([bytes]).stream().pipeThrough(cs);
+        const buf = new Uint8Array(await new Response(stream).arrayBuffer());
+        return 'z' + b64(buf);                       // z 前缀 = 已压缩
+      } catch (e) { /* 落到下面 */ }
+    }
+    return 'r' + b64(bytes);                          // r 前缀 = 原始
+  }
+  function b64(u8) {
+    let s = '';
+    const CH = 0x8000;
+    for (let i = 0; i < u8.length; i += CH) {
+      s += String.fromCharCode.apply(null, u8.subarray(i, i + CH));
+    }
+    return btoa(s);
+  }
+
+  /** 生成带数据的网址 */
+  async function buildSiteUrl(snap) {
+    const json = JSON.stringify(snap);
+    const packed = await compress(json);
+    return `${SITE}#p=${packed}`;
+  }
+
   const PRICE = {
     /** 上次落盘时间（0 = 从未） */
     get lastWrittenAt() { return lastWrittenAt; },
@@ -3537,6 +3582,23 @@
     async disconnect() {
       fileHandle = null;
       await forgetHandle();
+    },
+
+    /** 网址（供网站侧解码用，测试与排查时也方便） */
+    buildSiteUrl,
+
+    /** 一键把价格送到利润网站：新标签打开，网站自己收下存进 localStorage */
+    async sendToSite() {
+      const snap = buildSnapshot();
+      if (!snap.count) return { ok: false, why: '还没有任何市场数据 —— 先打开一次游戏里的市场页面' };
+      try {
+        const url = await buildSiteUrl(snap);
+        const w = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
+        w.open(url, '_blank');
+        return { ok: true, count: snap.count, bytes: url.length };
+      } catch (e) {
+        return { ok: false, why: e && e.message };
+      }
     },
 
     /** 降级路径：下载一份 */
@@ -4472,6 +4534,17 @@
     setTimeout(() => {
       ui.toast(api.price.gh.up ? '已推送，网站现在能读到了' : '推送失败，详情见控制台 [DVI:价格桥]');
     }, 2500);
+  });
+
+  /* 一键把价格送到利润网站：数据走网址 # 片段，网站收下存 localStorage。
+   * 不经过文件、不经过后台服务、不经过 GitHub。 */
+  GM_registerMenuCommand('📤 送到利润网站（一键同步）', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    ui.toast('正在打包…');
+    api.price.sendToSite().then((r) => {
+      if (r.ok) ui.toast(`已在新标签打开利润网站，带去 ${r.count} 个物品（${Math.round(r.bytes / 1024)} KB）`);
+      else ui.toast('发送失败：' + r.why);
+    });
   });
 
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {

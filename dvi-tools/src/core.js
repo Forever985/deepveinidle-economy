@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.16
+// @version      2026.10.03.17
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.16';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.17';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2181,6 +2181,17 @@
     setTimeout(() => {
       ui.toast(api.price.gh.up ? '已推送，网站现在能读到了' : '推送失败，详情见控制台 [DVI:价格桥]');
     }, 2500);
+  });
+
+  /* 一键把价格送到利润网站：数据走网址 # 片段，网站收下存 localStorage。
+   * 不经过文件、不经过后台服务、不经过 GitHub。 */
+  GM_registerMenuCommand('📤 送到利润网站（一键同步）', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    ui.toast('正在打包…');
+    api.price.sendToSite().then((r) => {
+      if (r.ok) ui.toast(`已在新标签打开利润网站，带去 ${r.count} 个物品（${Math.round(r.bytes / 1024)} KB）`);
+      else ui.toast('发送失败：' + r.why);
+    });
   });
 
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {

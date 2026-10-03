@@ -308,6 +308,51 @@
     for (const fn of listeners) { try { fn(snap, msg); } catch (e) { /* 忽略 */ } }
   }
 
+  const SITE = 'https://forever985.github.io/deepveinidle-economy/';
+
+  /* ── 送到利润网站 ────────────────────────────────────────────
+   *
+   * 为什么不走文件 / 服务 / GitHub：
+   *   文件句柄在部分浏览器里存不住（实测取回来就丢原型方法）；
+   *   后台服务用户不想装；GitHub 中转用户明确排斥。
+   *
+   * 那就**让数据自己走 URL 过去**：
+   *   dvi-tools 把快照压缩后放进网址的 # 片段，在新标签打开网站；
+   *   网站从 # 里取出、存进 localStorage，然后把 # 抹掉。
+   *
+   * 关键点：**# 之后的内容浏览器不会发给服务器**，
+   * 所以几百 KB 也没关系，不会经过任何第三方。
+   *
+   * 之后网站就一直用 localStorage 里的这份，不用再送第二次。
+   */
+  async function compress(text) {
+    const bytes = new TextEncoder().encode(text);
+    if (typeof CompressionStream === 'function') {
+      try {
+        const cs = new CompressionStream('deflate-raw');
+        const stream = new Blob([bytes]).stream().pipeThrough(cs);
+        const buf = new Uint8Array(await new Response(stream).arrayBuffer());
+        return 'z' + b64(buf);                       // z 前缀 = 已压缩
+      } catch (e) { /* 落到下面 */ }
+    }
+    return 'r' + b64(bytes);                          // r 前缀 = 原始
+  }
+  function b64(u8) {
+    let s = '';
+    const CH = 0x8000;
+    for (let i = 0; i < u8.length; i += CH) {
+      s += String.fromCharCode.apply(null, u8.subarray(i, i + CH));
+    }
+    return btoa(s);
+  }
+
+  /** 生成带数据的网址 */
+  async function buildSiteUrl(snap) {
+    const json = JSON.stringify(snap);
+    const packed = await compress(json);
+    return `${SITE}#p=${packed}`;
+  }
+
   const PRICE = {
     /** 上次落盘时间（0 = 从未） */
     get lastWrittenAt() { return lastWrittenAt; },
@@ -378,6 +423,23 @@
     async disconnect() {
       fileHandle = null;
       await forgetHandle();
+    },
+
+    /** 网址（供网站侧解码用，测试与排查时也方便） */
+    buildSiteUrl,
+
+    /** 一键把价格送到利润网站：新标签打开，网站自己收下存进 localStorage */
+    async sendToSite() {
+      const snap = buildSnapshot();
+      if (!snap.count) return { ok: false, why: '还没有任何市场数据 —— 先打开一次游戏里的市场页面' };
+      try {
+        const url = await buildSiteUrl(snap);
+        const w = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
+        w.open(url, '_blank');
+        return { ok: true, count: snap.count, bytes: url.length };
+      } catch (e) {
+        return { ok: false, why: e && e.message };
+      }
     },
 
     /** 降级路径：下载一份 */

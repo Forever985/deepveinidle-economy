@@ -46,6 +46,3 @@ dvi_probe/gamedata/dvi-gamedata.json
 
 # 部署日志（每次运行生成，不需要入库）
 logs/
-
-# 云端价格快照 —— 由 dvi-tools 推送，不要手工编辑
-data/prices.json

@@ -60,98 +60,55 @@ const fsa = () => window as unknown as FSAWindow
 
 export const supportsFileApi = typeof window !== 'undefined' && typeof fsa().showOpenFilePicker === 'function'
 
-/**
- * 本机价格服务地址（scripts/price-server.js）。
+/* ═══════════════ 网址接收（dvi-tools 一键送来）═══════════════
  *
- * ## 这是首选通路
- *   dvi-tools 每次拿到行情就 POST 到 127.0.0.1:8791，网站直接 GET。
- *   **全程 localhost**：不经过文件、不经过拖拽、不经过 GitHub部署，
- *   也就绕开了那一整类「沙箱 + 文件句柄」的坑
- *   （Illegal invocation / getFile is not a function /
- *    Must be handling a user gesture / instanceof 恒 false）。
+ * dvi-tools 把价格压缩后放进网址的 # 片段，在新标签打开本站。
+ * 本站取出 → 存进 localStorage → 抹掉 #。
  *
- * ## 为什么 https 页面能读 http://127.0.0.1
- *   Chrome / Edge 把 127.0.0.1 与 localhost 视为「可能可信来源」，
- *   所以不算混合内容，不会被拦。
+ * 为什么这样最省事：
+ *   · 不经过文件（句柄在部分浏览器存不住）
+ *   · 不经过后台服务
+ *   · 不经过 GitHub —— # 之后的内容浏览器**不会发给服务器**
+ *   · 一次送达，之后一直用 localStorage 里的这份
  */
-export const LOCAL_SERVER = 'http://127.0.0.1:8791'
 
-/**
- * 云端价格地址 —— **首选通路**。
- *
- * dvi-tools 充当 DVI 的「价格 API」（银河奶牛本来就有公开 API，
- * milkonomy 才那么简单；DVI 没有，我们让用户脚本补上这一层）：
- * 它把行情写进仓库里的 data/prices.json，网站从这里读。
- *
- * ## 为什么这不是「部署」
- *   网站**不需要重新构建、不需要推送**。游戏推数据、网站拉数据，各走各的。
- *   raw.githubusercontent.com 带 CORS 头，HTTPS 页面直接 fetch 即可。
- *
- * ## 隐私
- *   只上传**价格**，不含任何玩家身份信息。
- */
-export const CLOUD_PRICES =
-  'https://raw.githubusercontent.com/Forever985/deepveinidle-economy/main/data/prices.json'
+/** base64 → 字节 */
+function unb64(s: string): Uint8Array {
+  const bin = atob(s)
+  const u8 = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i)
+  return u8
+}
 
-/** 云端是否可用 */
-export const cloudUp = reactive<{ up: boolean; checked: boolean; at: string | null; count: number }>({
-  up: false, checked: false, at: null, count: 0,
-})
-
-/** 从云端拉价格。返回 false 表示拿不到（调用方退回缓存/兜底价）。 */
-export async function pullFromCloud(timeoutMs = 6000): Promise<boolean> {
-  const ac = new AbortController()
-  const timer = setTimeout(() => ac.abort(), timeoutMs)
+/** 解出网址里带来的快照；没有就返回 null */
+export async function takeFromUrl(): Promise<number> {
+  const h = location.hash
+  const m = /[#&]p=([zr])([A-Za-z0-9+/=_-]+)/.exec(h)
+  if (!m) return 0
   try {
-    // 加时间戳绕开 CDN / 浏览器缓存，保证每次打开都拿到最新的
-    const url = CLOUD_PRICES + '?t=' + Date.now()
-    const r = await fetch(url, { signal: ac.signal, cache: 'no-store' })
-    if (!r.ok) throw new Error('HTTP ' + r.status)
-    const txt = await r.text()
-    if (!applySnapshot(txt, 'drop')) return false
-    cloudUp.up = true
-    cloudUp.checked = true
-    cloudUp.count = Object.keys(priceState.market).length
-    cloudUp.at = priceState.at
-    return true
-  } catch {
-    cloudUp.up = false
-    cloudUp.checked = true
-    return false
-  } finally {
-    clearTimeout(timer)
+    const bytes = unb64(m[2].replace(/-/g, '+').replace(/_/g, '/'))
+    let text: string
+    if (m[1] === 'z') {
+      // CompressionStream 没有解压版本，用 DecompressionStream
+      const ds = new DecompressionStream('deflate-raw')
+      const stream = new Blob([bytes as BlobPart]).stream().pipeThrough(ds)
+      text = await new Response(stream).text()
+    } else {
+      text = new TextDecoder().decode(bytes)
+    }
+    const snap = JSON.parse(text) as unknown
+    if (!applySnapshot(snap, 'paste')) return 0
+    // 抹掉 #，免得刷新时重复导入、也免得网址一直带着几百 KB
+    history.replaceState(null, '', location.pathname + location.search)
+    return Object.keys(priceState.market).length
+  } catch (e) {
+    priceState.error = '网址里的数据解不开：' + ((e as Error)?.message ?? e)
+    // 数据坏了也要清掉网址，否则用户会被同一个坏数据卡住
+    try { history.replaceState(null, '', location.pathname + location.search) } catch { /* 忽略 */ }
+    return 0
   }
 }
 
-/** 本机服务是否可用（页面加载时探一次） */
-export const localServerUp = reactive<{ up: boolean; checked: boolean; count: number }>({
-  up: false, checked: false, count: 0,
-})
-
-/**
- * 从本机服务拉价格。**不需要任何用户授权**，也不碰文件系统。
- * 服务没开就返回 false，调用方退回缓存 / 兜底价。
- */
-export async function pullFromLocalServer(timeoutMs = 2500): Promise<boolean> {
-  const ac = new AbortController()
-  const timer = setTimeout(() => ac.abort(), timeoutMs)
-  try {
-    const r = await fetch(LOCAL_SERVER + '/prices.json', { signal: ac.signal, cache: 'no-store' })
-    if (!r.ok) throw new Error('HTTP ' + r.status)
-    const txt = await r.text()
-    if (!applySnapshot(txt, 'file')) return false
-    localServerUp.up = true
-    localServerUp.checked = true
-    localServerUp.count = Object.keys(priceState.market).length
-    return true
-  } catch {
-    localServerUp.up = false
-    localServerUp.checked = true
-    return false
-  } finally {
-    clearTimeout(timer)
-  }
-}
 
 /* ─────────────── 解析与入库 ─────────────── */
 
