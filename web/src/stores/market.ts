@@ -37,6 +37,8 @@ export const priceState = reactive<{
   /** 已连接的文件（File System Access API） */
   fileName: string | null
   fileConnected: boolean
+  /** 数据指纹 —— 与 dvi-tools 送出的那份对账用 */
+  fingerprint: string
   /** 是否已记住文件句柄（关掉浏览器再打开仍然有效） */
   fileRemembered: boolean
   /** 需要你点一下才能继续读（浏览器要求授权必须有用户手势） */
@@ -44,7 +46,7 @@ export const priceState = reactive<{
   lastRead: string | null
   error: string
 }>({
-  market: {}, at: null, origin: 'none',
+  market: {}, at: null, origin: 'none', fingerprint: '',
   fileName: null, fileConnected: false, fileRemembered: false,
   needsGesture: false, lastRead: null, error: '',
 })
@@ -71,6 +73,32 @@ export const supportsFileApi = typeof window !== 'undefined' && typeof fsa().sho
  *   · 不经过 GitHub —— # 之后的内容浏览器**不会发给服务器**
  *   · 一次送达，之后一直用 localStorage 里的这份
  */
+
+/**
+ * 数据指纹 —— 与 dvi-tools **完全相同**的算法。
+ *
+ * 作用：让用户能自己核对「游戏里送出的数据」和「网站里正在用的数据」
+ * 是不是同一份。价格是外部输入，不给可核对的凭证就等于让人盲信。
+ *
+ *   游戏：油猴菜单「🔏 查看送出凭证」→ 指纹 ABC123
+ *   网站：顶栏「价格」徽标 → 指纹 ABC123
+ *   两串一样 ⇒ 一字节不差地送达并正在使用。
+ *
+ * 哈希对象是**排序后的规范化条目**，与 JSON 键序、空白无关，
+ * 所以两端必然算出同一个值。
+ */
+export function fingerprintOf(market: Record<string, unknown>): string {
+  const rows: string[] = []
+  for (const id of Object.keys(market).sort((a, b) => Number(a) - Number(b))) {
+    const m = (market[id] || {}) as { a?: { p?: number; q?: number }; b?: { p?: number; q?: number } }
+    const a = m.a || {}, b = m.b || {}
+    rows.push(`${id}:${a.p ?? ''}:${a.q ?? ''}:${b.p ?? ''}:${b.q ?? ''}`)
+  }
+  const str = rows.join('|')
+  let h = 5381
+  for (let i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0
+  return h.toString(36).toUpperCase().padStart(6, '0').slice(-6)
+}
 
 /** base64 → 字节 */
 function unb64(s: string): Uint8Array {
@@ -151,6 +179,7 @@ export function applySnapshot(raw: unknown, origin: 'file' | 'drop' | 'paste'): 
   priceState.at = snap.at || null
   priceState.origin = origin
   priceState.error = ''
+  priceState.fingerprint = fingerprintOf(out)
   saveToCache()
   return true
 }
@@ -177,6 +206,7 @@ export function loadCache() {
     priceState.market = o.market
     priceState.at = o.at || null
     priceState.origin = 'cache'
+    priceState.fingerprint = fingerprintOf(o.market)
     return true
   } catch { return false }
 }

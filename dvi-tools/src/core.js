@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.17
+// @version      2026.10.03.18
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.17';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.18';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2189,9 +2189,34 @@
     if (!api.price) { ui.toast('价格桥未就绪'); return; }
     ui.toast('正在打包…');
     api.price.sendToSite().then((r) => {
-      if (r.ok) ui.toast(`已在新标签打开利润网站，带去 ${r.count} 个物品（${Math.round(r.bytes / 1024)} KB）`);
+      if (r.ok) ui.toast(`已送出 ${r.count} 个物品 · 指纹 ${r.fp}\n到网站「⑥ 价格」页顶部核对`);
       else ui.toast('发送失败：' + r.why);
     });
+  });
+
+  /* 核对凭证：让用户能证明「数据真的送到网站并被用上了」。
+   * 游戏侧算出指纹 → 网站侧算出同一个指纹 → 两串对上就是证据。 */
+  GM_registerMenuCommand('🔏 查看送出凭证（核对用）', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    const r = api.price.sentReceipt();
+    const st = api.price.status();
+    const lines = [
+      '── 我方送出凭证 ──',
+      r ? `送出时间   : ${new Date(r.at).toLocaleString('zh-CN')}` : '送出时间   : 还没送过',
+      r ? `送出物品数 : ${r.count}` : '',
+      r ? `数据指纹   : ${r.fp}` : '',
+      '',
+      '── 网站侧应显示 ──',
+      r ? '「⑥ 价格」页顶部的「数据来源」栏里，'
+         + '「指纹」那一行应当是同一个值' : '',
+      '',
+      '两串一致 ⇒ 数据一字节不差地送达并正在使用。',
+      '',
+      '── 本机状态 ──',
+      `上次快照   : ${st.snapshotAt ? new Date(st.snapshotAt).toLocaleString('zh-CN') : '从未'}（${st.snapshotCount} 个）`,
+      `文件连接   : ${st.connected ? st.fileName + (st.fileRemembered ? '（已记住）' : '（仅本次）') : '未连接'}`,
+    ].filter(Boolean);
+    alert(lines.join('\n'));
   });
 
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {

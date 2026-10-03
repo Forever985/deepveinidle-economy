@@ -10,6 +10,10 @@ import { settings, calcOptions, resetSettings } from './stores/settings.ts'
 import { loadPrices, priceState } from './stores/prices.ts'
 import { priceState as marketState, loadCache as loadMarketCache, takeFromUrl } from './stores/market.ts'
 
+const marketCount = computed(() => Object.keys(marketState.market).length)
+const marketAt = computed(() =>
+  marketState.at ? new Date(marketState.at).toLocaleString('zh-CN') : '—')
+
 function loadMarket(): Record<string, any> {
   loadMarketCache()
   // 顺序：网址带来（dvi-tools 一键送）→ localStorage 缓存 → 兜底价
@@ -123,7 +127,17 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
       <button class="langbtn" @click="toggleLang()" :title="'切换语言 / Switch language'">
         {{ langState.lang === 'zh' ? '中文' : 'EN' }}
       </button>
-      <span class="ver" v-if="book">{{ book.marketCount() }} 个市场价</span>
+      <!-- 价格数据徽标：常驻。绿色=正在用真实行情，灰色=全用兜底价 -->
+      <button
+        class="pricebadge"
+        :class="marketState.fingerprint ? 'live' : 'off'"
+        :title="marketState.fingerprint
+          ? `正在使用真实市场行情\n物品 ${marketCount} 个\n数据指纹 ${marketState.fingerprint}\n快照时间 ${marketAt}`
+          : '没有行情数据，所有价格都是游戏内置的兜底价（物品基础价值）'"
+        @click="go('market')">
+        <template v-if="marketState.fingerprint">行情 {{ marketCount }} · {{ marketState.fingerprint }}</template>
+        <template v-else>兜底价（未用行情）</template>
+      </button>
       <span class="ver ok" v-if="!isPristine(player)">玩家配置已生效</span>
     </header>
 
@@ -277,6 +291,9 @@ function onReset() { resetSettings(); priceState.manual = {}; rebuild() }
 .nav .ic{font-size:11px;opacity:.55;margin-right:1px}
 .ver.ok{color:var(--up)}
 .langbtn{font-size:12px;padding:2px 9px}
+.pricebadge{font-size:11.5px;padding:2px 9px;border-radius:10px;font-weight:600;letter-spacing:.2px}
+.pricebadge.live{background:#e6f6ec;color:#1a7f3c;border:1px solid #a8dcbc}
+.pricebadge.off{background:#f0f1f3;color:#8a95a0;border:1px solid #dcdfe3}
 .vhead{margin-bottom:10px}
 .vhead h2{margin:0 0 3px;font-size:17px}
 .vhead p{margin:0;font-size:12.5px;color:var(--fg2)}

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.17
+// @version      2026.10.03.18
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -33,12 +33,12 @@
  * ═══════════════════════════════════════════════════════════════════════
  */
 
-// [build] v2026.10.03.17 · 2026-10-03 18:47 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
+// [build] v2026.10.03.18 · 2026-10-03 19:03 · 游戏数据 0.0.1164-latest / reextract 2026-10-03 · 物品 301 · 配方 221 · 怪物 20 · 站点 383
 (function () {
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.17';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.18';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -3271,6 +3271,7 @@
   let lastWrittenAt = 0;
   let lastCount = 0;
   let listeners = [];
+  let lastSent = null;   /** 上次送出的凭证 { at, count, fp } */
 
   function log(...a) { console.info('[DVI:价格桥]', ...a); }
 
@@ -3496,6 +3497,32 @@
     }
     return 'r' + b64(bytes);                          // r 前缀 = 原始
   }
+  /**
+   * 数据指纹 —— 「送到网站」的可核对凭证。
+   *
+   * 为什么要它：价格是**外部输入**，用户凭什么相信网站算出来的数字是真的用了行情？
+   * 光显示「已连接」不算证据。这里让两端对**同一份规范化数据**算同一个哈希：
+   *   · dvi-tools 送出后显示「我送出的指纹」
+   *   · 网站收下后显示「我收到的指纹」
+   * 两串一样 ⇒ 数据一字节不差地送达了。对不上 ⇒ 传输有问题，立刻可见。
+   *
+   * 算法用 djb2 —— 短、快、跨语言容易复现。
+   * 哈希对象是**排序后的规范化条目**（id:askP:askQ:bidP:bidQ），
+   * 这样与 JSON 的键序、空白无关，两端算出来必然一致。
+   */
+  function fingerprint(market) {
+    const rows = [];
+    for (const id of Object.keys(market).sort((a, b) => Number(a) - Number(b))) {
+      const m = market[id] || {};
+      const a = m.a || {}, b = m.b || {};
+      rows.push(`${id}:${a.p ?? ''}:${a.q ?? ''}:${b.p ?? ''}:${b.q ?? ''}`);
+    }
+    const s = rows.join('|');
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+    return h.toString(36).toUpperCase().padStart(6, '0').slice(-6);
+  }
+
   function b64(u8) {
     let s = '';
     const CH = 0x8000;
@@ -3584,6 +3611,17 @@
       await forgetHandle();
     },
 
+    /** 上次送出的凭证（给「核对」用） */
+    sentReceipt() {
+      if (!lastSent) {
+        try {
+          const raw = GM_getValue('dvi-last-sent', '');
+          if (raw) lastSent = JSON.parse(raw);
+        } catch (e) { /* 忽略 */ }
+      }
+      return lastSent;
+    },
+
     /** 网址（供网站侧解码用，测试与排查时也方便） */
     buildSiteUrl,
 
@@ -3595,7 +3633,9 @@
         const url = await buildSiteUrl(snap);
         const w = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
         w.open(url, '_blank');
-        return { ok: true, count: snap.count, bytes: url.length };
+        lastSent = { at: snap.at, count: snap.count, fp: fingerprint(snap.market) };
+        try { GM_setValue('dvi-last-sent', JSON.stringify(lastSent)); } catch (e) { /* 忽略 */ }
+        return { ok: true, count: snap.count, bytes: url.length, fp: lastSent.fp };
       } catch (e) {
         return { ok: false, why: e && e.message };
       }
@@ -4542,9 +4582,34 @@
     if (!api.price) { ui.toast('价格桥未就绪'); return; }
     ui.toast('正在打包…');
     api.price.sendToSite().then((r) => {
-      if (r.ok) ui.toast(`已在新标签打开利润网站，带去 ${r.count} 个物品（${Math.round(r.bytes / 1024)} KB）`);
+      if (r.ok) ui.toast(`已送出 ${r.count} 个物品 · 指纹 ${r.fp}\n到网站「⑥ 价格」页顶部核对`);
       else ui.toast('发送失败：' + r.why);
     });
+  });
+
+  /* 核对凭证：让用户能证明「数据真的送到网站并被用上了」。
+   * 游戏侧算出指纹 → 网站侧算出同一个指纹 → 两串对上就是证据。 */
+  GM_registerMenuCommand('🔏 查看送出凭证（核对用）', () => {
+    if (!api.price) { ui.toast('价格桥未就绪'); return; }
+    const r = api.price.sentReceipt();
+    const st = api.price.status();
+    const lines = [
+      '── 我方送出凭证 ──',
+      r ? `送出时间   : ${new Date(r.at).toLocaleString('zh-CN')}` : '送出时间   : 还没送过',
+      r ? `送出物品数 : ${r.count}` : '',
+      r ? `数据指纹   : ${r.fp}` : '',
+      '',
+      '── 网站侧应显示 ──',
+      r ? '「⑥ 价格」页顶部的「数据来源」栏里，'
+         + '「指纹」那一行应当是同一个值' : '',
+      '',
+      '两串一致 ⇒ 数据一字节不差地送达并正在使用。',
+      '',
+      '── 本机状态 ──',
+      `上次快照   : ${st.snapshotAt ? new Date(st.snapshotAt).toLocaleString('zh-CN') : '从未'}（${st.snapshotCount} 个）`,
+      `文件连接   : ${st.connected ? st.fileName + (st.fileRemembered ? '（已记住）' : '（仅本次）') : '未连接'}`,
+    ].filter(Boolean);
+    alert(lines.join('\n'));
   });
 
   GM_registerMenuCommand('💾 下载价格文件（降级方式）', () => {

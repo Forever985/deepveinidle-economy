@@ -112,6 +112,7 @@
   let lastWrittenAt = 0;
   let lastCount = 0;
   let listeners = [];
+  let lastSent = null;   /** 上次送出的凭证 { at, count, fp } */
 
   function log(...a) { console.info('[DVI:价格桥]', ...a); }
 
@@ -337,6 +338,32 @@
     }
     return 'r' + b64(bytes);                          // r 前缀 = 原始
   }
+  /**
+   * 数据指纹 —— 「送到网站」的可核对凭证。
+   *
+   * 为什么要它：价格是**外部输入**，用户凭什么相信网站算出来的数字是真的用了行情？
+   * 光显示「已连接」不算证据。这里让两端对**同一份规范化数据**算同一个哈希：
+   *   · dvi-tools 送出后显示「我送出的指纹」
+   *   · 网站收下后显示「我收到的指纹」
+   * 两串一样 ⇒ 数据一字节不差地送达了。对不上 ⇒ 传输有问题，立刻可见。
+   *
+   * 算法用 djb2 —— 短、快、跨语言容易复现。
+   * 哈希对象是**排序后的规范化条目**（id:askP:askQ:bidP:bidQ），
+   * 这样与 JSON 的键序、空白无关，两端算出来必然一致。
+   */
+  function fingerprint(market) {
+    const rows = [];
+    for (const id of Object.keys(market).sort((a, b) => Number(a) - Number(b))) {
+      const m = market[id] || {};
+      const a = m.a || {}, b = m.b || {};
+      rows.push(`${id}:${a.p ?? ''}:${a.q ?? ''}:${b.p ?? ''}:${b.q ?? ''}`);
+    }
+    const s = rows.join('|');
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+    return h.toString(36).toUpperCase().padStart(6, '0').slice(-6);
+  }
+
   function b64(u8) {
     let s = '';
     const CH = 0x8000;
@@ -425,6 +452,17 @@
       await forgetHandle();
     },
 
+    /** 上次送出的凭证（给「核对」用） */
+    sentReceipt() {
+      if (!lastSent) {
+        try {
+          const raw = GM_getValue('dvi-last-sent', '');
+          if (raw) lastSent = JSON.parse(raw);
+        } catch (e) { /* 忽略 */ }
+      }
+      return lastSent;
+    },
+
     /** 网址（供网站侧解码用，测试与排查时也方便） */
     buildSiteUrl,
 
@@ -436,7 +474,9 @@
         const url = await buildSiteUrl(snap);
         const w = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
         w.open(url, '_blank');
-        return { ok: true, count: snap.count, bytes: url.length };
+        lastSent = { at: snap.at, count: snap.count, fp: fingerprint(snap.market) };
+        try { GM_setValue('dvi-last-sent', JSON.stringify(lastSent)); } catch (e) { /* 忽略 */ }
+        return { ok: true, count: snap.count, bytes: url.length, fp: lastSent.fp };
       } catch (e) {
         return { ok: false, why: e && e.message };
       }

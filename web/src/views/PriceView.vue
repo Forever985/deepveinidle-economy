@@ -142,6 +142,32 @@ const spreads = computed(() => {
       </p>
     </div>
 
+    <!-- 数据来源：可核对的一手信息 -->
+    <div class="card src-card">
+      <h3>数据来源</h3>
+      <div class="src-grid">
+        <div class="src-row">
+          <span>正在使用</span>
+          <b :class="stats.n ? 'ok' : 'bad'">{{ stats.n ? '真实市场行情' : '兜底价（游戏内置价值）' }}</b>
+        </div>
+        <div class="src-row"><span>物品数</span><b>{{ stats.n }}</b></div>
+        <div class="src-row"><span>数据指纹</span>
+          <b class="mono">{{ priceState.fingerprint || '—' }}</b>
+          <span class="tip" title="和游戏里「🔏 查看送出凭证」显示的指纹对比。两串一致 = 你在游戏里送出的数据，一字节不差地在这里被使用着。">?</span>
+        </div>
+        <div class="src-row"><span>快照时间</span><b>{{ when }}</b></div>
+        <div class="src-row"><span>送达方式</span><b>{{ originLabel }}</b></div>
+      </div>
+      <p v-if="stats.n" class="tip2">
+        核对方法：游戏里打开油猴菜单 →「🔏 查看送出凭证」，
+        把那里的<b>指纹</b>和上面这一行对比。<b>一致</b>就证明本站正在用的就是你送出的那份数据。
+      </p>
+      <p v-else class="tip2">
+        当前所有价格都是游戏内置的基础价值，<b>不是市场真实价格</b>，利润排序仅供参考。
+        想用真实行情：游戏里点「📤 送到利润网站」。
+      </p>
+    </div>
+
     <!-- 状态 -->
     <div class="stats">
       <div><div class="k">物品数</div><div class="v">{{ stats.n }}</div></div>
@@ -302,6 +328,15 @@ code{font-family:var(--mono);background:#eceff3;padding:1px 4px;border-radius:3p
 .msg{margin-top:8px;font-size:12.5px;color:var(--up)}
 .msg.err{color:var(--warn)}
 .tw{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:7px}
+.src-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 16px}
+.src-row{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.src-row>span:first-child{color:var(--fg3);min-width:56px}
+.src-row b{font-weight:600}
+.src-row b.ok{color:var(--up)} .src-row b.bad{color:var(--warn)}
+.mono{font-family:var(--mono);letter-spacing:1px}
+.tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;
+     border-radius:50%;background:var(--line2);color:var(--fg3);font-size:10px;cursor:help}
+.tip2{font-size:12px;color:var(--fg2);margin:9px 0 0;line-height:1.6}
 .diag{margin-top:10px;border:1px solid var(--line);border-radius:7px;padding:9px 11px;background:#fbfcfd}
 .diag-t{font-size:12.5px;font-weight:600;margin-bottom:5px}
 .diag .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:1px 0}
