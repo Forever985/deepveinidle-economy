@@ -1,0 +1,82 @@
+[
+ {
+  "id": "xp",
+  "name": "XP gain",
+  "blurb": "More XP from every skill.",
+  "lane": "efficiency",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "gather",
+  "name": "Gather speed",
+  "blurb": "Mine, fish, chop, farm and steal faster.",
+  "lane": "efficiency",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "craft",
+  "name": "Craft speed",
+  "blurb": "Smith, cook, fletch, brew and craft faster.",
+  "lane": "efficiency",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "offline",
+  "name": "Offline hours",
+  "blurb": "Bank more progress while you are away.",
+  "lane": "efficiency",
+  "perRank": 0.005,
+  "unit": "hours"
+ },
+ {
+  "id": "move",
+  "name": "Move speed",
+  "blurb": "Walk between rocks, trees and foes faster.",
+  "lane": "efficiency",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "hp",
+  "name": "Max HP",
+  "blurb": "More maximum health.",
+  "lane": "efficiency",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "maxhit",
+  "name": "Max hit",
+  "blurb": "Hit harder with every style.",
+  "lane": "power",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "accuracy",
+  "name": "Accuracy",
+  "blurb": "Land more of your swings.",
+  "lane": "power",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "rare",
+  "name": "Rare-find",
+  "blurb": "Better odds of a rarer drop.",
+  "lane": "power",
+  "perRank": 0.005,
+  "unit": "percent"
+ },
+ {
+  "id": "enhance",
+  "name": "Enhance odds",
+  "blurb": "Better odds when enhancing gear.",
+  "lane": "power",
+  "perRank": 0.0025,
+  "unit": "percent"
+ }
+]

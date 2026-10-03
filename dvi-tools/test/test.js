@@ -266,10 +266,17 @@ ok('API 版本存在', DVI.API_VERSION === 1);
 /* ══════════ 数据层 ══════════ */
 section('② 数据层');
 const D = DVI.data;
-ok(`物品表已加载（${D.DATA.items.length}）`, D.DATA.items.length === 290);
-ok(`配方表已加载（${D.DATA.actions.length}）`, D.DATA.actions.length === 221);
-ok(`站点表已加载（${D.DATA.sites.length}）`, D.DATA.sites.length === 383);
-ok(`怪物表已加载（${D.DATA.monsters.length}）`, D.DATA.monsters.length === 20);
+/* 刻意**不断言具体数量** —— 之前写死 290，游戏一更新（物品已涨到 301）就直接失败，
+ * 而这种失败跟代码对错无关，纯属噪声。改为断言「规模合理 + 结构完整」，
+ * 真出问题时（比如提取脚本漏表）仍然会红。 */
+ok(`物品表已加载（${D.DATA.items.length}）`, D.DATA.items.length >= 250, `实得 ${D.DATA.items.length}`);
+ok(`配方表已加载（${D.DATA.actions.length}）`, D.DATA.actions.length >= 180, `实得 ${D.DATA.actions.length}`);
+ok(`站点表已加载（${D.DATA.sites.length}）`, D.DATA.sites.length >= 300, `实得 ${D.DATA.sites.length}`);
+ok(`怪物表已加载（${D.DATA.monsters.length}）`, D.DATA.monsters.length >= 15, `实得 ${D.DATA.monsters.length}`);
+ok('物品 id 无重复', new Set(D.DATA.items.map(i => i.id)).size === D.DATA.items.length);
+ok('配方 id 无重复', new Set(D.DATA.actions.map(a => a.id)).size === D.DATA.actions.length);
+ok('每个配方都有产出', D.DATA.actions.every(a => a.output && a.output.itemId));
+ok('每个配方都有原料数组', D.DATA.actions.every(a => Array.isArray(a.inputs)));
 ok('按 skill 建了索引', D.BY_SKILL.size >= 10);
 ok('物品名解析', D.itemName(1) === 'Copper', `实得 ${D.itemName(1)}`);
 ok('配方名解析', D.actionName(42).includes('Iron'), `实得 ${D.actionName(42)}`);

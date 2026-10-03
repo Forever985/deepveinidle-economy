@@ -1646,6 +1646,72 @@
   "value": 25
  },
  {
+  "id": 400,
+  "name": "Pebble golem",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 401,
+  "name": "Baby kraken",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 402,
+  "name": "Acorn squirrel",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 403,
+  "name": "Queen bee",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 404,
+  "name": "Raccoon",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 405,
+  "name": "Chef rat",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 406,
+  "name": "Ember salamander",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 407,
+  "name": "Fletch falcon",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 408,
+  "name": "Toadstool",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 409,
+  "name": "Yarn kitten",
+  "stackable": false,
+  "value": 0
+ },
+ {
+  "id": 410,
+  "name": "Star fairy",
+  "stackable": false,
+  "value": 0
+ },
+ {
   "id": 280,
   "name": "Gnawer pup",
   "stackable": false,

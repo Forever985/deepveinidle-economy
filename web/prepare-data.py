@@ -14,7 +14,31 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-SRC = ROOT.parent / "dvi_probe" / "gamedata"
+
+def _pick_data_dir() -> Path:
+    """挑一份最新的 gamedata。
+
+    历史上 dvi_probe 有两份副本（git 仓库内一份、工作区一份），
+    容易改了一份忘了另一份 —— 网页于是读到了旧数据。
+    所以这里**按修改时间自动选最新的那份**，而不是写死路径。
+    """
+    cands = [
+        ROOT.parent / "dvi_probe" / "gamedata",
+        Path("C:/Users/18405/WorkBuddy/2026-10-01-09-35-15/dvi_probe/gamedata"),
+    ]
+    ok = [d for d in cands if (d / "items.json").exists()]
+    if not ok:
+        die("找不到 gamedata（候选：\n  " + "\n  ".join(str(c) for c in cands))
+    newest = max(ok, key=lambda d: (d / "items.json").stat().st_mtime)
+    if len(ok) > 1:
+        others = [d for d in ok if d != newest]
+        print(f"⚠ 发现 {len(ok)} 份 gamedata，用最新的那份：")
+        print(f"    {newest}")
+        for o in others:
+            print(f"    （跳过较早的：{o}）")
+    return newest
+
+SRC = _pick_data_dir()
 OUT = ROOT / "public" / "data" / "dvi-gamedata.json"
 
 # 只需要这几个字段，其余一律不带（体积减半，也避免塞进用不上的东西）
@@ -23,13 +47,13 @@ ACTION_FIELDS = ("id", "name", "skill", "group", "levelReq", "baseTicks", "xp")
 SITE_FIELDS = ("id", "x", "y", "kind", "jobIds")
 
 
+def pick(obj, fields):
+    return {k: obj[k] for k in fields if k in obj}
+
+
 def die(msg):
     print("✗ " + msg)
     sys.exit(1)
-
-
-def pick(obj, fields):
-    return {k: obj[k] for k in fields if k in obj}
 
 
 def main():

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DVI Tools（核心主干）
 // @namespace    dvi.tools
-// @version      2026.10.03.9
+// @version      2026.10.03.10
 // @description  Deep Vein Idle 增强工具集的核心主干：静态数据、计算引擎、状态归约、事件总线、UI 框架与插件注册表。本身不含业务功能，只读，不发送任何游戏指令。
 // @author       -
 // @match        https://deepveinidle.com/*
@@ -37,7 +37,7 @@
   'use strict';
 
   const NS = 'DVI';
-  const VERSION = '2026.10.03.9';   // 与文件头 @version 保持一致
+  const VERSION = '2026.10.03.10';   // 与文件头 @version 保持一致
   const API_VERSION = 1;
 
   /* ═══ 沙箱与页面窗口的桥接 ═══
@@ -2014,6 +2014,82 @@
   });
 
   /* --- 运行日志：出问题时直接导出，不用翻控制台 --- */
+  /* --- 价格快照：直接喂给利润网站 ---
+   *
+   * 为什么需要：DVI 没有公开的价格接口（bundle 里一个外部 URL 都没有），
+   * 价格只存在于游戏内的 WebSocket。所以**必须有人开着游戏抓一次**。
+   * 抓完之后导出成 JSON，静态站就能用它算 —— 之后不登录也能用，
+   * 只是数据停留在快照那一刻。
+   *
+   * 抓取频率待实测：客户端没有任何 market 相关的轮询，
+   * 说明是服务端推送，但间隔没暴露在代码里。用下面那条「测推送频率」统计。
+   */
+  GM_registerMenuCommand('💰 导出价格快照（给利润网站）', () => {
+    const mk = s.market;
+    const out = {};
+    for (const [id, m] of mk) {
+      const row = {};
+      if (m.ask != null) row.a = { p: m.ask, q: m.askQty };
+      if (m.bid != null) row.b = { p: m.bid, q: m.bidQty };
+      if (m.ask != null || m.bid != null) out[id] = row;
+    }
+    const n = Object.keys(out).length;
+    if (!n) {
+      ui.toast('还没有任何市场数据 —— 打开游戏里的市场页面等几秒再试');
+      return;
+    }
+    const payload = {
+      _note: 'DVI 价格快照。由 dvi-tools 从游戏内 WebSocket 抓取。',
+      toolVersion: VERSION,
+      at: new Date().toISOString(),
+      count: n,
+      market: out,
+    };
+    const name = `dvi-prices-${new Date().toISOString().slice(0, 10)}.json`;
+    if (ui.downloadText(JSON.stringify(payload, null, 1), name, 'application/json')) {
+      ui.toast(`已导出 ${n} 个物品的价格，放到 web/public/data/ 后重新部署即可`);
+    } else {
+      console.info('[DVI] 价格快照', payload);
+      ui.toast('导出失败，已打到控制台');
+    }
+  });
+
+  GM_registerMenuCommand('⏱ 测市场推送频率（跑 1 分钟）', () => {
+    const buckets = {};
+    const times = [];
+    const t0 = Date.now();
+    // 市场消息统一从 EVT.MARKET 抛出，载荷是 { type, data }
+    const onMsg = (e) => {
+      const k = (e && e.type) || 'unknown';
+      buckets[k] = (buckets[k] || 0) + 1;
+      times.push(Date.now() - t0);
+    };
+    bus.on(EVT.MARKET, onMsg);
+    ui.toast('开始记录，60 秒后自动出结果');
+    setTimeout(() => {
+      bus.off(EVT.MARKET, onMsg);
+      const total = times.length;
+      if (!total) { ui.toast('60 秒内一条市场消息都没有 —— 请先打开游戏里的市场页面'); return; }
+      const gaps = [];
+      for (let i = 1; i < times.length; i++) gaps.push(times[i] - times[i - 1]);
+      gaps.sort((a, b) => a - b);
+      const med = gaps[Math.floor(gaps.length / 2)] || 0;
+      const lines = [
+        `记录时长 ${(times[times.length - 1] / 1000).toFixed(0)} 秒，共 ${total} 条市场消息`,
+        ...Object.entries(buckets).filter(([, v]) => v).map(([k, v]) => `  ${k}: ${v}`),
+        `相邻间隔 中位数 ${med} ms · 最小 ${gaps[0] ?? '-'} ms · 最大 ${gaps[gaps.length - 1] ?? '-'} ms`,
+        med ? `→ 约每 ${(med / 1000).toFixed(1)} 秒收到一次市场推送` : '',
+      ].filter(Boolean);
+      const text = lines.join('\n');
+      if (ui.downloadText(text, `dvi-market-rate-${Date.now()}.txt`, 'text/plain')) {
+        ui.toast('推送频率已导出');
+      } else {
+        alert(text);
+      }
+      console.info('[DVI] 市场推送频率', { buckets, median: med, samples: total });
+    }, 60000);
+  });
+
   GM_registerMenuCommand('📄 保存运行日志（下载 txt）', () => {
     const text = DIAG.text();
     const name = `dvi-log-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '')}.txt`;

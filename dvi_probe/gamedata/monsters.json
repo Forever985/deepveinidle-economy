@@ -135,9 +135,10 @@
   ],
   "bonus": {
    "itemId": 207,
-   "chance": 0.003
+   "chance": 0.0015
   },
-  "drop": 249
+  "drop": 249,
+  "dropChance": 0.5
  },
  {
   "id": 8,
@@ -195,9 +196,10 @@
   ],
   "bonus": {
    "itemId": 215,
-   "chance": 0.0022
+   "chance": 0.0011
   },
-  "drop": 248
+  "drop": 248,
+  "dropChance": 0.5
  },
  {
   "id": 11,
@@ -210,14 +212,15 @@
   "speed": 5,
   "xp": 2000,
   "gold": [
-   1815,
-   3371
+   1509,
+   2802
   ],
   "bonus": {
    "itemId": 216,
-   "chance": 0.003
+   "chance": 0.0015
   },
-  "drop": 250
+  "drop": 250,
+  "dropChance": 0.5
  },
  {
   "id": 12,
@@ -230,14 +233,15 @@
   "speed": 5,
   "xp": 2800,
   "gold": [
-   2655,
-   4932
+   1724,
+   3202
   ],
   "bonus": {
    "itemId": 217,
-   "chance": 0.0035
+   "chance": 0.00175
   },
-  "drop": 251
+  "drop": 251,
+  "dropChance": 0.5
  },
  {
   "id": 13,
@@ -250,14 +254,15 @@
   "speed": 6,
   "xp": 4000,
   "gold": [
-   4120,
-   7651
+   2012,
+   3736
   ],
   "bonus": {
    "itemId": 218,
-   "chance": 0.004
+   "chance": 0.002
   },
-  "drop": 252
+  "drop": 252,
+  "dropChance": 0.5
  },
  {
   "id": 14,
