@@ -164,8 +164,9 @@ const spreads = computed(() => {
       <template v-else>
         <b>还没有任何价格数据</b>，当前全部使用兜底价（物品基础价值）。
         <div style="margin-top:4px;font-size:12px">
-          在游戏里打开油猴菜单 → <b>「🔗 连接价格文件」</b>选一个位置保存，
-          之后每次刷新页面与每小时都会自动写入；本站点下面的「连接」选同一个文件即可。
+          <b>主通路</b>：在游戏里点油猴菜单 → <b>「📤 送到利润网站」</b>，
+          浏览器会自动打开本站并把价格带过来（之后本站一直用这一份）。<br>
+          <b>想手动来</b>：游戏里点「💾 下载价格文件」，再把文件<b>拖到本页任意位置</b>。
         </div>
       </template>
     </div>
@@ -173,6 +174,11 @@ const spreads = computed(() => {
     <div class="card">
       <h3>其他接入方式</h3>
       <div class="entries">
+        <div class="entry">
+          <div class="t">① 拖放文件</div>
+          <p>把 <code>dvi-prices.json</code> <b>直接拖到页面任意位置</b>。无需任何授权。</p>
+          <div class="acts"><span class="muted">游戏里「💾 下载价格文件」后再拖进来</span></div>
+        </div>
         <div class="entry">
           <div class="t">② 粘贴 JSON</div>
           <p>把快照内容贴进文本框。</p>
